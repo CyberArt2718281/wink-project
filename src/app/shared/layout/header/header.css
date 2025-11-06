@@ -1,0 +1,49 @@
+/* Улучшенные стили для header и бургер-меню */
+header {
+  transition: box-shadow 0.2s;
+}
+
+@media (max-width: 768px) {
+  .active-link {
+    border-bottom: none;
+    background: #e0e7ff;
+    border-radius: 0.5rem;
+    padding: 0.25rem 0.5rem;
+  }
+}
+
+.fixed {
+  position: fixed;
+}
+.animate-fade-in {
+  animation: fade-in 0.25s ease;
+}
+
+/* Для плавного затемнения подложки */
+.bg-black\/30 {
+  background-color: rgba(0,0,0,0.3);
+  transition: background 0.2s;
+}
+
+
+
+
+.active-link {
+  color: #2563eb !important;
+  font-weight: 600;
+  border-bottom: 2px solid #2563eb;
+}
+@keyframes slide-fade-in {
+  from { opacity: 0; transform: translateY(-16px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes slide-fade-out {
+  from { opacity: 1; transform: translateY(0) scale(1); }
+  to { opacity: 0; transform: translateY(-16px) scale(0.98); }
+}
+.animate-slide-fade-in {
+  animation: slide-fade-in 0.3s cubic-bezier(.4,0,.2,1);
+}
+.animate-slide-fade-out {
+  animation: slide-fade-out 0.3s cubic-bezier(.4,0,.2,1);
+}

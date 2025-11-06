@@ -1,0 +1,33 @@
+<header class="w-full bg-white shadow-md py-4 px-4 md:px-8 flex items-center justify-between sticky top-0 z-40">
+  <div class="flex items-center gap-2">
+    <svg class="w-9 h-9 text-blue-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="10" />
+      <path stroke-linecap="round" stroke-linejoin="round" d="M8 12h4v4" />
+    </svg>
+    <span class="text-xl font-bold text-blue-600">Wink Project</span>
+  </div>
+  <!-- Desktop nav -->
+  <nav class="hidden md:flex gap-6">
+    <a routerLink="/upload" routerLinkActive="active-link" [routerLinkActiveOptions]="{ exact: true }" class="text-gray-700 hover:text-blue-500 font-medium transition">Загрузка</a>
+    <a routerLink="/table" routerLinkActive="active-link" [routerLinkActiveOptions]="{ exact: true }" class="text-gray-700 hover:text-blue-500 font-medium transition">Таблица</a>
+    <a routerLink="/export" routerLinkActive="active-link" [routerLinkActiveOptions]="{ exact: true }" class="text-gray-700 hover:text-blue-500 font-medium transition">Экспорт</a>
+  </nav>
+  <!-- Burger for mobile -->
+  <div class="md:hidden relative">
+    <button class="p-2 rounded cursor-pointer focus:outline-none focus:ring-0 focus:border-0" (click)="toggleMenu()" aria-label="Открыть меню" aria-expanded="{{menuOpen}}">
+      @if (!menuOpen) {
+        <svg class="w-8 h-8 text-blue-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+      } @else {
+        <svg class="w-8 h-8 text-blue-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+      }
+    </button>
+    @if (menuOpen) {
+      <div class="fixed inset-0 bg-black/30 z-40 transition-opacity duration-300" [class.opacity-0]="!menuOpen" [class.opacity-100]="menuOpen" (click)="closeMenu()"></div>
+      <div class="absolute right-0 top-12 bg-white shadow-lg rounded-xl py-4 px-6 flex flex-col gap-4 z-50 w-56 animate-slide-fade-in" [class.animate-slide-fade-out]="!menuOpen">
+        <a routerLink="/upload" routerLinkActive="active-link" [routerLinkActiveOptions]="{ exact: true }" class="text-gray-700 hover:text-blue-500 font-medium transition py-1" (click)="closeMenu()" style="padding: 0.25rem 0.5rem;">Загрузка</a>
+        <a routerLink="/table" routerLinkActive="active-link" [routerLinkActiveOptions]="{ exact: true }" class="text-gray-700 hover:text-blue-500 font-medium transition py-1" (click)="closeMenu()" style="padding: 0.25rem 0.5rem;">Таблица</a>
+        <a routerLink="/export" routerLinkActive="active-link" [routerLinkActiveOptions]="{ exact: true }" class="text-gray-700 hover:text-blue-500 font-medium transition py-1" (click)="closeMenu()" style="padding: 0.25rem 0.5rem;">Экспорт</a>
+      </div>
+    }
+  </div>
+</header>
