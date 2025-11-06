@@ -1,13 +1,15 @@
-import {ChangeDetectorRef, Component, ElementRef, inject, ViewChild} from '@angular/core';
+import {ChangeDetectorRef, Component, ElementRef, inject, OnInit, ViewChild} from '@angular/core';
 import {Toast} from 'primeng/toast';
 import {ButtonModule} from 'primeng/button';
 import {MessageService} from 'primeng/api';
 import {ProgressBar} from 'primeng/progressbar';
+import {SettingsUpload} from './settings-upload/settings-upload';
+import {CommonModule} from '@angular/common';
 
 @Component({
   selector: 'app-file-upload',
   standalone: true,
-  imports: [Toast, ButtonModule, ProgressBar],
+  imports: [Toast, ButtonModule, ProgressBar, SettingsUpload, CommonModule],
   providers: [MessageService],
   styleUrls: ['./file-upload.component.css'],
   template: `
@@ -33,6 +35,16 @@ import {ProgressBar} from 'primeng/progressbar';
     <p-toast position="top-center" key="error" [baseZIndex]="6000"></p-toast>
     <div class="flex flex-col items-center justify-center min-h-[60vh] bg-gray-50 rounded-xl p-8">
       <h2 class="text-2xl font-bold mb-6 text-gray-800">Загрузка файла (PDF/DOCX)</h2>
+
+      <div class="mb-4 w-full flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span class="inline-block px-3 py-1 rounded-lg text-sm font-medium shadow-sm"
+                [ngStyle]="getPresetStyle(selectedOption)">
+            Пресет: <span class="font-bold">{{ getPresetLabel(selectedOption) }}</span>
+          </span>
+        </div>
+        <app-settings-upload (presetChange)="onPresetChange($event)"></app-settings-upload>
+      </div>
       <div
         class="w-full flex flex-col items-center justify-center h-40 border-2 border-dashed border-blue-400 rounded-xl cursor-pointer transition hover:border-blue-600 bg-white mb-4 relative"
         (drop)="onDrop($event)"
@@ -49,6 +61,7 @@ import {ProgressBar} from 'primeng/progressbar';
         <input #fileInput type="file" class="absolute inset-0 opacity-0 cursor-pointer file-upload__choose-input"
                (change)="onFileSelected($event)" accept=".pdf,.docx" [disabled]="visible"/>
       </div>
+
       <button class="mt-2 px-6 py-2 bg-blue-500 text-white rounded-lg shadow hover:bg-blue-600 transition font-semibold file-upload__choose-btn"
               (click)="triggerFileInput()" [disabled]="visible">Выбрать файл</button>
       @if (uploadedFile && !visible) {
@@ -65,7 +78,7 @@ import {ProgressBar} from 'primeng/progressbar';
   `,
   styles: []
 })
-export class FileUploadComponent {
+export class FileUploadComponent implements  OnInit{
   @ViewChild('fileInput') fileInput?: ElementRef<HTMLInputElement>;
   isDragOver = false;
   uploadedFile: File | null = null;
@@ -74,7 +87,7 @@ export class FileUploadComponent {
   visible: boolean = false;
   interval: any = null;
   error: string | null = null;
-
+  selectedOption: string | null = null;
   messageService = inject(MessageService);
   cdr = inject(ChangeDetectorRef);
 
@@ -91,7 +104,9 @@ export class FileUploadComponent {
     event.preventDefault();
     this.isDragOver = false;
   }
-
+  ngOnInit(){
+    this.selectedOption = localStorage.getItem('settings-upload-preset') || 'basic';
+  }
   onDrop(event: DragEvent) {
     event.preventDefault();
     this.isDragOver = false;
@@ -211,5 +226,32 @@ export class FileUploadComponent {
       {name: this.uploadedFile.name, elements: 'Моковые элементы'}
     ]));
     window.location.href = '/table';
+  }
+
+  getPresetLabel(preset: string | null): string {
+    switch (preset) {
+      case 'basic': return 'Базовый';
+      case 'advanced': return 'Расширенный';
+      case 'full': return 'Полный';
+      default: return 'Базовый';
+    }
+  }
+
+  getPresetStyle(preset: string | null): {[key: string]: string} {
+    switch (preset) {
+      case 'basic':
+        return { background: '#dbeafe', color: '#2563eb' };
+      case 'advanced':
+        return { background: '#fef9c3', color: '#ca8a04' };
+      case 'full':
+        return { background: '#dcfce7', color: '#22c55e' };
+      default:
+        return { background: '#dbeafe', color: '#2563eb' };
+    }
+  }
+
+  onPresetChange(preset: string) {
+    this.selectedOption = preset;
+    this.cdr.markForCheck();
   }
 }

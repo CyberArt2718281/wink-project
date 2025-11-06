@@ -7,7 +7,6 @@ import {RouterModule} from '@angular/router';
   selector: 'app-layout',
   imports: [Header, Footer, RouterModule],
   templateUrl: './layout.html',
-  styleUrl: './layout.css',
 })
 export class Layout {
 
