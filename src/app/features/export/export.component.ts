@@ -25,7 +25,7 @@ import {MessageService} from 'primeng/api';
           CSV
         </button>
       </div>
-      <p-toast position="top-center"></p-toast>
+      <p-toast position="top-center" class="w-full max-w-xs sm:max-w-md md:max-w-lg mx-auto"></p-toast>
     </div>
   `,
   styles: []
@@ -35,7 +35,6 @@ export class ExportComponent {
   private messageService = inject(MessageService);
 
   export(format: 'xlsx' | 'csv') {
-    // Получаем данные из localStorage
     const raw = localStorage.getItem('tableData');
     let scenes: { name: string; elements: string }[] = [];
     if (raw) {

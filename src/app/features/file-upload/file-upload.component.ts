@@ -13,9 +13,9 @@ import {CommonModule} from '@angular/common';
   providers: [MessageService],
   styleUrls: ['./file-upload.component.css'],
   template: `
-    <p-toast position="top-center" key="confirm" (onClose)="onClose()" [baseZIndex]="5000">
+    <p-toast position="top-center" key="confirm" (onClose)="onClose()" [baseZIndex]="5000" class="w-full max-w-xs sm:max-w-md md:max-w-lg mx-auto">
       <ng-template let-message #headless let-closeFn="closeFn">
-        <section class="flex flex-col p-4 gap-4 w-full bg-primary/70 rounded-xl">
+        <section class="flex flex-col p-4 gap-4 w-full max-w-xs sm:max-w-md md:max-w-lg bg-primary/70 rounded-xl mx-auto">
           <div class="flex items-center gap-5">
             <i class="pi pi-cloud-upload text-white dark:text-black text-2xl"></i>
             <span class="font-bold text-base text-white dark:text-black">{{ message.summary }}</span>
@@ -32,11 +32,11 @@ import {CommonModule} from '@angular/common';
         </section>
       </ng-template>
     </p-toast>
-    <p-toast position="top-center" key="error" [baseZIndex]="6000"></p-toast>
+    <p-toast position="top-center" key="error" [baseZIndex]="6000" style="width:100vw;max-width:360px;margin:0 auto;"></p-toast>
     <div class="flex flex-col items-center justify-center min-h-[60vh] bg-gray-50 rounded-xl p-8">
       <h2 class="text-2xl font-bold mb-6 text-gray-800">Загрузка файла (PDF/DOCX)</h2>
 
-      <div class="mb-4 w-full flex items-center justify-between">
+      <div class="mb-4 w-full flex flex-col items-center justify-between sm:flex-row">
         <div class="flex items-center gap-2">
           <span class="inline-block px-3 py-1 rounded-lg text-sm font-medium shadow-sm"
                 [ngStyle]="getPresetStyle(selectedOption)">

@@ -19,7 +19,6 @@ button[disabled] {
   transition: background 0.2s, border 0.2s, opacity 0.2s;
 }
 
-/* Курсор pointer для всех кнопок */
 button,
 .p-button,
 .file-upload__choose-btn {

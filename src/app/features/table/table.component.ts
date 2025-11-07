@@ -11,7 +11,7 @@ import {Toast} from 'primeng/toast';
   imports: [CommonModule, FormsModule, ButtonModule, Toast],
   providers: [ MessageService],
   template: `
-    <p-toast position="top-center"></p-toast>
+    <p-toast position="top-center" class="w-full max-w-xs sm:max-w-md md:max-w-lg mx-auto"></p-toast>
     <div class="flex flex-col items-center justify-center min-h-[60vh] bg-gray-50 rounded-xl  p-8">
       <h2 class="text-2xl font-bold mb-6 text-gray-800">Таблица данных</h2>
       <div class="overflow-x-auto w-full">
