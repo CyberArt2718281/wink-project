@@ -4,12 +4,13 @@ import {FormsModule} from '@angular/forms';
 import {MessageService} from 'primeng/api';
 import {ButtonModule} from 'primeng/button';
 import {Toast} from 'primeng/toast';
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'app-table',
   standalone: true,
   imports: [CommonModule, FormsModule, ButtonModule, Toast],
-  providers: [ MessageService],
+  providers: [ MessageService ],
   template: `
     <p-toast position="top-center" class="w-full max-w-xs sm:max-w-md md:max-w-lg mx-auto"></p-toast>
     <div class="flex flex-col items-center justify-center min-h-[60vh] bg-gray-50 rounded-xl  p-8">
@@ -61,6 +62,7 @@ export class TableComponent implements OnInit {
   editMessage: string | null = null;
   editDescription: string = '';
   messageService = inject(MessageService)
+  router = inject(Router)
   ngOnInit() {
     const saved = localStorage.getItem('tableData');
     if (saved) {
@@ -98,7 +100,6 @@ export class TableComponent implements OnInit {
   }
 
   goToExport() {
-    window.location.href = '/export';
+    this.router.navigate(['/export']);
   }
 }
-

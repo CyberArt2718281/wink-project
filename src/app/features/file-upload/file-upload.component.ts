@@ -5,6 +5,7 @@ import {MessageService} from 'primeng/api';
 import {ProgressBar} from 'primeng/progressbar';
 import {SettingsUpload} from './settings-upload/settings-upload';
 import {CommonModule} from '@angular/common';
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'app-file-upload',
@@ -90,6 +91,7 @@ export class FileUploadComponent implements  OnInit{
   selectedOption: string | null = null;
   messageService = inject(MessageService);
   cdr = inject(ChangeDetectorRef);
+  router = inject(Router);
 
   triggerFileInput() {
     this.fileInput?.nativeElement.click();
@@ -225,7 +227,7 @@ export class FileUploadComponent implements  OnInit{
     localStorage.setItem('tableData', JSON.stringify([
       {name: this.uploadedFile.name, elements: 'Моковые элементы'}
     ]));
-    window.location.href = '/table';
+    this.router.navigate(['/table']);
   }
 
   getPresetLabel(preset: string | null): string {
