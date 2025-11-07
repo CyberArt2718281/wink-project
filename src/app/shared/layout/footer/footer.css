@@ -1,0 +1,36 @@
+/* Современные стили для футера */
+.footer-modern {
+  font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+  box-shadow: 0 -2px 16px 0 rgba(0,0,0,0.04);
+  background: linear-gradient(to top, #f3f4f6 0%, #fff 100%);
+  border-top: 1px solid #e5e7eb;
+}
+.footer-modern svg {
+  vertical-align: middle;
+  margin-right: 0.25rem;
+}
+.footer-modern .text-gray-600 {
+  letter-spacing: 0.01em;
+}
+.footer-modern .text-gray-500 {
+  font-size: 0.95rem;
+}
+.footer-modern .text-gray-400 {
+  font-size: 0.92rem;
+}
+@media (max-width: 640px) {
+  .footer-modern {
+    padding: 1rem 0.5rem;
+    font-size: 0.92rem;
+  }
+  .footer-modern .flex {
+    flex-direction: column !important;
+    gap: 0.5rem !important;
+    align-items: center !important;
+  }
+  .footer-modern .text-gray-500,
+  .footer-modern .text-gray-400 {
+    text-align: center !important;
+    width: 100%;
+  }
+}

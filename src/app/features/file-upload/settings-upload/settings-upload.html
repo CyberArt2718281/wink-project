@@ -1,0 +1,29 @@
+<div class="settings-upload-container">
+  <p-button label="Настройки загрузки" severity="secondary" (click)="openModal()">
+    <i class="pi pi-cog mr-2"></i>
+  </p-button>
+  @if (modalOpen) {
+    <div class="settings-upload__modal-backdrop" (click)="closeModal()"></div>
+    <div class="settings-upload__modal">
+      <h3 class="settings-upload__modal-title">Выберите пресет загрузки</h3>
+      <form (ngSubmit)="saveSettings()" class="settings-upload__form">
+        <label class="settings-upload__label">
+          <input type="radio" name="preset" value="basic" [(ngModel)]="selectedPreset" />
+          Базовый
+        </label>
+        <label class="settings-upload__label">
+          <input type="radio" name="preset" value="advanced" [(ngModel)]="selectedPreset" />
+          Расширенный
+        </label>
+        <label class="settings-upload__label">
+          <input type="radio" name="preset" value="full" [(ngModel)]="selectedPreset" />
+          Полный
+        </label>
+        <div class="settings-upload__modal-actions">
+          <button type="submit" class="settings-upload__save-btn">Сохранить</button>
+          <button type="button" class="settings-upload__cancel-btn" (click)="closeModal()">Отмена</button>
+        </div>
+      </form>
+    </div>
+  }
+</div>
