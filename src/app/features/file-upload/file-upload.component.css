@@ -1,26 +1,102 @@
-/* Стили для задизейбленной кнопки "Выбрать файл" */
+/* Стили для задизейбленной кнопки "Выбрать файл" в стиле Wink */
 .file-upload__choose-btn:disabled,
 button[disabled] {
-  background-color: #a5b4fc !important; /* светло-синий, Tailwind indigo-300 */
-  color: #e5e7eb !important; /* Tailwind gray-200 */
+  background-color: #232323 !important; /* тёмно-серый Wink */
+  color: #666666 !important; /* серый текст */
   cursor: not-allowed !important;
-  opacity: 0.7 !important;
+  opacity: 0.6 !important;
   box-shadow: none !important;
-  border: none !important;
+  border: 1px solid #333333 !important;
   transition: background 0.2s, color 0.2s, opacity 0.2s;
 }
-.file-upload__choose-input:disabled, input[disabled] {
-  background-color: #e5e7eb !important; /* Tailwind gray-200 */
-  border: 1px solid #cbd5e1 !important; /* Tailwind gray-300 */
-  opacity: 0.6 !important;
+
+.file-upload__choose-input:disabled,
+input[disabled] {
+  background-color: #1A1A1A !important; /* тёмный фон Wink */
+  border: 1px solid #232323 !important; /* тёмно-серая граница */
+  opacity: 0.5 !important;
   cursor: not-allowed !important;
   box-shadow: none !important;
   outline: none !important;
   transition: background 0.2s, border 0.2s, opacity 0.2s;
 }
 
+/* Стили для активных состояний */
 button,
 .p-button,
 .file-upload__choose-btn {
   cursor: pointer !important;
+  transition: all 0.3s ease !important;
 }
+
+/* Ховер эффекты для активных кнопок */
+.file-upload__choose-btn:not(:disabled):hover {
+  background-color: #FF8533 !important; /* более светлый оранжевый при ховере */
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(255, 102, 0, 0.3) !important;
+}
+/* Более агрессивное скрытие текста файлового инпута */
+.file-upload__choose-input {
+  color: transparent !important;
+  font-size: 0 !important;
+  line-height: 0 !important;
+}
+
+.file-upload__choose-input::file-selector-button {
+  display: none !important;
+  visibility: hidden !important;
+  width: 0 !important;
+  height: 0 !important;
+  opacity: 0 !important;
+}
+
+.file-upload__choose-input::-webkit-file-upload-button {
+  display: none !important;
+  visibility: hidden !important;
+  width: 0 !important;
+  height: 0 !important;
+  opacity: 0 !important;
+}
+
+/* Скрываем любой текст в инпуте */
+.file-upload__choose-input::-webkit-input-placeholder {
+  color: transparent !important;
+}
+
+.file-upload__choose-input::-moz-placeholder {
+  color: transparent !important;
+}
+
+.file-upload__choose-input:-ms-input-placeholder {
+  color: transparent !important;
+}
+
+.file-upload__choose-input:-moz-placeholder {
+  color: transparent !important;
+}
+
+
+/* Убедитесь, что input не блокирует клики */
+.file-upload__choose-input:disabled {
+  cursor: not-allowed;
+}
+
+:host ::ng-deep .file-upload__choose-input:disabled {
+  cursor: not-allowed !important;
+}
+
+/* Стили для disabled состояния */
+.cursor-not-allowed {
+  cursor: not-allowed !important;
+}
+
+.opacity-60 {
+  opacity: 0.6;
+}
+
+/* Отключение hover эффектов для disabled элементов */
+button:disabled:hover {
+  transform: none !important;
+  box-shadow: none !important;
+}
+

@@ -1,0 +1,43 @@
+
+:host ::ng-deep {
+  .p-datatable .p-datatable-tbody > tr {
+    transition: background-color 0.2s;
+
+    &:hover {
+      background-color: #f8f9fa !important;
+    }
+
+    &.p-highlight {
+      background-color: #e3f2fd !important;
+    }
+  }
+
+  .p-button-sm {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.875rem;
+  }
+
+  .p-sortable-column:not(.p-sortable-disabled):hover {
+    background-color: #f8f9fa;
+  }
+
+  .p-sortable-column.p-highlight {
+    background-color: #e3f2fd;
+
+    &:hover {
+      background-color: #d1e7fd;
+    }
+  }
+
+  .p-dropdown-panel {
+    min-width: 100% !important;
+  }
+
+  .p-multiselect-panel {
+    min-width: 100% !important;
+  }
+}
+
+.bg-blue-50 {
+  background-color: #eff6ff;
+}

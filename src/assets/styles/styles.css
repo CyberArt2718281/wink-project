@@ -1,9 +1,14 @@
 @import "tailwindcss";
 @import 'primeicons/primeicons.css';
+
+
 :root {
-  --toast-text: #111;
+  --toast-text: #fff;
 }
 
 .p-toast .p-toast-message .p-toast-detail {
-  color: var(--toast-text) !important;
+  color: var(--toast-text) ;
+}
+button{
+  cursor: pointer;
 }

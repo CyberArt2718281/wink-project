@@ -34,4 +34,6 @@ export class SettingsUpload {
     this.presetChange.emit(this.selectedPreset);
     this.closeModal();
   }
+
+
 }

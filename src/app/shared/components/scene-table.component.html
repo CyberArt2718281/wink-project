@@ -1,0 +1,330 @@
+<p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>
+
+<div class="bg-black min-h-screen p-4 sm:p-6">
+  <!-- Заголовок и управление -->
+  <div class="bg-[#1A1A1A] border border-[#232323] rounded-xl p-6 mb-6 lg:mb-8">
+    <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
+      <div class="flex-1">
+        <div class="flex items-center gap-3 mb-3">
+          <div class="w-2 h-8 bg-[#FF6600] rounded-full"></div>
+          <h1 class="text-2xl sm:text-3xl font-bold text-white">
+            Таблица сцен
+          </h1>
+        </div>
+        <p class="text-gray-400 text-sm sm:text-base ml-5">
+          Централизованное управление всеми сценами проекта. Отслеживайте прогресс,
+          распределяйте бюджет и контролируйте статусы выполнения.
+        </p>
+      </div>
+      <div class="bg-[#232323] rounded-lg px-4 py-3 border border-[#333333]">
+        <div class="text-center">
+          <div class="text-[#FF6600] font-bold text-lg">{{ totalItems }}</div>
+          <div class="text-gray-400 text-xs">всего сцен</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 gap-4">
+    <div class="flex-1 min-w-0">
+      <h2 class="text-2xl sm:text-3xl font-bold text-white mb-2">{{ production.title }}</h2>
+      <div class="flex flex-wrap gap-4 text-gray-400 text-sm sm:text-base">
+        <span class="flex items-center gap-1">
+          <i class="pi pi-user"></i>
+          Режиссер: {{ production.director }}
+        </span>
+        <span class="flex items-center gap-1">
+          <i class="pi pi-dollar"></i>
+          Бюджет: {{ production.totalBudget | currency:'USD':'symbol':'1.0-0' }}
+        </span>
+      </div>
+    </div>
+    <div class="flex flex-wrap gap-2 w-full lg:w-auto">
+      <p-button icon="pi pi-file-excel" label="Excel" (click)="exportExcel()"
+                styleClass="!bg-[#1A1A1A] !border !border-[#232323] !text-gray-300 hover:!bg-[#FF6600] hover:!border-[#FF6600] hover:!text-white transition-all duration-200"/>
+      <p-button icon="pi pi-file" label="CSV" (click)="exportCSV()"
+                styleClass="!bg-[#1A1A1A] !border !border-[#232323] !text-gray-300 hover:!bg-[#FF6600] hover:!border-[#FF6600] hover:!text-white transition-all duration-200"/>
+      <p-button icon="pi pi-plus" label="Добавить" (click)="showAddDialog()"
+                styleClass="!bg-[#FF6600] !border-[#FF6600] !text-white hover:!bg-[#FF8533] hover:!border-[#FF8533] transition-all duration-200"/>
+      <p-button icon="pi pi-filter" label="Сбросить" (click)="clearFilters()"
+                styleClass="!bg-[#232323] !border-[#232323] !text-gray-300 hover:!bg-[#FF6600] hover:!border-[#FF6600] hover:!text-white transition-all duration-200"/>
+    </div>
+  </div>
+
+  <!-- Фильтры -->
+  <div class="flex flex-col lg:flex-row gap-4 mb-6 p-4 bg-[#1A1A1A] border border-[#232323] rounded-xl">
+    <div class="flex-1">
+      <label class="block text-sm font-medium mb-2 text-white">Категория</label>
+      <p-multiSelect
+        [options]="categoryOptions"
+        [(ngModel)]="selectedCategories"
+        optionLabel="label"
+        placeholder="Все категории"
+        (onChange)="onFilterChange()"
+        class="w-full"
+        styleClass="!bg-[#0A0A0A] !border-[#232323] !text-white [&_.p-multiselect-label]:!text-gray-300">
+      </p-multiSelect>
+    </div>
+    <div class="flex-1">
+      <label class="block text-sm font-medium mb-2 text-white">Статус</label>
+      <p-multiSelect
+        [options]="statusOptions"
+        [(ngModel)]="selectedStatuses"
+        optionLabel="label"
+        placeholder="Все статусы"
+        (onChange)="onFilterChange()"
+        class="w-full"
+        styleClass="!bg-[#0A0A0A] !border-[#232323] !text-white [&_.p-multiselect-label]:!text-gray-300">
+      </p-multiSelect>
+    </div>
+    <div class="flex-1">
+      <label class="block text-sm font-medium mb-2 text-white">Поиск</label>
+      <p-iconField class="w-full">
+        <p-inputIcon>
+          <i class="pi pi-search text-gray-400"></i>
+        </p-inputIcon>
+        <input
+          pInputText
+          [(ngModel)]="searchText"
+          (input)="onSearchChange()"
+          placeholder="Поиск по названию, контакту..."
+          class="w-full !bg-[#0A0A0A] !border-[#232323] !text-white placeholder:!text-gray-500"/>
+      </p-iconField>
+    </div>
+  </div>
+
+  <!-- Статистика по категориям -->
+  <div class="mb-6">
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-3">
+      <div *ngFor="let category of categoryStats"
+           class="p-3 rounded-xl text-center cursor-pointer border-none transition-all duration-200 hover:scale-105 hover:border-[#FF6600]"
+           [style.background]="getCategoryStyle(category.name).background"
+           (click)="filterByCategory(category.name)"
+           [title]="'Нажмите для фильтрации по ' + category.label">
+        <div class="text-xs sm:text-sm font-medium text-white">{{ category.label }}</div>
+        <div class="text-lg font-bold text-white mt-1">{{ category.count }}</div>
+        <div class="text-xs text-gray-300 mt-1">{{ category.totalCost | currency:'USD':'symbol':'1.0-0' }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Таблица -->
+  <div class="bg-[#1A1A1A] border border-[#232323] rounded-xl overflow-hidden">
+    <p-table
+      #dt
+      [value]="filteredItems"
+      [paginator]="true"
+      [rows]="10"
+      [rowsPerPageOptions]="[5, 10, 20, 50]"
+      [globalFilterFields]="['name', 'contact', 'category']"
+      selectionMode="single"
+      [(selection)]="selectedItem"
+      dataKey="id"
+      [totalRecords]="totalRecords"
+      currentPageReportTemplate="Показано {first} - {last} из {totalRecords} элементов"
+      [loading]="loading"
+      sortMode="multiple"
+      styleClass="custom-table">
+
+      <ng-template #header>
+        <tr class="bg-[#232323] border-b border-[#333333]">
+          <th pSortableColumn="name" class="!border-[#333333] !text-white">
+            <div class="flex items-center gap-2">
+              <i class="pi pi-tag text-[#FF6600]"></i>
+              <span class="font-semibold">Название</span>
+              <p-sortIcon field="name" class="!text-[#FF6600]"/>
+            </div>
+          </th>
+          <th pSortableColumn="category" class="!border-[#333333] !text-white">
+            <div class="flex items-center gap-2">
+              <i class="pi pi-folder text-[#FF6600]"></i>
+              <span class="font-semibold">Категория</span>
+              <p-sortIcon field="category" class="!text-[#FF6600]"/>
+            </div>
+          </th>
+          <th pSortableColumn="cost" class="!border-[#333333] !text-white">
+            <div class="flex items-center gap-2">
+              <i class="pi pi-dollar text-[#FF6600]"></i>
+              <span class="font-semibold">Стоимость</span>
+              <p-sortIcon field="cost" class="!text-[#FF6600]"/>
+            </div>
+          </th>
+          <th pSortableColumn="status" class="!border-[#333333] !text-white">
+            <div class="flex items-center gap-2">
+              <i class="pi pi-info-circle text-[#FF6600]"></i>
+              <span class="font-semibold">Статус</span>
+              <p-sortIcon field="status" class="!text-[#FF6600]"/>
+            </div>
+          </th>
+          <th pSortableColumn="contact" class="!border-[#333333] !text-white">
+            <div class="flex items-center gap-2">
+              <i class="pi pi-phone text-[#FF6600]"></i>
+              <span class="font-semibold">Контакт</span>
+              <p-sortIcon field="contact" class="!text-[#FF6600]"/>
+            </div>
+          </th>
+          <th class="!border-[#333333] !text-white">
+            <div class="flex items-center gap-2">
+              <i class="pi pi-cog text-[#FF6600]"></i>
+              <span class="font-semibold">Действия</span>
+            </div>
+          </th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-item let-rowIndex="rowIndex">
+        <tr [pSelectableRow]="item" class="border-b border-[#232323] hover:bg-[#232323] transition-colors duration-200">
+          <td class="!border-[#232323]">
+            <div class="flex items-center gap-3">
+              <i [class]="getCategoryIcon(item.category)"
+                 [style.color]="getCategoryStyle(item.category).background"
+                 class="text-lg"></i>
+              <div>
+                <div class="font-medium text-white">{{ item.name }}</div>
+                <div class="text-xs text-gray-400">ID: {{ item.id }}</div>
+              </div>
+            </div>
+          </td>
+          <td class="!border-[#232323]">
+            <p-tag [value]="getCategoryLabel(item.category)"
+                   [style]="getCategoryStyle(item.category)"
+                   styleClass="!border-0 !font-semibold"/>
+          </td>
+          <td class="!border-[#232323]">
+            <div class="flex items-center gap-2">
+              <span class="font-bold text-[#FF6600]">{{ item.cost | currency:'USD':'symbol':'1.0-0' }}</span>
+              <i class="pi pi-info-circle text-[#FF8533] cursor-pointer hover:text-[#FF6600] transition-colors"
+                 [title]="'Бюджет категории: ' + (getCategoryBudget(item.category) | currency:'USD':'symbol':'1.0-0')"></i>
+            </div>
+          </td>
+          <td class="!border-[#232323]">
+            <p-tag [value]="getStatusLabel(item.status)"
+                   [style]="getStatusStyle(item.status)"
+                   styleClass="!border-0 !font-semibold"/>
+          </td>
+          <td class="!border-[#232323]">
+            <div class="flex items-center gap-2">
+              <i class="pi pi-user text-gray-500"></i>
+              <span class="text-sm text-gray-300" [class.text-gray-500]="!item.contact">
+                {{ item.contact || 'Не указан' }}
+              </span>
+            </div>
+          </td>
+          <td class="!border-[#232323]">
+            <div class="flex gap-2">
+              <p-button icon="pi pi-pencil"
+                        styleClass="p-button-rounded !bg-[#FF6600] !border-[#FF6600] !text-white hover:!bg-[#232323] hover:!border-[#232323] hover:!text-white transition-all duration-200"
+                        (click)="editItem(item)"
+                        title="Редактировать"/>
+              <p-button icon="pi pi-trash"
+                        styleClass="p-button-rounded !bg-[#FF4444] !border-[#FF4444] !text-white hover:!bg-[#232323] hover:!border-[#232323] hover:!text-white transition-all duration-200"
+                        (click)="confirmDelete(item)"
+                        title="Удалить"/>
+              <p-button *ngIf="item.status !== 'completed'"
+                        icon="pi pi-check"
+                        styleClass="p-button-rounded !bg-[#00CC66] !border-[#00CC66] !text-white hover:!bg-[#232323] hover:!border-[#232323] hover:!text-white transition-all duration-200"
+                        (click)="markAsCompleted(item)"
+                        title="Отметить как завершено"/>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="6" class="text-center p-8">
+            <div class="flex flex-col items-center justify-center text-gray-500">
+              <i class="pi pi-inbox text-4xl mb-2 text-gray-600"></i>
+              <div class="text-lg text-gray-400">Элементы не найдены</div>
+              <p class="text-sm mt-1 text-gray-500">Попробуйте изменить параметры фильтрации</p>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="summary">
+        <div class="flex flex-col lg:flex-row justify-between items-center p-4 bg-[#232323] border-t border-[#333333]">
+          <div class="text-sm text-gray-300 mb-2 lg:mb-0">
+            Общая стоимость отфильтрованных элементов:
+            <span class="font-bold text-[#FF6600]">{{ totalCost | currency:'USD':'symbol':'1.0-0' }}</span>
+          </div>
+          <div class="text-sm text-gray-300">
+            Элементов: {{ totalItems }} | Подтверждено: {{ confirmedCount }} | Завершено: {{ completedCount }}
+          </div>
+        </div>
+      </ng-template>
+    </p-table>
+  </div>
+</div>
+
+<!-- Диалог добавления/редактирования -->
+<p-dialog
+  header="{{ editingItem ? 'Редактировать элемент' : 'Добавить элемент' }}"
+  [(visible)]="showDialog"
+  [style]="{ width: '500px' }"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [contentStyle]="{ 'overflow': 'visible' }"
+  styleClass="custom-dialog">
+
+  <div class="grid gap-4" *ngIf="formItem">
+    <div>
+      <label class="block text-sm font-medium mb-2 text-white">Название *</label>
+      <input pInputText [(ngModel)]="formItem.name"
+             class="w-full !bg-[#1A1A1A] !border-[#232323] !text-white placeholder:!text-gray-500"
+             placeholder="Введите название элемента"/>
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium mb-2 text-white">Категория *</label>
+      <p-select
+        [options]="categoryOptions"
+        [(ngModel)]="formItem.category"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="Выберите категорию"
+        styleClass="!bg-[#1A1A1A] !border-[#232323] !text-white [&_.p-dropdown-label]:!text-gray-300">
+      </p-select>
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium mb-2 text-white">Стоимость ($) *</label>
+      <input pInputText type="number" [(ngModel)]="formItem.cost"
+             class="w-full !bg-[#1A1A1A] !border-[#232323] !text-white placeholder:!text-gray-500"
+             placeholder="0" min="0"/>
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium mb-2 text-white">Статус *</label>
+      <p-select
+        [options]="statusOptions"
+        [(ngModel)]="formItem.status"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="Выберите статус"
+        styleClass="!bg-[#1A1A1A] !border-[#232323] !text-white [&_.p-dropdown-label]:!text-gray-300">
+      </p-select>
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium mb-2 text-white">Контакт</label>
+      <input pInputText [(ngModel)]="formItem.contact"
+             class="w-full !bg-[#1A1A1A] !border-[#232323] !text-white placeholder:!text-gray-500"
+             placeholder="Введите контактную информацию"/>
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <div class="flex justify-between w-full">
+      <p-button label="Отмена" icon="pi pi-times" (click)="showDialog = false"
+                styleClass="!bg-[#232323] !border-[#232323] !text-gray-300 hover:!bg-[#FF6600] hover:!border-[#FF6600] hover:!text-white transition-all duration-200"/>
+      <p-button
+        label="{{ editingItem ? 'Обновить' : 'Добавить' }}"
+        icon="pi pi-check"
+        (click)="saveItem()"
+        [disabled]="!isFormValid()"
+        styleClass="!bg-[#FF6600] !border-[#FF6600] !text-white hover:!bg-[#FF8533] hover:!border-[#FF8533] transition-all duration-200"/>
+    </div>
+  </ng-template>
+</p-dialog>
