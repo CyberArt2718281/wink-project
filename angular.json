@@ -25,13 +25,15 @@
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "css",
             "assets": [
+              "src/assets/favicon.ico",
+              "src/assets",
               {
                 "glob": "**/*",
-                "input": "public"
+                "input": "src/assets/i18n",
+                "output": "/assets/i18n/"
               }
             ],
             "styles": [
-
               "src/assets/styles/styles.css"
             ]
           },

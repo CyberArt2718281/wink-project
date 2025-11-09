@@ -4,15 +4,16 @@ import {SettingsUpload} from './settings-upload/settings-upload';
 import {CommonModule} from '@angular/common';
 import {Router} from '@angular/router';
 import {SharedModule} from '../../shared/shared-module';
+import {TranslateModule, TranslateService} from '@ngx-translate/core';
+import {LanguageService} from '../../core/language.service';
 
 @Component({
   selector: 'app-file-upload',
   standalone: true,
-  imports: [SharedModule, SettingsUpload, CommonModule],
+  imports: [SharedModule, SettingsUpload, CommonModule, TranslateModule],
   providers: [MessageService],
   styleUrls: ['./file-upload.component.css'],
   templateUrl: './file-upload.component.html',
-
 })
 export class FileUploadComponent implements OnInit, OnDestroy {
   @ViewChild('fileInput') fileInput?: ElementRef<HTMLInputElement>;
@@ -29,6 +30,27 @@ export class FileUploadComponent implements OnInit, OnDestroy {
   messageService = inject(MessageService);
   cdr = inject(ChangeDetectorRef);
   router = inject(Router);
+  languageService = inject(LanguageService);
+  translate = inject(TranslateService);
+
+  constructor() {
+    this.languageService.getLanguage$().subscribe(lang => {
+      this.translate.use(lang);
+      // Если тост активен, обновить summary
+      if (this.visible && !this.error) {
+        this.translate.get('UPLOAD.LOADING').subscribe((loadingText: string) => {
+          this.messageService.clear('confirm');
+          this.messageService.add({
+            key: 'confirm',
+            sticky: true,
+            severity: 'custom',
+            summary: loadingText,
+            styleClass: 'backdrop-blur-lg rounded-2xl'
+          });
+        });
+      }
+    });
+  }
 
   ngOnInit() {
     this.selectedOption = localStorage.getItem('settings-upload-preset') || 'basic';
@@ -79,17 +101,17 @@ export class FileUploadComponent implements OnInit, OnDestroy {
     ];
 
     if (!allowedTypes.includes(file.type)) {
-      this.showError('Файл должен быть в формате PDF или DOCX');
+      this.showError(this.translate.instant('UPLOAD.ERROR_TYPE'));
       return;
     }
 
     if (file.size > 20 * 1024 * 1024) {
-      this.showError('Файл слишком большой. Максимальный размер: 20MB');
+      this.showError(this.translate.instant('UPLOAD.ERROR_SIZE'));
       return;
     }
 
     if (!file.name.match(/\.(pdf|docx)$/i)) {
-      this.showError('Неверное расширение файла');
+      this.showError(this.translate.instant('UPLOAD.ERROR_EXTENSION'));
       return;
     }
 
@@ -101,14 +123,16 @@ export class FileUploadComponent implements OnInit, OnDestroy {
 
   showError(message: string) {
     this.error = message;
+    const errorTitle = this.translate.instant('UPLOAD.ERROR_TITLE');
     this.messageService.add({
       key: 'error',
       severity: 'error',
-      summary: 'Ошибка загрузки',
+      summary: errorTitle,
       detail: message,
-      life: 5000,
+      life: 3000,
       styleClass: 'bg-[#1A1A1A] text-white border border-[#FF6600]/20 rounded-xl backdrop-blur-lg text-sm'
     });
+    this.cdr.detectChanges();
     this.visible = false;
     this.uploadedFile = null;
     this.uploadedFileType = null;
@@ -120,7 +144,7 @@ export class FileUploadComponent implements OnInit, OnDestroy {
         key: 'confirm',
         sticky: true,
         severity: 'custom',
-        summary: 'Загрузка файла...',
+        summary: this.translate.instant('UPLOAD.LOADING'),
         styleClass: 'backdrop-blur-lg rounded-2xl'
       });
       this.visible = true;
@@ -174,13 +198,13 @@ export class FileUploadComponent implements OnInit, OnDestroy {
   getPresetLabel(preset: string | null): string {
     switch (preset) {
       case 'basic':
-        return 'Базовый';
+        return this.translate.instant('SETTINGS_UPLOAD.BASIC');
       case 'advanced':
-        return 'Расширенный';
+        return this.translate.instant('SETTINGS_UPLOAD.ADVANCED');
       case 'full':
-        return 'Полный';
+        return this.translate.instant('SETTINGS_UPLOAD.FULL');
       default:
-        return 'Базовый';
+        return this.translate.instant('SETTINGS_UPLOAD.BASIC');
     }
   }
 

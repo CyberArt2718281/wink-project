@@ -1,77 +1,127 @@
-<header class="w-full bg-black py-4 px-4 md:px-8 flex items-center justify-between sticky top-0 z-40 border-b border-gray-800">
+<header class="w-full bg-black py-4 px-4 md:px-8 flex items-center justify-between sticky top-0 z-40 border-b border-[#232323] backdrop-blur-sm bg-black/95">
   <!-- Логотип и название -->
   <div class="flex items-center gap-3">
-    <div class="w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center shadow-lg shadow-orange-500/20">
+    <div class="w-10 h-10 bg-[#FF6600] rounded-lg flex items-center justify-center shadow-lg shadow-[#FF6600]/30">
       <svg class="w-6 h-6 text-black" fill="currentColor" viewBox="0 0 24 24">
         <path d="M12 2C13.1 2 14 2.9 14 4C14 5.1 13.1 6 12 6C10.9 6 10 5.1 10 4C10 2.9 10.9 2 12 2ZM21 9V7L15 5.5V7H9V5.5L3 7V9L9 10.5V12L3 13.5V15.5L9 14V16L3 17.5V19.5L9 18V22H15V18L21 19.5V17.5L15 16V14L21 15.5V13.5L15 12V10.5L21 9Z"/>
       </svg>
     </div>
     <div>
-      <span class="text-xl font-bold text-white">Wink</span>
-      <span class="text-orange-500 font-semibold block text-sm -mt-1">Project</span>
+      <span class="text-xl font-bold text-white">{{ 'HEADER.TITLE' | translate }}</span>
+      <span class="text-[#FF6600] font-semibold block text-sm -mt-1">{{ 'HEADER.SUBTITLE' | translate }}</span>
     </div>
   </div>
 
   <!-- Desktop nav -->
   <nav class="hidden md:flex gap-8">
     <a routerLink="/upload"
-       routerLinkActive="text-orange-500"
+       routerLinkActive="text-[#FF6600]"
        [routerLinkActiveOptions]="{ exact: true }"
-       class="text-gray-300 hover:text-orange-500 font-medium transition-colors duration-200 relative group">
-      Загрузка
-      <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-orange-500 transition-all duration-200 group-hover:w-full"></span>
+       class="text-white hover:text-[#FF6600] font-medium transition-colors duration-200 relative group">
+      {{ 'HEADER.UPLOAD' | translate }}
+      <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-[#FF6600] transition-all duration-200 group-hover:w-full"
+            [class.w-full]="isRouteActive('/upload')"></span>
     </a>
     <a routerLink="/table"
-       routerLinkActive="text-orange-500"
+       routerLinkActive="text-[#FF6600]"
        [routerLinkActiveOptions]="{ exact: true }"
-       class="text-gray-300 hover:text-orange-500 font-medium transition-colors duration-200 relative group">
-      Таблица
-      <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-orange-500 transition-all duration-200 group-hover:w-full"></span>
+       class="text-white hover:text-[#FF6600] font-medium transition-colors duration-200 relative group">
+      {{ 'HEADER.TABLE' | translate }}
+      <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-[#FF6600] transition-all duration-200 group-hover:w-full"
+            [class.w-full]="isRouteActive('/table')"></span>
     </a>
-
   </nav>
 
-  <!-- Burger for mobile -->
-  <div class="md:hidden relative">
-    <button class="p-2 rounded-lg cursor-pointer focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-opacity-50 transition-all duration-200 hover:bg-gray-800"
-            (click)="toggleMenu()"
-            aria-label="Открыть меню"
-            aria-expanded="{{menuOpen}}">
-      @if (!menuOpen) {
-        <svg class="w-7 h-7 text-orange-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
-        </svg>
-      } @else {
-        <svg class="w-7 h-7 text-orange-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
-        </svg>
+  <!-- Правая часть: языковой селект и бургер -->
+  <div class="flex items-center gap-4">
+    <!-- Языковой селект -->
+    <div class="hidden md:block">
+      <p-select
+        [options]="languageOptions"
+        [(ngModel)]="selectedLanguage"
+        (onChange)="onLanguageChange($event)"
+        optionLabel="label"
+        [appendTo]="'body'"
+        styleClass="!bg-[#1A1A1A] !border-[#232323] !text-white [&_.p-dropdown-label]:!text-gray-300 [&_.p-dropdown-panel]:!bg-[#1A1A1A] [&_.p-dropdown-panel]:!border-[#232323] min-w-[100px]"
+        [dropdownIcon]="'pi pi-globe'">
+        <ng-template pTemplate="selectedItem">
+          <div class="flex items-center gap-2">
+            <i class="pi pi-globe text-[#FF6600] text-sm"></i>
+            <span class="text-white text-sm">{{ selectedLanguage.label }}</span>
+          </div>
+        </ng-template>
+        <ng-template let-language pTemplate="item">
+          <div class="flex items-center gap-2">
+            <i class="pi pi-globe text-[#FF6600] text-sm"></i>
+            <span class="text-white">{{ language.label }}</span>
+          </div>
+        </ng-template>
+      </p-select>
+    </div>
+
+    <!-- Burger for mobile -->
+    <div class="md:hidden relative">
+      <button class="p-2 rounded-lg cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#FF6600] focus:ring-opacity-50 transition-all duration-200 hover:bg-[#232323]"
+              (click)="toggleMenu()"
+              [attr.aria-label]="'HEADER.MENU' | translate"
+              [attr.aria-expanded]="menuOpen">
+        @if (!menuOpen) {
+          <svg class="w-7 h-7 text-[#FF6600]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
+          </svg>
+        } @else {
+          <svg class="w-7 h-7 text-[#FF6600]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        }
+      </button>
+
+      @if (menuOpen) {
+        <div class="absolute right-0 top-12 bg-[#1A1A1A] shadow-2xl rounded-xl py-4 px-6 flex flex-col gap-3 z-50 w-64 border border-[#232323] animate-slide-fade-in">
+          <!-- Мобильный языковой селект -->
+          <div class="mb-2">
+            <p-select
+              [options]="languageOptions"
+              [(ngModel)]="selectedLanguage"
+              (onChange)="onLanguageChange($event)"
+              optionLabel="label"
+              [appendTo]="'body'"
+              styleClass="!bg-[#232323] !border-[#333333] !text-white [&_.p-dropdown-label]:!text-gray-300 [&_.p-dropdown-panel]:!bg-[#1A1A1A] [&_.p-dropdown-panel]:!border-[#232323] w-full"
+              [dropdownIcon]="'pi pi-globe'">
+              <ng-template pTemplate="selectedItem">
+                <div class="flex items-center gap-2">
+                  <i class="pi pi-globe text-[#FF6600] text-sm"></i>
+                  <span class="text-white text-sm">{{ selectedLanguage.label }}</span>
+                </div>
+              </ng-template>
+              <ng-template let-language pTemplate="item">
+                <div class="flex items-center gap-2">
+                  <i class="pi pi-globe text-[#FF6600] text-sm"></i>
+                  <span class="text-white">{{ language.label }}</span>
+                </div>
+              </ng-template>
+            </p-select>
+          </div>
+
+          <!-- Навигационные ссылки -->
+          <a routerLink="/upload"
+             routerLinkActive="text-[#FF6600] bg-[#232323]"
+             [routerLinkActiveOptions]="{ exact: true }"
+             class="text-white hover:text-[#FF6600] hover:bg-[#232323] font-medium transition-all duration-200 rounded-lg px-3 py-2 flex items-center gap-2"
+             (click)="closeMenu()">
+            <i class="pi pi-upload text-sm"></i>
+            {{ 'HEADER.UPLOAD' | translate }}
+          </a>
+          <a routerLink="/table"
+             routerLinkActive="text-[#FF6600] bg-[#232323]"
+             [routerLinkActiveOptions]="{ exact: true }"
+             class="text-white hover:text-[#FF6600] hover:bg-[#232323] font-medium transition-all duration-200 rounded-lg px-3 py-2 flex items-center gap-2"
+             (click)="closeMenu()">
+            <i class="pi pi-table text-sm"></i>
+            {{ 'HEADER.TABLE' | translate }}
+          </a>
+        </div>
       }
-    </button>
-
-    @if (menuOpen) {
-      <div class="fixed inset-0 bg-black/50 z-40 transition-opacity duration-300"
-           [class.opacity-0]="!menuOpen"
-           [class.opacity-100]="menuOpen"
-           (click)="closeMenu()"></div>
-
-      <div class="absolute right-0 top-12 bg-[#1A1A1A] shadow-2xl rounded-xl py-4 px-6 flex flex-col gap-3 z-50 w-64 border border-[#232323] animate-slide-fade-in"
-           [class.animate-slide-fade-out]="!menuOpen">
-        <a routerLink="/upload"
-           routerLinkActive="text-[#FF6600] bg-[#232323]"
-           [routerLinkActiveOptions]="{ exact: true }"
-           class="text-white hover:text-[#FF6600] hover:bg-[#232323] font-medium transition-all duration-200 rounded-lg px-3 py-2"
-           (click)="closeMenu()">
-          Загрузка
-        </a>
-        <a routerLink="/table"
-           routerLinkActive="text-[#FF6600] bg-[#232323]"
-           [routerLinkActiveOptions]="{ exact: true }"
-           class="text-white hover:text-[#FF6600] hover:bg-[#232323] font-medium transition-all duration-200 rounded-lg px-3 py-2"
-           (click)="closeMenu()">
-          Таблица
-        </a>
-
-      </div>
-    }
+    </div>
   </div>
 </header>

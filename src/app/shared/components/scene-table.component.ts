@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, inject, OnInit} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {TableModule} from 'primeng/table';
 import {ButtonModule} from 'primeng/button';
@@ -15,6 +15,8 @@ import {ConfirmationService, MessageService} from 'primeng/api';
 import {ToastModule} from 'primeng/toast';
 import * as XLSX from 'xlsx';
 import {saveAs} from 'file-saver-es';
+
+import {TranslateModule, TranslateService} from '@ngx-translate/core';
 
 // Интерфейсы
 export interface FilmingItem {
@@ -63,11 +65,12 @@ export interface FilmingProduction {
     MultiSelectModule,
     SelectModule,
     ConfirmDialogModule,
-    ToastModule
+    ToastModule,
+    TranslateModule
   ],
   providers: [ConfirmationService, MessageService],
-  templateUrl: 'scene-table.component.html',
-  styleUrls: ['scene-table.component.css'],
+  templateUrl: './scene-table.component.html',
+  styleUrls: ['./scene-table.component.css'],
 })
 export class FilmingTableComponent implements OnInit {
   production: FilmingProduction = {
@@ -171,6 +174,8 @@ export class FilmingTableComponent implements OnInit {
     {label: 'Завершено', value: 'completed'}
   ];
 
+
+  translate = inject(TranslateService);
   constructor(
     private confirmationService: ConfirmationService,
     private messageService: MessageService
@@ -253,7 +258,11 @@ export class FilmingTableComponent implements OnInit {
     this.selectedStatuses = [];
     this.searchText = '';
     this.applyFilters();
-    this.messageService.add({severity: 'info', summary: 'Фильтры сброшены', detail: 'Все фильтры были очищены'});
+    this.messageService.add({
+      severity: 'info',
+      summary: this.translate.instant('SCENE_TABLE.RESET_FILTERS'),
+      detail: this.translate.instant('SCENE_TABLE.FILTERS_CLEARED')
+    });
   }
 
   filterByCategory(category: string): void {
@@ -281,11 +290,11 @@ export class FilmingTableComponent implements OnInit {
 
   confirmDelete(item: FilmingItem): void {
     this.confirmationService.confirm({
-      message: `Вы уверены, что хотите удалить "${item.name}"?`,
-      header: 'Подтверждение удаления',
+      message: this.translate.instant('SCENE_TABLE.CONFIRM_DELETE', {name: item.name}),
+      header: this.translate.instant('SCENE_TABLE.CONFIRM_DELETE_HEADER'),
       icon: 'pi pi-exclamation-triangle',
-      acceptLabel: 'Да, удалить',
-      rejectLabel: 'Отмена',
+      acceptLabel: this.translate.instant('SCENE_TABLE.CONFIRM_DELETE_ACCEPT'),
+      rejectLabel: this.translate.instant('SCENE_TABLE.DIALOG_CANCEL'),
       accept: () => this.deleteItem(item)
     });
   }
@@ -296,7 +305,11 @@ export class FilmingTableComponent implements OnInit {
 
     this.loadAllItems();
     this.applyFilters();
-    this.messageService.add({severity: 'success', summary: 'Успешно', detail: `Элемент "${item.name}" удален`});
+    this.messageService.add({
+      severity: 'success',
+      summary: this.translate.instant('SCENE_TABLE.DELETE_SUCCESS'),
+      detail: this.translate.instant('SCENE_TABLE.DELETE_DETAIL', {name: item.name})
+    });
   }
 
   markAsCompleted(item: FilmingItem): void {
@@ -308,8 +321,8 @@ export class FilmingTableComponent implements OnInit {
       this.applyFilters();
       this.messageService.add({
         severity: 'success',
-        summary: 'Обновлено',
-        detail: `Элемент "${item.name}" отмечен как завершенный`
+        summary: this.translate.instant('SCENE_TABLE.MARK_COMPLETED_SUCCESS'),
+        detail: this.translate.instant('SCENE_TABLE.MARK_COMPLETED_DETAIL', {name: item.name})
       });
     }
   }
@@ -326,15 +339,15 @@ export class FilmingTableComponent implements OnInit {
       }
       this.messageService.add({
         severity: 'success',
-        summary: 'Обновлено',
-        detail: `Элемент "${this.formItem.name}" обновлен`
+        summary: this.translate.instant('SCENE_TABLE.UPDATE_SUCCESS'),
+        detail: this.translate.instant('SCENE_TABLE.UPDATE_DETAIL', {name: this.formItem.name})
       });
     } else {
       category.items.push({...this.formItem});
       this.messageService.add({
         severity: 'success',
-        summary: 'Добавлено',
-        detail: `Элемент "${this.formItem.name}" добавлен`
+        summary: this.translate.instant('SCENE_TABLE.ADD_SUCCESS'),
+        detail: this.translate.instant('SCENE_TABLE.ADD_DETAIL', {name: this.formItem.name})
       });
     }
 
@@ -353,7 +366,11 @@ export class FilmingTableComponent implements OnInit {
     const excelBuffer = XLSX.write(workbook, {bookType: 'xlsx', type: 'array'});
     const blob = new Blob([excelBuffer], {type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
     saveAs(blob, `production_data_${new Date().toISOString().split('T')[0]}.xlsx`);
-    this.messageService.add({severity: 'success', summary: 'Экспорт', detail: 'Данные экспортированы в Excel'});
+    this.messageService.add({
+      severity: 'success',
+      summary: this.translate.instant('SCENE_TABLE.EXPORT_SUCCESS'),
+      detail: this.translate.instant('SCENE_TABLE.EXPORT_EXCEL_DETAIL')
+    });
   }
 
   exportCSV(): void {
@@ -363,7 +380,11 @@ export class FilmingTableComponent implements OnInit {
 
     const blob = new Blob(['\uFEFF' + csvOutput], {type: 'text/csv;charset=utf-8;'});
     saveAs(blob, `production_data_${new Date().toISOString().split('T')[0]}.csv`);
-    this.messageService.add({severity: 'success', summary: 'Экспорт', detail: 'Данные экспортированы в CSV'});
+    this.messageService.add({
+      severity: 'success',
+      summary: this.translate.instant('SCENE_TABLE.EXPORT_SUCCESS'),
+      detail: this.translate.instant('SCENE_TABLE.EXPORT_CSV_DETAIL')
+    });
   }
 
   private prepareExportData(): any[] {
@@ -384,6 +405,18 @@ export class FilmingTableComponent implements OnInit {
 
   isFormValid(): boolean {
     return !!(this.formItem.name && this.formItem.cost && this.formItem.status && this.formItem.category);
+  }
+
+  isFormChanged(): boolean {
+    if (!this.editingItem) return true;
+    // Сравниваем только значимые поля
+    return (
+      this.formItem.name !== this.editingItem.name ||
+      this.formItem.category !== this.editingItem.category ||
+      this.formItem.cost !== this.editingItem.cost ||
+      this.formItem.status !== this.editingItem.status ||
+      this.formItem.contact !== this.editingItem.contact
+    );
   }
 
   getCategoryLabel(category: string): string {

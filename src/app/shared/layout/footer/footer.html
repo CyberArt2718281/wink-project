@@ -12,12 +12,11 @@
           </div>
           <div>
             <span class="text-2xl font-bold text-white">Wink</span>
-            <span class="text-orange-500 font-semibold block">Project</span>
+            <span class="text-orange-500 font-semibold block">{{ 'FOOTER.PROJECT' | translate }}</span>
           </div>
         </div>
         <p class="text-gray-400 text-sm leading-relaxed">
-          Профессиональная платформа для управления кинопроизводством.
-          Создавайте, организуйте и контролируйте все этапы съёмочного процесса.
+          {{ 'FOOTER.DESCRIPTION' | translate }}
         </p>
       </div>
 
@@ -31,7 +30,7 @@
     <div class="flex flex-col md:flex-row items-center justify-between gap-4">
       <!-- Копирайт и версия -->
       <div class="flex flex-col sm:flex-row items-center gap-4 text-sm">
-        <span class="text-gray-400">&copy; 2025 Wink Project. Все права защищены.</span>
+        <span class="text-gray-400">&copy; 2025 Wink Project. {{ 'FOOTER.RIGHTS' | translate }}</span>
         <div class="flex items-center gap-2">
           <div class="w-2 h-2 bg-orange-500 rounded-full animate-pulse"></div>
           <span class="text-orange-500 font-medium">v1.0</span>

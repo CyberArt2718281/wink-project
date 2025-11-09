@@ -1,6 +1,6 @@
 @import "tailwindcss";
 @import 'primeicons/primeicons.css';
-
+@import "./_scrollbar.css";
 
 :root {
   --toast-text: #fff;

@@ -1,11 +1,12 @@
 import {Component, EventEmitter, Output} from '@angular/core';
 import {FormsModule} from '@angular/forms';
 import {ButtonModule} from 'primeng/button';
+import {TranslateModule} from '@ngx-translate/core';
 
 @Component({
   selector: 'app-settings-upload',
   standalone: true,
-  imports: [FormsModule,ButtonModule],
+  imports: [FormsModule,ButtonModule,TranslateModule],
   templateUrl: './settings-upload.html',
   styleUrl: './settings-upload.css',
 })
