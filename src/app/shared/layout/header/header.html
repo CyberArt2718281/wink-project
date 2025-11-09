@@ -54,19 +54,19 @@
            [class.opacity-100]="menuOpen"
            (click)="closeMenu()"></div>
 
-      <div class="absolute right-0 top-12 bg-gray-800 shadow-2xl rounded-xl py-4 px-6 flex flex-col gap-3 z-50 w-64 border border-gray-700 animate-slide-fade-in"
+      <div class="absolute right-0 top-12 bg-[#1A1A1A] shadow-2xl rounded-xl py-4 px-6 flex flex-col gap-3 z-50 w-64 border border-[#232323] animate-slide-fade-in"
            [class.animate-slide-fade-out]="!menuOpen">
         <a routerLink="/upload"
-           routerLinkActive="text-orange-500 bg-gray-700"
+           routerLinkActive="text-[#FF6600] bg-[#232323]"
            [routerLinkActiveOptions]="{ exact: true }"
-           class="text-gray-300 hover:text-orange-500 hover:bg-gray-700 font-medium transition-all duration-200 rounded-lg px-3 py-2"
+           class="text-white hover:text-[#FF6600] hover:bg-[#232323] font-medium transition-all duration-200 rounded-lg px-3 py-2"
            (click)="closeMenu()">
           Загрузка
         </a>
         <a routerLink="/table"
-           routerLinkActive="text-orange-500 bg-gray-700"
+           routerLinkActive="text-[#FF6600] bg-[#232323]"
            [routerLinkActiveOptions]="{ exact: true }"
-           class="text-gray-300 hover:text-orange-500 hover:bg-gray-700 font-medium transition-all duration-200 rounded-lg px-3 py-2"
+           class="text-white hover:text-[#FF6600] hover:bg-[#232323] font-medium transition-all duration-200 rounded-lg px-3 py-2"
            (click)="closeMenu()">
           Таблица
         </a>
