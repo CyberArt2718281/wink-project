@@ -26,6 +26,7 @@ export class FileUploadComponent implements OnInit, OnDestroy {
   timeOut: any = null;
   error: string | null = null;
   selectedOption: string | null = null;
+  selectedColumns: string[] = [];
 
   messageService = inject(MessageService);
   cdr = inject(ChangeDetectorRef);
@@ -54,17 +55,21 @@ export class FileUploadComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.selectedOption = localStorage.getItem('settings-upload-preset') || 'basic';
+    this.selectedColumns = JSON.parse(localStorage.getItem('settings-upload-columns') || '[]');
     this.timeOut = setTimeout(() => {
       this.cdr.detectChanges();
     }, 0);
   }
+
   ngOnDestroy() {
     if (this.interval) {
       clearInterval(this.interval);
-    }if(this.timeOut){
+    }
+    if (this.timeOut) {
       clearTimeout(this.timeOut);
     }
   }
+
   triggerFileInput() {
     this.fileInput?.nativeElement.click();
   }
@@ -201,6 +206,8 @@ export class FileUploadComponent implements OnInit, OnDestroy {
         return this.translate.instant('SETTINGS_UPLOAD.BASIC');
       case 'advanced':
         return this.translate.instant('SETTINGS_UPLOAD.ADVANCED');
+      case 'custom':
+        return this.translate.instant('SETTINGS_UPLOAD.CUSTOM');
       case 'full':
         return this.translate.instant('SETTINGS_UPLOAD.FULL');
       default:
@@ -214,8 +221,11 @@ export class FileUploadComponent implements OnInit, OnDestroy {
         return {background: 'rgba(255, 102, 0, 0.1)', color: '#FF6600', borderColor: 'rgba(255, 102, 0, 0.3)'};
       case 'advanced':
         return {background: 'rgba(255, 133, 51, 0.1)', color: '#FF8533', borderColor: 'rgba(255, 133, 51, 0.3)'};
-      case 'full':
+      case 'custom':
         return {background: 'rgba(255, 163, 102, 0.1)', color: '#FFA366', borderColor: 'rgba(255, 163, 102, 0.3)'};
+      case 'full':
+        return {background: 'rgba(255, 193, 182, 0.1)', color: '#FFA399', borderColor: 'rgba(255, 193, 152, 0.3)'};
+
       default:
         return {background: 'rgba(255, 102, 0, 0.1)', color: '#FF6600', borderColor: 'rgba(255, 102, 0, 0.3)'};
     }
@@ -231,6 +241,13 @@ export class FileUploadComponent implements OnInit, OnDestroy {
 
   onPresetChange(preset: string) {
     this.selectedOption = preset;
+    localStorage.setItem('settings-upload-preset', preset);
+    this.cdr.markForCheck();
+  }
+
+  onColumnsChange(event: { preset: string }) {
+    this.selectedOption = event.preset;
+    localStorage.setItem('settings-upload-preset', event.preset);
     this.cdr.markForCheck();
   }
 }

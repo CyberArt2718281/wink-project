@@ -1,0 +1,506 @@
+/* Общие стили для страниц ошибок */
+.error-page-container {
+  min-height: 100vh;
+
+  background: linear-gradient(135deg, #000000 0%, #0A0A0A 50%, #1A1A1A 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  font-family: inherit;
+}
+
+/* Анимированный фон */
+.error-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+.bg-orbit {
+  position: absolute;
+  border: 1px solid rgba(255, 102, 0, 0.1);
+  border-radius: 50%;
+  animation: orbit 20s linear infinite;
+}
+
+.bg-orbit-1 {
+  width: 200px;
+  height: 200px;
+  top: 10%;
+  left: 10%;
+  animation-delay: 0s;
+}
+
+.bg-orbit-2 {
+  width: 300px;
+  height: 300px;
+  top: 60%;
+  right: 10%;
+  animation-delay: -5s;
+}
+
+.bg-orbit-3 {
+  width: 150px;
+  height: 150px;
+  bottom: 20%;
+  left: 20%;
+  animation-delay: -10s;
+}
+
+.bg-pulse {
+  position: absolute;
+  background: radial-gradient(circle, rgba(255, 102, 0, 0.1) 0%, transparent 70%);
+  border-radius: 50%;
+  animation: pulse 4s ease-in-out infinite;
+}
+
+.bg-pulse-1 {
+  width: 100px;
+  height: 100px;
+  top: 20%;
+  right: 20%;
+  animation-delay: 0s;
+}
+
+.bg-pulse-2 {
+  width: 150px;
+  height: 150px;
+  bottom: 30%;
+  left: 15%;
+  animation-delay: -2s;
+}
+
+/* Стили для 505 ошибки */
+.server-error .bg-pulse-error-1 {
+  width: 120px;
+  height: 120px;
+  top: 15%;
+  left: 10%;
+  background: radial-gradient(circle, rgba(239, 68, 68, 0.15) 0%, transparent 70%);
+  animation: pulseError 3s ease-in-out infinite;
+}
+
+.server-error .bg-pulse-error-2 {
+  width: 80px;
+  height: 80px;
+  top: 70%;
+  right: 15%;
+  background: radial-gradient(circle, rgba(245, 158, 11, 0.1) 0%, transparent 70%);
+  animation: pulseError 4s ease-in-out infinite;
+  animation-delay: -1s;
+}
+
+.bg-glitch {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(45deg, transparent 49%, rgba(255, 102, 0, 0.03) 50%, transparent 51%);
+  background-size: 10px 10px;
+  animation: glitchBackground 0.1s infinite;
+  opacity: 0.1;
+}
+
+/* Основной контент */
+.error-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  max-width: 800px;
+  padding: 2rem;
+  width: 100%;
+}
+
+.error-main {
+  background: rgba(26, 26, 26, 0.8);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 102, 0, 0.2);
+  border-radius: 24px;
+  padding: 3rem 2rem;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+/* Анимированные числа */
+.error-number {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.number-digit {
+  font-size: 8rem;
+  font-weight: 900;
+  background: linear-gradient(135deg, #FF6600, #FF8533);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 30px rgba(255, 102, 0, 0.5);
+}
+
+.server-error-number .number-digit {
+  background: linear-gradient(135deg, #EF4444, #F59E0B);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 30px rgba(239, 68, 68, 0.5);
+}
+
+/* Текст */
+.error-text {
+  margin-bottom: 2rem;
+}
+
+.error-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #FFFFFF;
+  margin-bottom: 1rem;
+}
+
+.error-description {
+  font-size: 1.25rem;
+  color: #9CA3AF;
+  line-height: 1.6;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* Детали ошибки */
+.error-details {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.detail-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: rgba(35, 35, 35, 0.6);
+  border: 1px solid rgba(255, 102, 0, 0.1);
+  border-radius: 12px;
+  color: #D1D5DB;
+  font-size: 0.95rem;
+}
+
+.server-error-details .detail-item {
+  border-color: rgba(239, 68, 68, 0.1);
+}
+
+.error-item {
+  background: rgba(35, 35, 35, 0.8);
+}
+
+/* Кнопки действий */
+.error-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 2rem;
+}
+
+.action-button {
+  min-width: 140px;
+  border-radius: 12px;
+  font-weight: 600;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.action-button.primary {
+  background: linear-gradient(135deg, #FF6600, #FF8533) !important;
+  border: none !important;
+  box-shadow: 0 4px 15px rgba(255, 102, 0, 0.3) !important;
+}
+
+.action-button.primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(255, 102, 0, 0.4) !important;
+}
+
+.action-button.secondary {
+  background: rgba(35, 35, 35, 0.8) !important;
+  border: 1px solid rgba(255, 102, 0, 0.3) !important;
+  color: #FF6600 !important;
+}
+
+.action-button.secondary:hover {
+  background: rgba(255, 102, 0, 0.1) !important;
+  transform: translateY(-2px);
+}
+
+.action-button.tertiary {
+  background: rgba(239, 68, 68, 0.1) !important;
+  border: 1px solid rgba(239, 68, 68, 0.3) !important;
+  color: #EF4444 !important;
+}
+
+.action-button.tertiary:hover {
+  background: rgba(239, 68, 68, 0.2) !important;
+  transform: translateY(-2px);
+}
+
+/* Дополнительные элементы */
+.error-help {
+  margin-bottom: 1rem;
+}
+
+.help-text {
+  color: #6B7280;
+  font-size: 0.95rem;
+}
+
+.help-link {
+  color: #FF6600;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.3s;
+}
+
+.help-link:hover {
+  color: #FF8533;
+  text-decoration: underline;
+}
+
+/* Сообщение для 505 */
+.error-message {
+  margin-bottom: 2rem;
+}
+
+.message-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1.5rem;
+  background: rgba(255, 102, 0, 0.05);
+  border: 1px solid rgba(255, 102, 0, 0.2);
+  border-radius: 16px;
+  text-align: left;
+}
+
+.message-icon {
+  font-size: 1.5rem;
+  color: #FF6600;
+  margin-top: 0.25rem;
+}
+
+.message-content h4 {
+  color: #FFFFFF;
+  margin-bottom: 0.5rem;
+  font-size: 1.1rem;
+}
+
+.message-content p {
+  color: #9CA3AF;
+  line-height: 1.5;
+}
+
+/* Таймер автоматического обновления */
+.auto-reload {
+  margin-top: 2rem;
+}
+
+.reload-timer {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: rgba(35, 35, 35, 0.6);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 102, 0, 0.1);
+}
+
+.timer-icon {
+  color: #FF6600;
+}
+
+.timer-text {
+  color: #D1D5DB;
+  font-size: 0.9rem;
+}
+
+.timer-progress {
+  flex: 1;
+  height: 4px;
+  background: rgba(255, 102, 0, 0.2);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.timer-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #FF6600, #FF8533);
+  border-radius: 2px;
+  animation: timerCountdown 10s linear infinite;
+}
+
+/* Анимации */
+@keyframes orbit {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.1);
+  }
+}
+
+@keyframes pulseError {
+  0%, 100% {
+    opacity: 0.2;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.4;
+    transform: scale(1.05);
+  }
+}
+
+@keyframes glitchBackground {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 10px 10px;
+  }
+}
+
+@keyframes timerCountdown {
+  0% {
+    width: 100%;
+  }
+  100% {
+    width: 0%;
+  }
+}
+
+@keyframes bounce-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.3) translateY(-50px);
+  }
+  50% {
+    transform: scale(1.05) translateY(10px);
+  }
+  70% {
+    transform: scale(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes glitch {
+  0% {
+    transform: translate(0);
+  }
+  20% {
+    transform: translate(-2px, 2px);
+  }
+  40% {
+    transform: translate(-2px, -2px);
+  }
+  60% {
+    transform: translate(2px, 2px);
+  }
+  80% {
+    transform: translate(2px, -2px);
+  }
+  100% {
+    transform: translate(0);
+  }
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-bounce-in {
+  animation: bounce-in 0.6s ease-out forwards;
+}
+
+.animate-glitch {
+  animation: glitch 0.3s ease-in-out forwards;
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.6s ease-out forwards;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .error-content {
+    padding: 1rem;
+  }
+
+  .error-main {
+    padding: 2rem 1rem;
+  }
+
+  .number-digit {
+    font-size: 5rem;
+  }
+
+  .error-title {
+    font-size: 2rem;
+  }
+
+  .error-description {
+    font-size: 1.1rem;
+  }
+
+  .error-actions {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .action-button {
+    width: 100%;
+    max-width: 250px;
+  }
+}
+
+@media (max-width: 480px) {
+  .number-digit {
+    font-size: 4rem;
+  }
+
+  .error-title {
+    font-size: 1.75rem;
+  }
+
+  .error-number {
+    gap: 0.5rem;
+  }
+}

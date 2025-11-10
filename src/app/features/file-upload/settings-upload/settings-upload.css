@@ -18,4 +18,7 @@ input[type="radio"]:focus {
   ring: 2px;
   ring-color: #f97316;
 }
+button:disabled {
+  cursor: not-allowed;
+}
 

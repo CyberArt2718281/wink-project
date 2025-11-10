@@ -39,16 +39,36 @@
     "RIGHTS": "All rights reserved."
   },
   "SETTINGS_UPLOAD": {
-    "BUTTON": "Upload settings",
-    "TITLE": "Select upload preset",
+    "BUTTON": "Upload Settings",
     "BASIC": "Basic",
-    "BASIC_DESC": "Minimal settings for fast upload",
+    "FULL": "Full",
+    "BASIC_DESC": "Minimal settings for quick upload",
     "ADVANCED": "Advanced",
     "ADVANCED_DESC": "Additional options for fine-tuning",
-    "FULL": "Full",
+    "CUSTOM": "Сustom",
     "FULL_DESC": "All available settings and features",
     "CANCEL": "Cancel",
-    "SAVE": "Save"
+    "SAVE": "Save",
+    "TITLE": "Select upload preset",
+    "SUBTITLE": "Configure data import parameters",
+    "PRESET_SELECTION": "Preset selection",
+    "CUSTOM_COLUMNS": "Custom columns",
+    "CUSTOM_COLUMNS_CATEGORY": "User columns",
+    "BASIC_INFO": "Basic information",
+    "FINANCIAL": "Financial data",
+    "PRODUCTION": "Production",
+    "ADD_CUSTOM_COLUMN": "Add your own column",
+    "COLUMN_NAME_PLACEHOLDER": "Enter column name...",
+    "SELECTED_COLUMNS": "Selected columns",
+    "COLUMNS_SELECTED": "columns selected",
+    "SELECT_ALL": "Select all",
+    "DESELECT_ALL": "Deselect all",
+    "SELECTED": "Selected",
+    "COLUMNS": "columns",
+    "ADD": "Add",
+    "CUSTOM": "Custom",
+    "CUSTOM_DESC": "Select the required columns manually",
+    "REMOVE_COLUMN": "Remove column"
   },
   "SCENE_TABLE": {
     "TITLE": "Scene Table",
@@ -115,5 +135,32 @@
     "EXPORT_SUCCESS": "Export",
     "EXPORT_EXCEL_DETAIL": "Data exported to Excel.",
     "EXPORT_CSV_DETAIL": "Data exported to CSV."
+  },
+
+  "ERROR_404": {
+    "TITLE": "Page not found",
+    "DESCRIPTION": "Sorry, the requested page does not exist or has been removed.",
+    "DETAIL_1": "Check the address for typos.",
+    "DETAIL_2": "The page may have been moved or deleted.",
+    "DETAIL_3": "Try using search or go to the home page.",
+    "GO_HOME": "Home",
+    "GO_BACK": "Back",
+    "HELP_TEXT": "You can go to the page ",
+    "UPLOAD_PAGE": "upload page",
+    "OR_TEXT": " or ",
+    "TABLE_PAGE": "scene table"
+  },
+  "ERROR_505": {
+    "TITLE": "Internal Server Error",
+    "DESCRIPTION": "An unexpected error occurred on the server. Please try again later.",
+    "DETAIL_1": "The server is temporarily unavailable or overloaded.",
+    "DETAIL_2": "Try refreshing the page or come back later.",
+    "DETAIL_3": "Try refreshing the page later or contact support.",
+    "MESSAGE_TITLE": "Possible actions",
+    "MESSAGE_TEXT": "You can try reloading the page, go to the home page, or contact support.",
+    "RELOAD_PAGE": "Reload page",
+    "GO_HOME": "Home",
+    "CONTACT_SUPPORT": "Contact support",
+    "AUTO_RELOAD": "Auto-reloading in a few seconds..."
   }
 }

@@ -1,0 +1,101 @@
+<div class="error-page-container server-error">
+  <!-- Анимированный фон для ошибки сервера -->
+  <div class="error-background">
+    <div class="bg-pulse bg-pulse-error-1"></div>
+    <div class="bg-pulse bg-pulse-error-2"></div>
+    <div class="bg-pulse bg-pulse-error-3"></div>
+    <div class="bg-glitch"></div>
+  </div>
+
+  <div class="error-content">
+    <!-- Основной контент -->
+    <div class="error-main animate-fade-in-up">
+      <!-- Анимированное число 505 с эффектом глитча -->
+      <div class="error-number server-error-number">
+        <span class="number-digit animate-glitch" style="animation-delay: 0.1s">5</span>
+        <span class="number-digit animate-glitch" style="animation-delay: 0.2s">0</span>
+        <span class="number-digit animate-glitch" style="animation-delay: 0.3s">5</span>
+      </div>
+
+      <!-- Заголовок и описание -->
+      <div class="error-text">
+        <h1 class="error-title animate-fade-in-up" style="animation-delay: 0.4s">
+          {{ 'ERROR_505.TITLE' | translate }}
+        </h1>
+        <p class="error-description animate-fade-in-up" style="animation-delay: 0.5s">
+          {{ 'ERROR_505.DESCRIPTION' | translate }}
+        </p>
+      </div>
+
+      <!-- Детали ошибки сервера -->
+      <div class="error-details server-error-details animate-fade-in-up" style="animation-delay: 0.6s">
+        <div class="detail-item error-item">
+          <i class="pi pi-server text-red-500"></i>
+          <span>{{ 'ERROR_505.DETAIL_1' | translate }}</span>
+        </div>
+        <div class="detail-item error-item">
+          <i class="pi pi-bolt text-yellow-500"></i>
+          <span>{{ 'ERROR_505.DETAIL_2' | translate }}</span>
+        </div>
+        <div class="detail-item error-item">
+          <i class="pi pi-cog text-blue-500"></i>
+          <span>{{ 'ERROR_505.DETAIL_3' | translate }}</span>
+        </div>
+      </div>
+
+      <!-- Сообщение для пользователя -->
+      <div class="error-message animate-fade-in-up" style="animation-delay: 0.7s">
+        <div class="message-card">
+          <i class="pi pi-info-circle message-icon"></i>
+          <div class="message-content">
+            <h4>{{ 'ERROR_505.MESSAGE_TITLE' | translate }}</h4>
+            <p>{{ 'ERROR_505.MESSAGE_TEXT' | translate }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Кнопки действий -->
+      <div class="error-actions animate-fade-in-up" style="animation-delay: 0.8s">
+        <button pButton
+                class="action-button primary"
+                (click)="reloadPage()"
+                icon="pi pi-refresh">
+          {{ 'ERROR_505.RELOAD_PAGE' | translate }}
+        </button>
+        <button pButton
+                class="action-button secondary"
+                (click)="goHome()"
+                icon="pi pi-home">
+          {{ 'ERROR_505.GO_HOME' | translate }}
+        </button>
+        <button pButton
+                class="action-button tertiary"
+                (click)="contactSupport()"
+                icon="pi pi-envelope">
+          {{ 'ERROR_505.CONTACT_SUPPORT' | translate }}
+        </button>
+      </div>
+
+      <!-- Таймер автоматического обновления -->
+      <div class="auto-reload animate-fade-in-up" style="animation-delay: 0.9s">
+        <div class="reload-timer">
+          <i class="pi pi-clock timer-icon"></i>
+          <span class="timer-text">{{ 'ERROR_505.AUTO_RELOAD' | translate }}</span>
+          <div class="timer-progress">
+            <div class="timer-bar"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Анимированный сервер -->
+    <div class="server-animation">
+      <div class="server-rack">
+        <div class="server-led server-led-1"></div>
+        <div class="server-led server-led-2"></div>
+        <div class="server-led server-led-3"></div>
+        <div class="server-light"></div>
+      </div>
+    </div>
+  </div>
+</div>

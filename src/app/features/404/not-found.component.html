@@ -1,0 +1,81 @@
+<div class="error-page-container">
+  <!-- Анимированный фон -->
+  <div class="error-background">
+    <div class="bg-orbit bg-orbit-1"></div>
+    <div class="bg-orbit bg-orbit-2"></div>
+    <div class="bg-orbit bg-orbit-3"></div>
+    <div class="bg-pulse bg-pulse-1"></div>
+    <div class="bg-pulse bg-pulse-2"></div>
+  </div>
+
+  <div class="error-content">
+    <!-- Основной контент -->
+    <div class="error-main animate-fade-in-up">
+      <!-- Анимированное число 404 -->
+      <div class="error-number">
+        <span class="number-digit animate-bounce-in" style="animation-delay: 0.1s">4</span>
+        <span class="number-digit animate-bounce-in" style="animation-delay: 0.2s">0</span>
+        <span class="number-digit animate-bounce-in" style="animation-delay: 0.3s">4</span>
+      </div>
+
+      <!-- Заголовок и описание -->
+      <div class="error-text">
+        <h1 class="error-title animate-fade-in-up" style="animation-delay: 0.4s">
+          {{ 'ERROR_404.TITLE' | translate }}
+        </h1>
+        <p class="error-description animate-fade-in-up" style="animation-delay: 0.5s">
+          {{ 'ERROR_404.DESCRIPTION' | translate }}
+        </p>
+      </div>
+
+      <!-- Детали ошибки -->
+      <div class="error-details animate-fade-in-up" style="animation-delay: 0.6s">
+        <div class="detail-item">
+          <i class="pi pi-exclamation-triangle text-[#FF6600]"></i>
+          <span>{{ 'ERROR_404.DETAIL_1' | translate }}</span>
+        </div>
+        <div class="detail-item">
+          <i class="pi pi-link text-[#FF6600]"></i>
+          <span>{{ 'ERROR_404.DETAIL_2' | translate }}</span>
+        </div>
+        <div class="detail-item">
+          <i class="pi pi-search text-[#FF6600]"></i>
+          <span>{{ 'ERROR_404.DETAIL_3' | translate }}</span>
+        </div>
+      </div>
+
+      <!-- Кнопки действий -->
+      <div class="error-actions animate-fade-in-up" style="animation-delay: 0.7s">
+        <button pButton
+                class="action-button primary"
+                (click)="goHome()"
+                icon="pi pi-home">
+          {{ 'ERROR_404.GO_HOME' | translate }}
+        </button>
+        <button pButton
+                class="action-button secondary"
+                (click)="goBack()"
+                icon="pi pi-arrow-left">
+          {{ 'ERROR_404.GO_BACK' | translate }}
+        </button>
+      </div>
+
+      <!-- Дополнительная информация -->
+      <div class="error-help animate-fade-in-up" style="animation-delay: 0.8s">
+        <p class="help-text">
+          {{ 'ERROR_404.HELP_TEXT' | translate }}
+          <a routerLink="/upload" class="help-link">{{ 'ERROR_404.UPLOAD_PAGE' | translate }}</a>
+          {{ 'ERROR_404.OR_TEXT' | translate }}
+          <a routerLink="/table" class="help-link">{{ 'ERROR_404.TABLE_PAGE' | translate }}</a>
+        </p>
+      </div>
+    </div>
+
+    <!-- Декоративный элемент -->
+    <div class="error-decoration">
+      <div class="decoration-orb decoration-orb-1"></div>
+      <div class="decoration-orb decoration-orb-2"></div>
+      <div class="decoration-orb decoration-orb-3"></div>
+    </div>
+  </div>
+</div>
