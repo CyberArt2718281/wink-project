@@ -24,7 +24,8 @@
     "ERROR_TITLE": "Error uploading file",
     "ERROR_TYPE": "Unsupported file type. Please upload a PDF or DOCX file.",
     "ERROR_SIZE": "File size exceeds the 20MB limit. Please upload a smaller file.",
-    "ERROR_EXTENSION": "File extension is not allowed. Please upload a valid document."
+    "ERROR_EXTENSION": "File extension is not allowed. Please upload a valid document.",
+    "PROCESS_DATA": "Process Data"
   },
   "HEADER": {
     "TITLE": "Wink",

@@ -5,14 +5,11 @@
       <!-- Логотип и описание -->
       <div class="flex-1 max-w-md">
         <div class="flex items-center gap-3 mb-4">
-          <div class="w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center shadow-lg shadow-orange-500/20">
-            <svg class="w-6 h-6 text-black" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M12 2C13.1 2 14 2.9 14 4C14 5.1 13.1 6 12 6C10.9 6 10 5.1 10 4C10 2.9 10.9 2 12 2ZM21 9V7L15 5.5V7H9V5.5L3 7V9L9 10.5V12L3 13.5V15.5L9 14V16L3 17.5V19.5L9 18V22H15V18L21 19.5V17.5L15 16V14L21 15.5V13.5L15 12V10.5L21 9Z"/>
-            </svg>
-          </div>
-          <div>
-            <span class="text-2xl font-bold text-white">Wink</span>
-            <span class="text-orange-500 font-semibold block">{{ 'FOOTER.PROJECT' | translate }}</span>
+          <div class="logo">
+            <picture class="flex items-center">
+              <source srcset="assets/images/logo.avif" type="image/avif">
+              <img src="assets/images/logo.svg" alt="Логотип" class="w-[133px] h-[33px] object-contain" />
+            </picture>
           </div>
         </div>
         <p class="text-gray-400 text-sm leading-relaxed">

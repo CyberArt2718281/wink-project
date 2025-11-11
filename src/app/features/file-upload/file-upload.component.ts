@@ -27,6 +27,7 @@ export class FileUploadComponent implements OnInit, OnDestroy {
   error: string | null = null;
   selectedOption: string | null = null;
   selectedColumns: string[] = [];
+  isProcessing: boolean = false;
 
   messageService = inject(MessageService);
   cdr = inject(ChangeDetectorRef);
@@ -37,15 +38,14 @@ export class FileUploadComponent implements OnInit, OnDestroy {
   constructor() {
     this.languageService.getLanguage$().subscribe(lang => {
       this.translate.use(lang);
-      // Если тост активен, обновить summary
       if (this.visible && !this.error) {
-        this.translate.get('UPLOAD.LOADING').subscribe((loadingText: string) => {
+        this.translate.get('UPLOAD.PROCESSING').subscribe((processingText: string) => {
           this.messageService.clear('confirm');
           this.messageService.add({
             key: 'confirm',
             sticky: true,
             severity: 'custom',
-            summary: loadingText,
+            summary: processingText,
             styleClass: 'backdrop-blur-lg rounded-2xl'
           });
         });
@@ -62,11 +62,17 @@ export class FileUploadComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.cleanup();
+  }
+
+  private cleanup(): void {
     if (this.interval) {
       clearInterval(this.interval);
+      this.interval = null;
     }
     if (this.timeOut) {
       clearTimeout(this.timeOut);
+      this.timeOut = null;
     }
   }
 
@@ -123,7 +129,16 @@ export class FileUploadComponent implements OnInit, OnDestroy {
     this.error = null;
     this.uploadedFile = file;
     this.uploadedFileType = file.type === 'application/pdf' ? 'PDF' : 'DOCX';
-    this.showLoaderToast();
+    this.isProcessing = false;
+    this.progress = 0;
+
+    // Скроллим к блоку информации о файле
+    setTimeout(() => {
+      const infoBlock = document.getElementById('file-info-block');
+      if (infoBlock) {
+        infoBlock.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }, 100);
   }
 
   showError(message: string) {
@@ -141,63 +156,80 @@ export class FileUploadComponent implements OnInit, OnDestroy {
     this.visible = false;
     this.uploadedFile = null;
     this.uploadedFileType = null;
+    this.isProcessing = false;
   }
 
-  showLoaderToast() {
-    if (!this.visible && !this.error) {
-      this.messageService.add({
-        key: 'confirm',
-        sticky: true,
-        severity: 'custom',
-        summary: this.translate.instant('UPLOAD.LOADING'),
-        styleClass: 'backdrop-blur-lg rounded-2xl'
-      });
-      this.visible = true;
-      this.progress = 0;
+  processData() {
+    if (!this.uploadedFile) return;
 
-      if (this.interval) {
-        clearInterval(this.interval);
+    this.isProcessing = true;
+    this.progress = 0;
+    this.visible = true;
+
+    this.messageService.add({
+      key: 'confirm',
+      sticky: true,
+      severity: 'custom',
+      summary: this.translate.instant('UPLOAD.PROCESSING'),
+      styleClass: 'backdrop-blur-lg rounded-2xl'
+    });
+
+    this.cleanup();
+
+    // Правильная симуляция прогресса с целыми числами
+    this.interval = setInterval(() => {
+      if (this.progress < 100) {
+        // Увеличиваем прогресс на 10% каждый раз, но не более 100%
+        this.progress = Math.min(this.progress + 10, 100);
+        this.progress = Math.round(this.progress); // Обеспечиваем целое число
+
+        console.log('Progress:', this.progress); // Для отладки
       }
 
-      this.interval = setInterval(() => {
-        if (this.progress < 100) {
-          this.progress = this.progress + 20;
+      // Когда достигли 100%, завершаем обработку
+      if (this.progress >= 100) {
+        this.completeProcessing();
+      }
+
+      this.cdr.markForCheck();
+    }, 500); // Интервал 500ms для плавного прогресса
+  }
+
+  private completeProcessing(): void {
+    console.log('Complete processing called, progress:', this.progress); // Для отладки
+
+    this.cleanup();
+
+    // Сохраняем данные
+    if (this.uploadedFile) {
+      localStorage.setItem('tableData', JSON.stringify([
+        {
+          name: this.uploadedFile.name,
+          type: this.uploadedFileType,
+          size: this.uploadedFile.size,
+          elements: 'Обработанные элементы',
+          preset: this.selectedOption,
+          uploadDate: new Date().toISOString()
         }
-        if (this.progress >= 100) {
-          this.progress = 100;
-          clearInterval(this.interval);
-          setTimeout(() => {
-            this.messageService.clear('confirm');
-            this.visible = false;
-            this.cdr.markForCheck();
-          }, 800);
-        }
-        this.cdr.markForCheck();
-      }, 600);
+      ]));
     }
+
+    // Даем небольшую задержку чтобы пользователь увидел 100%
+    setTimeout(() => {
+      this.messageService.clear('confirm');
+      this.visible = false;
+      this.isProcessing = false;
+      this.router.navigate(['/table']).then(() => {
+        window.scrollTo({ top: 0, behavior: 'auto' });
+      });
+    }, 800);
   }
 
   onClose() {
+    this.cleanup();
     this.visible = false;
-    if (this.interval) {
-      clearInterval(this.interval);
-    }
-    this.uploadedFile = null;
-    this.uploadedFileType = null;
-    this.error = null;
-  }
-
-  proceedToTable() {
-    if (!this.uploadedFile) return;
-    localStorage.setItem('tableData', JSON.stringify([
-      {
-        name: this.uploadedFile.name,
-        type: this.uploadedFileType,
-        size: this.uploadedFile.size,
-        elements: 'Моковые элементы'
-      }
-    ]));
-    this.router.navigate(['/table']);
+    this.isProcessing = false;
+    this.progress = 0;
   }
 
   getPresetLabel(preset: string | null): string {
@@ -225,7 +257,6 @@ export class FileUploadComponent implements OnInit, OnDestroy {
         return {background: 'rgba(255, 163, 102, 0.1)', color: '#FFA366', borderColor: 'rgba(255, 163, 102, 0.3)'};
       case 'full':
         return {background: 'rgba(255, 193, 182, 0.1)', color: '#FFA399', borderColor: 'rgba(255, 193, 152, 0.3)'};
-
       default:
         return {background: 'rgba(255, 102, 0, 0.1)', color: '#FF6600', borderColor: 'rgba(255, 102, 0, 0.3)'};
     }
