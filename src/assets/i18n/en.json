@@ -6,7 +6,7 @@
     "PRESET_SETTINGS": "Document processing settings",
     "DRAG_FILE": "Drag file here",
     "OR_SELECT": "or select on device",
-    "LOADING": "Uploading...",
+    "LOADING": "Processing...",
     "PLEASE_WAIT": "Please wait",
     "CHOOSE_FILE": "Choose file",
     "DELETE": "Delete",
@@ -25,7 +25,11 @@
     "ERROR_TYPE": "Unsupported file type. Please upload a PDF or DOCX file.",
     "ERROR_SIZE": "File size exceeds the 20MB limit. Please upload a smaller file.",
     "ERROR_EXTENSION": "File extension is not allowed. Please upload a valid document.",
-    "PROCESS_DATA": "Process Data"
+    "PROCESS_DATA": "Process Data",
+    "CONFIRM_CANCEL_TITLE": "Cancel Confirmation",
+    "CONFIRM_CANCEL_MESSAGE": "Are you sure you want to cancel file processing?",
+    "YES_CANCEL": "Yes, Cancel",
+    "NO": "No"
   },
   "HEADER": {
     "TITLE": "Wink",
@@ -124,20 +128,26 @@
     "FILTERS_CLEARED": "All filters have been cleared.",
     "CONFIRM_DELETE": "Are you sure you want to delete \"{{name}}\"?",
     "CONFIRM_DELETE_HEADER": "Delete confirmation",
+    "CONFIRM_DELETE_WARNING": "This action cannot be undone",
     "CONFIRM_DELETE_ACCEPT": "Yes, delete",
     "DELETE_SUCCESS": "Success",
-    "DELETE_DETAIL": "Item \"{{name}}\" deleted.",
+    "DELETE_DETAIL": "Item \"{{name}}\" successfully deleted",
     "MARK_COMPLETED_SUCCESS": "Updated",
     "MARK_COMPLETED_DETAIL": "Item \"{{name}}\" marked as completed.",
     "UPDATE_SUCCESS": "Updated",
     "UPDATE_DETAIL": "Item \"{{name}}\" updated.",
     "ADD_SUCCESS": "Added",
     "ADD_DETAIL": "Item \"{{name}}\" added.",
-    "EXPORT_SUCCESS": "Export",
-    "EXPORT_EXCEL_DETAIL": "Data exported to Excel.",
-    "EXPORT_CSV_DETAIL": "Data exported to CSV."
+    "EXPORT_CONFIRM_TITLE": "Export Confirmation",
+    "EXPORT_EXCEL_CONFIRM": "Export {{count}} records to Excel format?",
+    "EXPORT_CSV_CONFIRM": "Export {{count}} records to CSV format?",
+    "EXPORT_CONFIRM_BUTTON": "Export",
+    "EXPORT_SUCCESS": "Export Completed",
+    "EXPORT_EXCEL_DETAIL": "Data successfully exported to Excel",
+    "EXPORT_CSV_DETAIL": "Data successfully exported to CSV",
+    "EXPORT_CONFIRM_SUBTEXT": "The file will be saved to your downloads",
+    "ITEMS_SELECTED": "selected items"
   },
-
   "ERROR_404": {
     "TITLE": "Page not found",
     "DESCRIPTION": "Sorry, the requested page does not exist or has been removed.",

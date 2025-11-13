@@ -17,6 +17,7 @@ import * as XLSX from 'xlsx';
 import {saveAs} from 'file-saver-es';
 
 import {TranslateModule, TranslateService} from '@ngx-translate/core';
+import {PrimeNG} from 'primeng/config';
 
 // Интерфейсы
 export interface FilmingItem {
@@ -158,6 +159,7 @@ export class FilmingTableComponent implements OnInit {
 
   formItem: any = {};
 
+
   categoryOptions = [
     {label: 'Локации', value: 'locations'},
     {label: 'Персонажи', value: 'characters'},
@@ -173,13 +175,19 @@ export class FilmingTableComponent implements OnInit {
     {label: 'Подтверждено', value: 'confirmed'},
     {label: 'Завершено', value: 'completed'}
   ];
+  showExportDialog: boolean = false;
+  exportType: 'excel' | 'csv' | null = null;
+  exportMessage: string = '';
 
+  showDeleteDialog: boolean = false;
+  itemToDelete: FilmingItem | null = null;
 
   translate = inject(TranslateService);
-  constructor(
-    private confirmationService: ConfirmationService,
-    private messageService: MessageService
-  ) {
+  private primeng = inject(PrimeNG);
+
+  private messageService = inject(MessageService);
+
+  constructor() {
     this.loadAllItems();
   }
 
@@ -188,6 +196,13 @@ export class FilmingTableComponent implements OnInit {
     // Сбрасываем выделение при инициализации
     setTimeout(() => {
       this.selectedItem = null;
+    });
+    this.translate.get('SCENE_TABLE.ITEMS_SELECTED').subscribe(translated => {
+      this.primeng.setTranslation({
+        selectionMessage: `{0} ${translated}`,
+        emptyFilterMessage: 'Нет совпадений',
+        emptySearchMessage: 'Нет результатов',
+      });
     });
   }
 
@@ -289,27 +304,33 @@ export class FilmingTableComponent implements OnInit {
   }
 
   confirmDelete(item: FilmingItem): void {
-    this.confirmationService.confirm({
-      message: this.translate.instant('SCENE_TABLE.CONFIRM_DELETE', {name: item.name}),
-      header: this.translate.instant('SCENE_TABLE.CONFIRM_DELETE_HEADER'),
-      icon: 'pi pi-exclamation-triangle',
-      acceptLabel: this.translate.instant('SCENE_TABLE.CONFIRM_DELETE_ACCEPT'),
-      rejectLabel: this.translate.instant('SCENE_TABLE.DIALOG_CANCEL'),
-      accept: () => this.deleteItem(item)
-    });
+    this.itemToDelete = item;
+    this.showDeleteDialog = true;
   }
 
-  deleteItem(item: FilmingItem): void {
+  deleteItem(): void {
+    if (!this.itemToDelete) return;
+
+    const item = this.itemToDelete;
     const category = this.production.categories[item.category as keyof typeof this.production.categories];
     category.items = category.items.filter(i => i.id !== item.id);
 
     this.loadAllItems();
     this.applyFilters();
+
     this.messageService.add({
       severity: 'success',
       summary: this.translate.instant('SCENE_TABLE.DELETE_SUCCESS'),
       detail: this.translate.instant('SCENE_TABLE.DELETE_DETAIL', {name: item.name})
     });
+
+    this.showDeleteDialog = false;
+    this.itemToDelete = null;
+  }
+
+  cancelDelete(): void {
+    this.showDeleteDialog = false;
+    this.itemToDelete = null;
   }
 
   markAsCompleted(item: FilmingItem): void {
@@ -358,6 +379,36 @@ export class FilmingTableComponent implements OnInit {
 
   // Экспорт данных
   exportExcel(): void {
+    this.exportType = 'excel';
+    this.exportMessage = this.translate.instant('SCENE_TABLE.EXPORT_EXCEL_CONFIRM', {
+      count: this.filteredItems.length
+    });
+    this.showExportDialog = true;
+  }
+
+  exportCSV(): void {
+    this.exportType = 'csv';
+    this.exportMessage = this.translate.instant('SCENE_TABLE.EXPORT_CSV_CONFIRM', {
+      count: this.filteredItems.length
+    });
+    this.showExportDialog = true;
+  }
+
+  confirmExport(): void {
+    if (!this.exportType) return;
+
+    this.showExportDialog = false;
+
+    if (this.exportType === 'excel') {
+      this.performExcelExport();
+    } else if (this.exportType === 'csv') {
+      this.performCSVExport();
+    }
+
+    this.exportType = null;
+  }
+
+  private performExcelExport(): void {
     const data = this.prepareExportData();
     const worksheet = XLSX.utils.json_to_sheet(data);
     const workbook = XLSX.utils.book_new();
@@ -366,6 +417,7 @@ export class FilmingTableComponent implements OnInit {
     const excelBuffer = XLSX.write(workbook, {bookType: 'xlsx', type: 'array'});
     const blob = new Blob([excelBuffer], {type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
     saveAs(blob, `production_data_${new Date().toISOString().split('T')[0]}.xlsx`);
+
     this.messageService.add({
       severity: 'success',
       summary: this.translate.instant('SCENE_TABLE.EXPORT_SUCCESS'),
@@ -373,13 +425,14 @@ export class FilmingTableComponent implements OnInit {
     });
   }
 
-  exportCSV(): void {
+  private performCSVExport(): void {
     const data = this.prepareExportData();
     const worksheet = XLSX.utils.json_to_sheet(data);
     const csvOutput = XLSX.utils.sheet_to_csv(worksheet);
 
     const blob = new Blob(['\uFEFF' + csvOutput], {type: 'text/csv;charset=utf-8;'});
     saveAs(blob, `production_data_${new Date().toISOString().split('T')[0]}.csv`);
+
     this.messageService.add({
       severity: 'success',
       summary: this.translate.instant('SCENE_TABLE.EXPORT_SUCCESS'),

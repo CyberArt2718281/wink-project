@@ -6,11 +6,12 @@ import {Router} from '@angular/router';
 import {SharedModule} from '../../shared/shared-module';
 import {TranslateModule, TranslateService} from '@ngx-translate/core';
 import {LanguageService} from '../../core/language.service';
+import {DialogModule} from 'primeng/dialog';
 
 @Component({
   selector: 'app-file-upload',
   standalone: true,
-  imports: [SharedModule, SettingsUpload, CommonModule, TranslateModule],
+  imports: [SharedModule, SettingsUpload, CommonModule, TranslateModule, DialogModule],
   providers: [MessageService],
   styleUrls: ['./file-upload.component.css'],
   templateUrl: './file-upload.component.html',
@@ -28,6 +29,7 @@ export class FileUploadComponent implements OnInit, OnDestroy {
   selectedOption: string | null = null;
   selectedColumns: string[] = [];
   isProcessing: boolean = false;
+  showCancelDialog: boolean = false; // Новая переменная для модалки подтверждения
 
   messageService = inject(MessageService);
   cdr = inject(ChangeDetectorRef);
@@ -74,6 +76,22 @@ export class FileUploadComponent implements OnInit, OnDestroy {
       clearTimeout(this.timeOut);
       this.timeOut = null;
     }
+  }
+
+  // Показать модалку подтверждения отмены
+  showCancelConfirmation() {
+    this.showCancelDialog = true;
+  }
+
+  // Скрыть модалку подтверждения отмены
+  hideCancelConfirmation() {
+    this.showCancelDialog = false;
+  }
+
+  // Подтвердить отмену
+  confirmCancel() {
+    this.hideCancelConfirmation();
+    this.onClose();
   }
 
   triggerFileInput() {
@@ -149,7 +167,7 @@ export class FileUploadComponent implements OnInit, OnDestroy {
       severity: 'error',
       summary: errorTitle,
       detail: message,
-      life: 3000,
+      life: 300000,
       styleClass: 'bg-[#1A1A1A] text-white border border-[#FF6600]/20 rounded-xl backdrop-blur-lg text-sm'
     });
     this.cdr.detectChanges();
@@ -230,6 +248,7 @@ export class FileUploadComponent implements OnInit, OnDestroy {
     this.visible = false;
     this.isProcessing = false;
     this.progress = 0;
+    this.messageService.clear('confirm');
   }
 
   getPresetLabel(preset: string | null): string {

@@ -41,3 +41,68 @@
 .bg-blue-50 {
   background-color: #eff6ff;
 }
+/* Глобальные стили для кнопок с inter-medium */
+.p-button-inter-medium .p-button-label {
+  font-family: 'Inter Medium', sans-serif;
+  font-weight: 500 !important;
+}
+
+.p-button-inter-medium .p-button-icon {
+  font-family: 'Inter Medium', sans-serif;
+  font-weight: 500 !important;
+}
+
+/* Стили для диалога подтверждения удаления */
+:host ::ng-deep .delete-confirm-dialog {
+  .p-dialog {
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    border: 1px solid #333333;
+  }
+
+  .p-dialog .p-dialog-header {
+    background: #1A1A1A;
+    border-bottom: 1px solid #333333;
+    padding: 1.5rem;
+  }
+
+  .p-dialog .p-dialog-header .p-dialog-title {
+    color: white;
+    font-weight: 700;
+    font-size: 1.25rem;
+    font-family: 'Inter ExtraBold', sans-serif;
+  }
+
+  .p-dialog .p-dialog-header .p-dialog-header-icon {
+    color: #9CA3AF;
+    background: transparent;
+    border: none;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+  }
+
+  .p-dialog .p-dialog-header .p-dialog-header-icon:hover {
+    color: white;
+    background: #232323;
+  }
+
+  .p-dialog .p-dialog-content {
+    background: #1A1A1A;
+    color: white;
+    padding: 1.5rem;
+    border-bottom: 1px solid #232323;
+  }
+
+  .p-dialog .p-dialog-footer {
+    background: #1A1A1A;
+    border-top: none;
+    padding: 1.5rem;
+  }
+}
+button{
+  border-radius: 40px;
+
+}

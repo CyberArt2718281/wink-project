@@ -6,7 +6,7 @@
     "PRESET_SETTINGS": "Настройки обработки документа",
     "DRAG_FILE": "Перетащите файл сюда",
     "OR_SELECT": "или выберите на устройстве",
-    "LOADING": "Идет загрузка...",
+    "LOADING": "Идет обработка...",
     "PLEASE_WAIT": "Пожалуйста, подождите",
     "CHOOSE_FILE": "Выбрать файл",
     "DELETE": "Удалить",
@@ -23,11 +23,13 @@
     "ERROR_TYPE": "Пожалуйста, загрузите файл в формате PDF или DOCX.",
     "ERROR_SIZE": "Файл превышает лимит в 20MB. Пожалуйста, загрузите файл меньшего размера.",
     "ERROR_EXTENSION": "Файл с таким расширением не поддерживается. Пожалуйста, загрузите корректный документ.",
-
-      "PROCESS_DATA": "Обработать данные",
-      "PROCESSING": "Обработка данных...",
-      "FILE_PROCESSED": "Обработка файла"
-
+    "PROCESS_DATA": "Обработать данные",
+    "PROCESSING": "Обработка данных...",
+    "FILE_PROCESSED": "Обработка файла",
+    "CONFIRM_CANCEL_TITLE": "Подтверждение отмены",
+    "CONFIRM_CANCEL_MESSAGE": "Вы уверены, что хотите отменить обработку файла?",
+    "YES_CANCEL": "Да, отменить",
+    "NO": "Нет"
   },
   "HEADER": {
     "TITLE": "Wink",
@@ -126,18 +128,25 @@
     "FILTERS_CLEARED": "Все фильтры были очищены.",
     "CONFIRM_DELETE": "Вы уверены, что хотите удалить \"{{name}}\"?",
     "CONFIRM_DELETE_HEADER": "Подтверждение удаления",
+    "CONFIRM_DELETE_WARNING": "Это действие нельзя отменить",
     "CONFIRM_DELETE_ACCEPT": "Да, удалить",
     "DELETE_SUCCESS": "Успешно",
-    "DELETE_DETAIL": "Элемент \"{{name}}\" удален.",
+    "DELETE_DETAIL": "Элемент \"{{name}}\" успешно удален",
     "MARK_COMPLETED_SUCCESS": "Обновлено",
     "MARK_COMPLETED_DETAIL": "Элемент \"{{name}}\" отмечен как завершенный.",
     "UPDATE_SUCCESS": "Обновлено",
     "UPDATE_DETAIL": "Элемент \"{{name}}\" обновлен.",
     "ADD_SUCCESS": "Добавлено",
     "ADD_DETAIL": "Элемент \"{{name}}\" добавлен.",
-    "EXPORT_SUCCESS": "Экспорт",
-    "EXPORT_EXCEL_DETAIL": "Данные экспортированы в Excel.",
-    "EXPORT_CSV_DETAIL": "Данные экспортированы в CSV."
+    "EXPORT_CONFIRM_TITLE": "Подтверждение экспорта",
+    "EXPORT_EXCEL_CONFIRM": "Экспортировать {{count}} записей в формате Excel?",
+    "EXPORT_CSV_CONFIRM": "Экспортировать {{count}} записей в формате CSV?",
+    "EXPORT_CONFIRM_BUTTON": "Экспортировать",
+    "EXPORT_SUCCESS": "Экспорт завершен",
+    "EXPORT_EXCEL_DETAIL": "Данные успешно экспортированы в Excel",
+    "EXPORT_CSV_DETAIL": "Данные успешно экспортированы в CSV",
+    "EXPORT_CONFIRM_SUBTEXT": "Файл будет сохранен в ваши загрузки",
+    "ITEMS_SELECTED": "элементов выбрано"
   },
   "ERROR_404": {
     "TITLE": "Страница не найдена",

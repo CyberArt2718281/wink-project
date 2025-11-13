@@ -10,7 +10,7 @@ import {ProgressBarModule} from 'primeng/progressbar';
         CommonModule,
         ToastModule,
         ButtonModule,
-        ProgressBarModule
+        ProgressBarModule,
     ], exports: [
         ToastModule,
         ButtonModule,

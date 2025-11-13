@@ -1,0 +1,14 @@
+p-progressbar .p-progressbar {
+  background-color: #232323 !important;
+  border-radius: 8px !important;
+  height: 4px !important;
+}
+
+p-progressbar .p-progressbar-value {
+  background: linear-gradient(15deg, #ff9532 0%, #ff8a1c 9.96%, #ff5b21 51.66%, #ff5a24 86%) !important;
+  border-radius: 8px !important;
+}
+
+p-progressbar .p-progressbar-determinate {
+  background: linear-gradient(15deg, #ff9532 0%, #ff8a1c 9.96%, #ff5b21 51.66%, #ff5a24 86%) !important;
+}

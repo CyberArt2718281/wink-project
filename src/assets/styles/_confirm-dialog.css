@@ -1,0 +1,82 @@
+/* Стили для ConfirmationService в стиле Wink */
+.custom-confirm-dialog .p-dialog {
+  background: #1A1A1A !important;
+  border: 1px solid #232323 !important;
+  border-radius: 12px !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5) !important;
+}
+
+.custom-confirm-dialog .p-dialog-header {
+  background: #232323 !important;
+  border-bottom: 1px solid #333333 !important;
+  color: white !important;
+  padding: 1.5rem !important;
+  border-top-left-radius: 12px !important;
+  border-top-right-radius: 12px !important;
+}
+
+.custom-confirm-dialog .p-dialog-content {
+  background: #1A1A1A !important;
+  color: white !important;
+  padding: 1.5rem !important;
+}
+
+.custom-confirm-dialog .p-dialog-footer {
+  background: #232323 !important;
+  border-top: 1px solid #333333 !important;
+  padding: 1rem 1.5rem !important;
+  border-bottom-left-radius: 12px !important;
+  border-bottom-right-radius: 12px !important;
+}
+
+/* Стили для иконки */
+.custom-confirm-dialog .p-confirm-dialog-icon {
+  color: #FF6600 !important;
+  font-size: 1.5rem !important;
+}
+
+/* Стили для кнопок */
+.custom-confirm-dialog .p-button {
+  border: none !important;
+  font-weight: 600 !important;
+  transition: all 0.2s ease !important;
+}
+
+.custom-confirm-dialog .p-button.p-confirm-dialog-reject {
+  background: #232323 !important;
+  color: #gray-300 !important;
+  border: 1px solid #333333 !important;
+}
+
+.custom-confirm-dialog .p-button.p-confirm-dialog-reject:hover {
+  background: #2A2A2A !important;
+  border-color: #FF6600 !important;
+  color: white !important;
+}
+
+.custom-confirm-dialog .p-button.p-confirm-dialog-accept {
+  background: #FF6600 !important;
+  color: white !important;
+}
+
+.custom-confirm-dialog .p-button.p-confirm-dialog-accept:hover {
+  background: #FF8533 !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(255, 102, 0, 0.3) !important;
+}
+
+/* Анимация появления */
+.custom-confirm-dialog .p-dialog {
+  animation: dialog-scale-in 0.2s ease-out;
+}
+
+@keyframes dialog-scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

@@ -1,0 +1,50 @@
+.p-datatable-row-selected{
+  background: linear-gradient(15deg, rgba(255,149,50,0.4) 0%, rgba(255,138,28,0.4) 9.96%, rgba(255,91,33,0.5) 51.66%, rgba(255,90,36,0.5) 86%) !important;
+}
+
+
+.p-datatable-column-sorted{
+  background: linear-gradient(15deg, #ff9532 0%, #ff8a1c 9.96%, #ff5b21 51.66%, #ff5a24 86%) !important;
+}
+.p-paginator-rpp-dropdown{
+  border: none !important;
+}
+
+.p-paginator-page-selected{
+  background: linear-gradient(15deg, #ff9532 0%, #ff8a1c 9.96%, #ff5b21 51.66%, #ff5a24 86%) !important;
+}
+.p-multiselect-option-selected{
+  background: rgba(255, 149, 50, 0.5)  !important;
+
+}
+
+.p-checkbox-input{
+  background: linear-gradient(15deg, #ff9532 0%, #ff8a1c 9.96%, #ff5b21 51.66%, #ff5a24 86%) !important;
+  color: white  !important;
+
+}
+.p-checkbox-box {
+  background: #232323 !important; /* нейтральный фон */
+  border: 1px solid #ff9532 !important;
+}
+
+.p-checkbox-box.p-highlight {
+  background: rgba(255, 149, 50, 0.5) !important; /* полупрозрачный, потемнее */
+  border-color: #b36a1e !important;
+}
+
+.p-checkbox-icon {
+  color: #fff !important; /* белая галочка */
+}
+
+.p-multiselect-filter{
+  border-color: #131313 !important;
+  &:hover, &:focus{
+    border-color: #ff9532 !important;
+  }
+}
+
+.p-ripple{
+  font-family: "Inter Medium", sans-serif !important;
+  font-weight: 600 !important;
+}

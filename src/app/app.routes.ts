@@ -1,5 +1,6 @@
 import {Routes} from '@angular/router';
-import {Layout} from './features/layout/layout';
+import {Layout} from './shared/layout/layout/layout';
+import {FileUploadComponent} from './features/file-upload/file-upload.component';
 
 export const routes: Routes = [
 
@@ -14,7 +15,7 @@ export const routes: Routes = [
       },
       {
         path: 'upload',
-        loadComponent: () => import('./features/file-upload/file-upload.component').then(m => m.FileUploadComponent)
+        component: FileUploadComponent
       },
       {
         path: 'table',

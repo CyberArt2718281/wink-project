@@ -2,7 +2,6 @@
 .file-upload__choose-btn:disabled,
 button[disabled] {
   background-color: #232323 !important; /* тёмно-серый Wink */
-  color: #666666 !important; /* серый текст */
   cursor: not-allowed !important;
   opacity: 0.6 !important;
   box-shadow: none !important;
@@ -98,5 +97,43 @@ button,
 button:disabled:hover {
   transform: none !important;
   box-shadow: none !important;
+}
+
+button:focus,
+button:focus-visible,
+button:focus-within,
+button:active,
+button:active:focus,
+button:active:focus-visible,
+button:active:hover,
+button:disabled,
+button:disabled:hover,
+button:disabled:focus {
+  outline: none !important;
+  box-shadow: none !important;
+  border-color: transparent !important;
+  --tw-ring-color: transparent !important;
+  --tw-ring-shadow: none !important;
+  ring: none !important;
+}
+
+/* Убрать фокус конкретно для этих кнопок */
+button.bg-\[\#232323\],
+button.bg-\[\#FF6600\] {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Для состояний фокуса */
+button.bg-\[\#232323\]:focus,
+button.bg-\[\#232323\]:focus-visible,
+button.bg-\[\#FF6600\]:focus,
+button.bg-\[\#FF6600\]:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+button{
+  border-radius: 40px;
 }
 

@@ -73,8 +73,8 @@ export class SettingsUpload implements OnInit {
     colorScheme: {
       light: {
         root: {
-          checkedBackground: '#FF6600',     // цвет фона когда включено
-          checkedHoverBackground: '#FF6600',// фон при hover (вкл)
+          checkedBackground: 'linear-gradient(15deg, #ff9532 0%, #ff8a1c 9.96%, #ff5b21 51.66%, #ff5a24 86%)',     // цвет фона когда включено
+          checkedHoverBackground: 'linear-gradient(15deg, #ff9532 0%, #ff8a1c 9.96%, #ff5b21 51.66%, #ff5a24 86%)',// фон при hover (вкл)
           background: '#222',               // фон выключено
           hoverBackground: '#444',          // фон hover (выкл)
           borderRadius: '16px'
@@ -223,5 +223,10 @@ export class SettingsUpload implements OnInit {
 
   removeCustomColumn(columnId: string) {
     this.customColumns = this.customColumns.filter(col => col.id !== columnId);
+  }
+
+  toggleColumn(column: any, event: MouseEvent) {
+    event.preventDefault();
+    column.selected = !column.selected;
   }
 }

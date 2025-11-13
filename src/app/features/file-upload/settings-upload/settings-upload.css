@@ -18,7 +18,32 @@ input[type="radio"]:focus {
   ring: 2px;
   ring-color: #f97316;
 }
+
 button:disabled {
+
   cursor: not-allowed;
 }
+.select-all {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease !important;
+  border-radius: 40px;
+  background: #232323;
+  color: #fff;
+  font-weight: 500;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  padding: 8px 20px;
+  border: none;
+  cursor: pointer;
+}
 
+.select-all:hover {
+  opacity: 0.95 !important;
+  transform: translateY(-1px) !important;
+  background: linear-gradient(15deg, #ff9532 0%, #ff8a1c 9.96%, #ff5b21 51.66%, #ff5a24 86%);
+  color: #fff;
+}
+
+button{
+  border-radius: 40px;
+}

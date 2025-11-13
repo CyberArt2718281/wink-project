@@ -1,10 +1,17 @@
 <header
-  class="w-full bg-black py-4 px-4 md:px-8 flex items-center justify-between sticky top-0 z-40 border-b border-[#232323] backdrop-blur-sm bg-black/95">
+  class="w-full bg-black flex items-center justify-between sticky top-0 z-40 border-b border-[#232323] backdrop-blur-sm bg-black/95 py-4 px-4 sm:p-4 md:p-6  lg:p-8">
   <!-- Логотип -->
   <div class="logo">
     <picture class="flex items-center">
       <source srcset="assets/images/logo.avif" type="image/avif">
-      <img src="assets/images/logo.svg" alt="Логотип" class="w-[133px] h-[33px] object-contain" />
+      <source srcset="assets/images/logo.webp" type="image/webp">
+      <source srcset="assets/images/logo.svg" type="image/svg+xml">
+      <img
+        src="assets/images/logo.svg"
+        alt="Логотип"
+        class="w-auto h-8 sm:h-8 md:h-8 lg:h-8"
+        loading="lazy"
+      />
     </picture>
   </div>
 
@@ -13,7 +20,7 @@
     <a routerLink="/upload"
        routerLinkActive="text-[#FF6600]"
        [routerLinkActiveOptions]="{ exact: true }"
-       class="text-white hover:text-[#FF6600] font-medium transition-colors duration-200 relative group">
+       class="text-white hover:text-[#FF6600] font-medium transition-colors duration-200 relative group inter-medium">
       {{ 'HEADER.UPLOAD' | translate }}
       <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-[#FF6600] transition-all duration-200 group-hover:w-full"
             [class.w-full]="isRouteActive('/upload')"></span>
@@ -21,15 +28,15 @@
     <a routerLink="/table"
        routerLinkActive="text-[#FF6600]"
        [routerLinkActiveOptions]="{ exact: true }"
-       class="text-white hover:text-[#FF6600] font-medium transition-colors duration-200 relative group">
+       class="text-white hover:text-[#FF6600] font-medium transition-colors duration-200 relative group inter-medium">
       {{ 'HEADER.TABLE' | translate }}
-      <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-[#FF6600] transition-all duration-200 group-hover:w-full"
+      <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-[#FF6600]  transition-all duration-200 group-hover:w-full"
             [class.w-full]="isRouteActive('/table')"></span>
     </a>
   </nav>
 
   <!-- Правая часть: языковой селект и бургер -->
-  <div class="flex items-center gap-4">
+  <div class="flex items-center justify-center">
     <!-- Языковой селект -->
     <div class="hidden md:block">
       <p-select
@@ -38,18 +45,20 @@
         (onChange)="onLanguageChange($event)"
         optionLabel="label"
         [appendTo]="'body'"
-        styleClass="!bg-[#1A1A1A] !border-[#232323] !text-white [&_.p-dropdown-label]:!text-gray-300 [&_.p-dropdown-panel]:!bg-[#1A1A1A] [&_.p-dropdown-panel]:!border-[#232323] min-w-[100px]"
+        styleClass="!bg-[#1A1A1A] !border-[#232323] !text-white [&_.p-dropdown-label]:!text-gray-300 [&_.p-dropdown-panel]:!bg-[#1A1A1A] [&_.p-dropdown-panel]:!border-[#232323] min-w-[100px] !rounded-[40px]"
         [dropdownIcon]="'pi pi-globe'">
-        <ng-template pTemplate="selectedItem">
-          <div class="flex items-center gap-2">
-            <i class="pi pi-globe text-[#FF6600] text-sm"></i>
-            <span class="text-white text-sm">{{ selectedLanguage.label }}</span>
+        <ng-template pTemplate="selectedItem" >
+          <div class="flex items-center gap-2 !justify-center">
+            <i [class]="selectedLanguage.code === 'ru' ? 'pi pi-home  ' : 'pi pi pi-language '"
+               ></i>
+            <span class="text-white text-sm inter-medium ">{{ selectedLanguage.label }}</span>
           </div>
         </ng-template>
         <ng-template let-language pTemplate="item">
-          <div class="flex items-center gap-2">
-            <i class="pi pi-globe text-[#FF6600] text-sm"></i>
-            <span class="text-white">{{ language.label }}</span>
+          <div class="flex items-center gap-2 ">
+            <i [class]="language.code === 'ru' ? 'pi pi-home   ' : 'pi pi-language '"
+               ></i>
+            <span class="text-white inter-medium">{{ language.label }}</span>
           </div>
         </ng-template>
       </p-select>
@@ -84,18 +93,20 @@
               (onChange)="onLanguageChange($event)"
               optionLabel="label"
               [appendTo]="'body'"
-              styleClass="!bg-[#232323] !border-[#333333] !text-white [&_.p-dropdown-label]:!text-gray-300 [&_.p-dropdown-panel]:!bg-[#1A1A1A] [&_.p-dropdown-panel]:!border-[#232323] w-full"
+              styleClass="!bg-[#232323] !border-[#333333] !text-white [&_.p-dropdown-label]:!text-gray-300 [&_.p-dropdown-panel]:!bg-[#1A1A1A] [&_.p-dropdown-panel]:!border-[#232323] w-full inter-regular"
               [dropdownIcon]="'pi pi-globe'">
               <ng-template pTemplate="selectedItem">
                 <div class="flex items-center gap-2">
-                  <i class="pi pi-globe text-[#FF6600] text-sm"></i>
-                  <span class="text-white text-sm">{{ selectedLanguage.label }}</span>
+                  <i [class]="selectedLanguage.code === 'ru' ? 'pi pi-home !text-[#FF6600] ' : 'pi pi pi-language !text-[#FF6600]'"
+                  ></i>
+                  <span class="text-white text-sm inter-medium">{{ selectedLanguage.label }}</span>
                 </div>
               </ng-template>
               <ng-template let-language pTemplate="item">
                 <div class="flex items-center gap-2">
-                  <i class="pi pi-globe text-[#FF6600] text-sm"></i>
-                  <span class="text-white">{{ language.label }}</span>
+                  <i [class]="language.code === 'ru' ? 'pi pi-home   ' : 'pi pi-language '"
+                  ></i>
+                  <span class="text-white inter-medium">{{ language.label }}</span>
                 </div>
               </ng-template>
             </p-select>
@@ -105,7 +116,7 @@
           <a routerLink="/upload"
              routerLinkActive="text-[#FF6600] bg-[#232323]"
              [routerLinkActiveOptions]="{ exact: true }"
-             class="text-white hover:text-[#FF6600] hover:bg-[#232323] font-medium transition-all duration-200 rounded-lg px-3 py-2 flex items-center gap-2"
+             class="text-white hover:text-[#FF6600] hover:bg-[#232323] font-medium transition-all duration-200 rounded-lg px-3 py-2 flex items-center gap-2 inter-medium"
              (click)="closeMenu()">
             <i class="pi pi-upload text-sm"></i>
             {{ 'HEADER.UPLOAD' | translate }}
@@ -113,7 +124,7 @@
           <a routerLink="/table"
              routerLinkActive="text-[#FF6600] bg-[#232323]"
              [routerLinkActiveOptions]="{ exact: true }"
-             class="text-white hover:text-[#FF6600] hover:bg-[#232323] font-medium transition-all duration-200 rounded-lg px-3 py-2 flex items-center gap-2"
+             class="text-white hover:text-[#FF6600] hover:bg-[#232323] font-medium transition-all duration-200 rounded-lg px-3 py-2 flex items-center gap-2 inter-medium"
              (click)="closeMenu()">
             <i class="pi pi-table text-sm"></i>
             {{ 'HEADER.TABLE' | translate }}
