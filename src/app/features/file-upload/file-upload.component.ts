@@ -7,6 +7,10 @@ import {SharedModule} from '../../shared/shared-module';
 import {TranslateModule, TranslateService} from '@ngx-translate/core';
 import {LanguageService} from '../../core/language.service';
 import {DialogModule} from 'primeng/dialog';
+import {FileProcessing, FileProcessingError, FileProcessingProgress} from '../../shared/services/file-processing';
+import {Subject} from 'rxjs';
+import {takeUntil} from 'rxjs/operators';
+import {PostPreset} from '../../../types/Preset/presetType.type';
 
 @Component({
   selector: 'app-file-upload',
@@ -23,19 +27,25 @@ export class FileUploadComponent implements OnInit, OnDestroy {
   uploadedFileType: string | null = null;
   progress: number = 0;
   visible: boolean = false;
-  interval: any = null;
   timeOut: any = null;
   error: string | null = null;
   selectedOption: string | null = null;
   selectedColumns: string[] = [];
   isProcessing: boolean = false;
-  showCancelDialog: boolean = false; // Новая переменная для модалки подтверждения
+  showCancelDialog: boolean = false;
+  isFileInputDisabled: boolean = false;
+
+  // Subject для отмены операции
+  private cancel$ = new Subject<void>();
+  private destroy$ = new Subject<void>();
+  private processingSubscription: any = null;
 
   messageService = inject(MessageService);
   cdr = inject(ChangeDetectorRef);
   router = inject(Router);
   languageService = inject(LanguageService);
   translate = inject(TranslateService);
+  fileProcessing = inject(FileProcessing);
 
   constructor() {
     this.languageService.getLanguage$().subscribe(lang => {
@@ -65,16 +75,20 @@ export class FileUploadComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.cleanup();
+    this.destroy$.next();
+    this.destroy$.complete();
+    this.cancel$.complete();
   }
 
   private cleanup(): void {
-    if (this.interval) {
-      clearInterval(this.interval);
-      this.interval = null;
-    }
     if (this.timeOut) {
       clearTimeout(this.timeOut);
       this.timeOut = null;
+    }
+    // Отписываемся от текущей обработки
+    if (this.processingSubscription) {
+      this.processingSubscription.unsubscribe();
+      this.processingSubscription = null;
     }
   }
 
@@ -91,16 +105,22 @@ export class FileUploadComponent implements OnInit, OnDestroy {
   // Подтвердить отмену
   confirmCancel() {
     this.hideCancelConfirmation();
+    console.log('🛑 Пользователь подтвердил отмену обработки');
+    this.cancel$.next(); // Отправляем сигнал отмены
     this.onClose();
   }
 
   triggerFileInput() {
-    this.fileInput?.nativeElement.click();
+    if (!this.isFileInputDisabled) {
+      this.fileInput?.nativeElement.click();
+    }
   }
 
   onDragOver(event: DragEvent) {
-    event.preventDefault();
-    this.isDragOver = true;
+    if (!this.isFileInputDisabled) {
+      event.preventDefault();
+      this.isDragOver = true;
+    }
   }
 
   onDragLeave(event: DragEvent) {
@@ -111,7 +131,7 @@ export class FileUploadComponent implements OnInit, OnDestroy {
   onDrop(event: DragEvent) {
     event.preventDefault();
     this.isDragOver = false;
-    if (event.dataTransfer?.files && event.dataTransfer.files.length > 0) {
+    if (!this.isFileInputDisabled && event.dataTransfer?.files && event.dataTransfer.files.length > 0) {
       this.processFile(event.dataTransfer.files[0]);
     }
   }
@@ -123,22 +143,28 @@ export class FileUploadComponent implements OnInit, OnDestroy {
     input.value = '';
   }
 
+  /**
+   * Шаг 1: Валидация файла
+   */
   processFile(file: File) {
     const allowedTypes = [
       'application/pdf',
       'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
     ];
 
+    // Валидация типа
     if (!allowedTypes.includes(file.type)) {
       this.showError(this.translate.instant('UPLOAD.ERROR_TYPE'));
       return;
     }
 
+    // Валидация размера (20 MB)
     if (file.size > 20 * 1024 * 1024) {
       this.showError(this.translate.instant('UPLOAD.ERROR_SIZE'));
       return;
     }
 
+    // Валидация расширения
     if (!file.name.match(/\.(pdf|docx)$/i)) {
       this.showError(this.translate.instant('UPLOAD.ERROR_EXTENSION'));
       return;
@@ -154,7 +180,7 @@ export class FileUploadComponent implements OnInit, OnDestroy {
     setTimeout(() => {
       const infoBlock = document.getElementById('file-info-block');
       if (infoBlock) {
-        infoBlock.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        infoBlock.scrollIntoView({behavior: 'smooth', block: 'center'});
       }
     }, 100);
   }
@@ -175,80 +201,159 @@ export class FileUploadComponent implements OnInit, OnDestroy {
     this.uploadedFile = null;
     this.uploadedFileType = null;
     this.isProcessing = false;
+    this.isFileInputDisabled = false;
   }
 
+  /**
+   * Шаг 2: Инициализация обработки и показ модалки
+   */
   processData() {
-    if (!this.uploadedFile) return;
+    if (!this.uploadedFile) {
+      this.showError('Файл не выбран');
+      return;
+    }
 
+    // Инициализация обработки
     this.isProcessing = true;
-    this.progress = 0;
+    this.isFileInputDisabled = true;
+    this.progress = Math.round(10);
     this.visible = true;
+    this.error = null;
 
+    // Показываем модалку с прогрессом
+    const processingTitle = this.translate.instant('UPLOAD.PROCESSING');
     this.messageService.add({
       key: 'confirm',
       sticky: true,
       severity: 'custom',
-      summary: this.translate.instant('UPLOAD.PROCESSING'),
+      summary: processingTitle,
       styleClass: 'backdrop-blur-lg rounded-2xl'
     });
 
     this.cleanup();
 
-    // Правильная симуляция прогресса с целыми числами
-    this.interval = setInterval(() => {
-      if (this.progress < 100) {
-        // Увеличиваем прогресс на 10% каждый раз, но не более 100%
-        this.progress = Math.min(this.progress + 10, 100);
-        this.progress = Math.round(this.progress); // Обеспечиваем целое число
+    // Создаем новый Subject для отмены на каждую операцию
+    this.cancel$ = new Subject<void>();
 
-        console.log('Progress:', this.progress); // Для отладки
+    // Создаем конфиг для анализа
+    const config: PostPreset = {
+      preset: (this.selectedOption || 'basic') as 'basic' | 'advanced' | 'full' | 'custom',
+      ...(this.selectedOption === 'custom' && {custom_columns: this.selectedColumns})
+    };
+
+    console.log('🚀 Начинаем обработку файла:', {
+      file: this.uploadedFile.name,
+      config: config
+    });
+
+    /**
+     * Шаг 3-4: Отправка на анализ и опрос результата
+     */
+    this.processingSubscription = this.fileProcessing.processFile(
+      this.uploadedFile,
+      config,
+      (progressData: FileProcessingProgress) => {
+        this.updateProgress(progressData);
+      },
+      this.cancel$ // Передаем Subject для отмены
+    ).pipe(
+      takeUntil(this.destroy$)
+    ).subscribe({
+      next: (result) => {
+        console.log('✅ Обработка завершена успешно:', result);
+        /**
+         * Шаг 5: При успехе - сохранение данных в localStorage и переход на /table
+         */
+        this.completeProcessing(result);
+      },
+      error: (error: FileProcessingError | any) => {
+        // Проверяем, если это отмена пользователем - просто закрываем модалку
+        if (error && error.isCancelled) {
+          console.log('ℹ️ Операция отменена пользователем');
+          this.onClose();
+          return;
+        }
+
+        console.error('❌ Ошибка при обработке:', error);
+        /**
+         * Шаг 6: При ошибке - показ красного тоста и очистка
+         */
+        this.showError(error.message || this.translate.instant('UPLOAD.ERROR_UNKNOWN'));
       }
-
-      // Когда достигли 100%, завершаем обработку
-      if (this.progress >= 100) {
-        this.completeProcessing();
-      }
-
-      this.cdr.markForCheck();
-    }, 500); // Интервал 500ms для плавного прогресса
+    });
   }
 
-  private completeProcessing(): void {
-    console.log('Complete processing called, progress:', this.progress); // Для отладки
+  /**
+   * Обновление прогресса из сервиса
+   */
+  private updateProgress(progressData: FileProcessingProgress): void {
+    this.progress = Math.round(progressData.progress);
+    console.log(`📊 Прогресс: ${progressData.stage} - ${this.progress}% - ${progressData.message}`);
+    this.cdr.markForCheck();
+  }
+
+  /**
+   * Шаг 5: Завершение обработки - сохранение данных и переход на таблицу
+   */
+  private completeProcessing(result: any): void {
+    console.log('💾 Сохраняем данные в localStorage...');
+
+    // Сразу устанавливаем 100%
+    this.progress = 100;
+    this.cdr.markForCheck();
 
     this.cleanup();
 
-    // Сохраняем данные
-    if (this.uploadedFile) {
-      localStorage.setItem('tableData', JSON.stringify([
-        {
-          name: this.uploadedFile.name,
-          type: this.uploadedFileType,
-          size: this.uploadedFile.size,
-          elements: 'Обработанные элементы',
-          preset: this.selectedOption,
-          uploadDate: new Date().toISOString()
-        }
-      ]));
-    }
+    // Сохраняем обработанные данные в localStorage
+    const processedData = {
+      job_id: result.job_id,
+      preset: result.preset,
+      columns: result.requested_columns,
+      table: result.table,
+      metadata: result.metadata,
+      uploadedFileName: this.uploadedFile?.name,
+      uploadedFileType: this.uploadedFileType,
+      processedAt: new Date().toISOString()
+    };
 
-    // Даем небольшую задержку чтобы пользователь увидел 100%
+    localStorage.setItem('processedTableData', JSON.stringify(processedData));
+    console.log('✅ Данные сохранены в localStorage');
+
+    // Даем время пользователю увидеть 100% прогресс
     setTimeout(() => {
       this.messageService.clear('confirm');
       this.visible = false;
       this.isProcessing = false;
+      this.progress = 0;
+      this.uploadedFile = null;
+      this.uploadedFileType = null;
+      this.isFileInputDisabled = false;
+
+      // Переход на страницу таблицы
+      console.log('🔄 Переходим на страницу таблицы...');
       this.router.navigate(['/table']).then(() => {
-        window.scrollTo({ top: 0, behavior: 'auto' });
+        window.scrollTo({top: 0, behavior: 'auto'});
       });
     }, 800);
   }
 
+  /**
+   * Закрыть модалку - отмена операции
+   */
   onClose() {
+    // Проверяем, есть ли активная обработка
+    if (this.isProcessing) {
+      console.log('🛑 Отмена обработки файла');
+      // Отправляем сигнал отмены
+      this.cancel$.next();
+    }
+
     this.cleanup();
     this.visible = false;
     this.isProcessing = false;
     this.progress = 0;
     this.messageService.clear('confirm');
+    this.isFileInputDisabled = false;
   }
 
   getPresetLabel(preset: string | null): string {

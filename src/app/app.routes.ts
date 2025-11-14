@@ -1,6 +1,7 @@
 import {Routes} from '@angular/router';
 import {Layout} from './shared/layout/layout/layout';
 import {FileUploadComponent} from './features/file-upload/file-upload.component';
+import {serverErrorGuard} from './core/guard/server-error.guard';
 
 export const routes: Routes = [
 
@@ -10,11 +11,6 @@ export const routes: Routes = [
     children: [
       {
         path: '',
-        redirectTo: 'upload',
-        pathMatch: 'full'
-      },
-      {
-        path: 'upload',
         component: FileUploadComponent
       },
       {
@@ -27,13 +23,14 @@ export const routes: Routes = [
       },
       {
         path: '505',
-        loadComponent: () => import('./features/505/internal-server-error.component').then(m => m.InternalServerErrorComponent)
+        canActivate: [serverErrorGuard],
+        loadComponent: () => import('./features/505/internal-server-error.component').then(m => m.InternalServerErrorComponent),
       },
     ]
   },
   {
     path: '**',
-    redirectTo: '404',
+    redirectTo: '',
   }
 
 ];
