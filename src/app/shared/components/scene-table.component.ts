@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { ConfirmationService, MessageService } from 'primeng/api';
@@ -11,12 +11,13 @@ import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
 import { InputTextModule } from 'primeng/inputtext';
 import { MultiSelectModule } from 'primeng/multiselect';
+import { PaginatorModule } from 'primeng/paginator';
 import { SelectModule } from 'primeng/select';
 import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { ToastModule } from 'primeng/toast';
 import { BehaviorSubject, Subject } from 'rxjs';
-import { debounceTime, distinctUntilChanged, map, takeUntil } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, map, shareReplay, takeUntil } from 'rxjs/operators';
 import { SuccessResultResponse } from '../../../types/resultResponse.type';
 import { CeilRequest, CeilService } from '../services/ceil.service';
 import { ExportService } from '../services/export.service';
@@ -43,6 +44,8 @@ interface TableState {
   savingCells: Set<string>;
   showExportDialog: boolean;
   exportType: 'excel' | 'csv' | null;
+  currentPage: number;
+  pageSize: number;
 }
 
 @Component({
@@ -63,10 +66,12 @@ interface TableState {
     ConfirmDialogModule,
     ToastModule,
     TranslateModule,
+    PaginatorModule,
   ],
   providers: [ConfirmationService, MessageService],
   templateUrl: './scene-table.component.html',
   styleUrls: ['./scene-table.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FilmingTableComponent implements OnInit, OnDestroy {
   private readonly translate = inject(TranslateService);
@@ -92,25 +97,73 @@ export class FilmingTableComponent implements OnInit, OnDestroy {
     savingCells: new Set(),
     showExportDialog: false,
     exportType: null,
+    currentPage: 0,
+    pageSize: 10,
   };
 
   private readonly state$ = new BehaviorSubject<TableState>(this.initialState);
 
-  // Selectors
-  columns$ = this.state$.pipe(map((state) => state.columns));
-  filteredRows$ = this.state$.pipe(map((state) => state.filteredRows));
+  // Selectors с оптимизацией
+  columns$ = this.state$.pipe(
+    map((state) => state.columns),
+    distinctUntilChanged(),
+    shareReplay({ bufferSize: 1, refCount: true })
+  );
+
+  filteredRows$ = this.state$.pipe(
+    map((state) => state.filteredRows),
+    shareReplay({ bufferSize: 1, refCount: true })
+  );
+
   selectedRows$ = this.state$.pipe(map((state) => state.selectedRows));
   editingCell$ = this.state$.pipe(map((state) => state.editingCell));
-  loading$ = this.state$.pipe(map((state) => state.loading));
-  searchText$ = this.state$.pipe(map((state) => state.searchText));
-  showExportDialog$ = this.state$.pipe(map((state) => state.showExportDialog));
+  loading$ = this.state$.pipe(map((state) => state.loading), distinctUntilChanged());
+  searchText$ = this.state$.pipe(map((state) => state.searchText), distinctUntilChanged());
+  showExportDialog$ = this.state$.pipe(map((state) => state.showExportDialog), distinctUntilChanged());
   exportType$ = this.state$.pipe(map((state) => state.exportType));
   sortColumn$ = this.state$.pipe(map((state) => state.sortColumn));
   sortOrder$ = this.state$.pipe(map((state) => state.sortOrder));
 
   selectedCount$ = this.selectedRows$.pipe(map((selectedRows) => selectedRows.size));
-  allRecords$ = this.state$.pipe(map((state) => state.rows.length));
-  totalRecords$ = this.filteredRows$.pipe(map((rows) => rows.length));
+  allRecords$ = this.state$.pipe(map((state) => state.rows.length), distinctUntilChanged());
+  totalRecords$ = this.filteredRows$.pipe(map((rows) => rows.length), distinctUntilChanged());
+
+  // Pagination selectors
+  currentPage$ = this.state$.pipe(map((state) => state.currentPage), distinctUntilChanged());
+  pageSize$ = this.state$.pipe(map((state) => state.pageSize), distinctUntilChanged());
+
+  paginatedRows$ = this.state$.pipe(
+    map((state) => {
+      const start = state.currentPage * state.pageSize;
+      const end = start + state.pageSize;
+      const safeStart = Math.min(start, state.filteredRows.length);
+      const safeEnd = Math.min(end, state.filteredRows.length);
+      return state.filteredRows.slice(safeStart, safeEnd);
+    }),
+    shareReplay({ bufferSize: 1, refCount: true })
+  );
+
+  first$ = this.state$.pipe(
+    map((state) => state.currentPage * state.pageSize),
+    distinctUntilChanged()
+  );
+
+  // Pagination display info
+  paginationStart$ = this.state$.pipe(
+    map((state) => {
+      if (state.filteredRows.length === 0) return 0;
+      return state.currentPage * state.pageSize + 1;
+    }),
+    distinctUntilChanged()
+  );
+
+  paginationEnd$ = this.state$.pipe(
+    map((state) => {
+      const end = (state.currentPage + 1) * state.pageSize;
+      return Math.min(end, state.filteredRows.length);
+    }),
+    distinctUntilChanged()
+  );
 
   ngOnInit(): void {
     this.loadDataFromServer();
@@ -154,14 +207,7 @@ export class FilmingTableComponent implements OnInit, OnDestroy {
           filteredRows: [...rows],
           loading: false,
         });
-
-        console.log('📊 Данные загружены:', {
-          jobId: this.jobId,
-          columns: columns.length,
-          rowsCount: rows.length,
-        });
       } else {
-        console.warn('⚠️ Нет данных в localStorage');
         this.setState({
           columns: [],
           rows: [],
@@ -199,22 +245,27 @@ export class FilmingTableComponent implements OnInit, OnDestroy {
    * Обновляет результаты поиска
    */
   private updateSearch(searchText: string): void {
-    const state = this.state$.value;
-    let filtered = [...state.rows];
+  const state = this.state$.value;
+  let filtered = [...state.rows];
 
-    if (searchText.trim()) {
-      const searchLower = searchText.toLowerCase();
-      filtered = filtered.filter((row) =>
-        Object.values(row).some((value) => String(value).toLowerCase().includes(searchLower))
-      );
-    }
-
-    if (state.sortColumn) {
-      filtered = this.sortRows(filtered, state.sortColumn, state.sortOrder);
-    }
-
-    this.setState({ filteredRows: filtered });
+  if (searchText.trim()) {
+    const searchLower = searchText.toLowerCase();
+    filtered = filtered.filter((row) =>
+      Object.values(row).some((value) => String(value).toLowerCase().includes(searchLower))
+    );
   }
+
+  if (state.sortColumn) {
+    filtered = this.sortRows(filtered, state.sortColumn, state.sortOrder);
+  }
+
+  // Всегда сбрасываем на первую страницу при поиске
+  this.setState({ 
+    filteredRows: filtered, 
+    searchText, 
+    currentPage: 0 
+  });
+}
 
   /**
    * Сортировка строк
@@ -244,23 +295,27 @@ export class FilmingTableComponent implements OnInit, OnDestroy {
   /**
    * Сортировка по столбцу
    */
-  sortByColumn(columnName: string): void {
-    const state = this.state$.value;
-    let newOrder: 'asc' | 'desc' = 'asc';
+ sortByColumn(columnName: string): void {
+  const state = this.state$.value;
+  let newOrder: 'asc' | 'desc' = 'asc';
 
-    if (state.sortColumn === columnName) {
-      newOrder = state.sortOrder === 'asc' ? 'desc' : 'asc';
-    }
-
-    const sortedRows = this.sortRows(state.filteredRows, columnName, newOrder);
-
-    this.setState({
-      sortColumn: columnName,
-      sortOrder: newOrder,
-      filteredRows: sortedRows,
-    });
+  if (state.sortColumn === columnName) {
+    newOrder = state.sortOrder === 'asc' ? 'desc' : 'asc';
   }
 
+  const sortedRows = this.sortRows(state.filteredRows, columnName, newOrder);
+
+  // Пересчитываем текущую страницу после сортировки
+  const totalPages = Math.ceil(sortedRows.length / state.pageSize);
+  const newCurrentPage = state.currentPage >= totalPages ? 0 : state.currentPage;
+
+  this.setState({
+    sortColumn: columnName,
+    sortOrder: newOrder,
+    filteredRows: sortedRows,
+    currentPage: newCurrentPage, // Сбрасываем страницу если нужно
+  });
+}
   /**
    * Получить иконку сортировки для столбца
    */
@@ -287,20 +342,23 @@ export class FilmingTableComponent implements OnInit, OnDestroy {
    */
   clearFilters(): void {
     const state = this.state$.value;
-    this.setState({
-      searchText: '',
-      filteredRows: [...state.rows],
-      sortColumn: null,
-      sortOrder: 'asc',
-      selectedRows: new Set(),
-    });
+  this.setState({
+    searchText: '',
+    filteredRows: [...state.rows],
+    sortColumn: null,
+    sortOrder: 'asc',
+    selectedRows: new Set(),
+    currentPage: 0, // Уже сбрасывается на 0
+  });
 
-    this.messageService.add({
-      severity: 'info',
-      summary: this.translate.instant('SCENE_TABLE.FILTERS_CLEARED') || 'Фильтры очищены',
-      detail: this.translate.instant('SCENE_TABLE.FILTERS_DETAILS') || 'Все фильтры были сброшены до значений по умолчанию.',
-      life: 2000,
-    });
+  this.messageService.add({
+    severity: 'info',
+    summary: this.translate.instant('SCENE_TABLE.FILTERS_CLEARED') || 'Фильтры очищены',
+    detail:
+      this.translate.instant('SCENE_TABLE.FILTERS_DETAILS') ||
+      'Все фильтры были сброшены до значений по умолчанию.',
+    life: 2000,
+  });
   }
 
   /**
@@ -335,6 +393,24 @@ export class FilmingTableComponent implements OnInit, OnDestroy {
 
     this.setState({ selectedRows });
   }
+
+  /**
+   * Обработка изменения страницы пагинатора
+   */
+ onPageChange(event: any): void {
+  const pageSize = event.rows || 10;
+  const first = event.first || 0;
+  const currentPage = Math.floor(first / pageSize);
+
+  // Проверяем, что текущая страница не выходит за пределы
+  const totalPages = Math.ceil(this.state$.value.filteredRows.length / pageSize);
+  const safeCurrentPage = Math.min(currentPage, totalPages - 1);
+
+  this.setState({
+    currentPage: safeCurrentPage,
+    pageSize,
+  });
+}
 
   /**
    * Проверить, выбрана ли строка

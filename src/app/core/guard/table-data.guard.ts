@@ -1,60 +1,55 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
-import { catchError, of } from 'rxjs';
+import { catchError, of, shareReplay, timeout } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Result } from '../../shared/services/result';
+
+let cachedValidation: Map<string, { result: boolean; timestamp: number }> = new Map();
+const CACHE_DURATION_MS = 60000; // 1 минута
 
 export const TableDataGuard: CanActivateFn = (route, state) => {
   const result = inject(Result);
   const router = inject(Router);
 
-  // Проверяем наличие данных в localStorage
-  const storedData = localStorage.getItem('processedTableData');
+  // Минимизируем обращения к localStorage - одно обращение
   const storedJobId = localStorage.getItem('jobId');
 
-  console.log('🔐 TableDataGuard: Проверка доступа', {
-    hasStoredData: !!storedData,
-    hasJobId: !!storedJobId,
-  });
-
-  // Если нет данных в localStorage, перенаправляем на 404
-  if (!storedData || !storedJobId) {
-    console.warn('❌ TableDataGuard: Нет данных в localStorage');
+  if (!storedJobId) {
     router.navigate(['/error/404']);
     return false;
   }
 
-  // Проверяем данные на валидность через API
+  // Проверяем кэш перед API запросом
+  const cachedEntry = cachedValidation.get(storedJobId);
+  if (cachedEntry && Date.now() - cachedEntry.timestamp < CACHE_DURATION_MS) {
+    return cachedEntry.result;
+  }
+
+  // Валидируем данные через API с timeout
   return result.getResult(storedJobId).pipe(
-    map((response) => {
-      console.log('✅ TableDataGuard: Результат получен:', {
-        status: (response as any).status,
-        job_id: (response as any).job_id,
+    timeout(5000),
+    map((response: any) => {
+      const isValid = response?.status === 'completed';
+
+      // Кэшируем результат валидации
+      cachedValidation.set(storedJobId, {
+        result: isValid,
+        timestamp: Date.now(),
       });
 
-      // Если статус 'completed', пропускаем
-      if ((response as any).status === 'completed') {
-        console.log('✅ TableDataGuard: Доступ разрешен');
-        return true;
+      if (!isValid) {
+        router.navigate(['/error/404']);
       }
 
-      console.warn('❌ TableDataGuard: Неверный статус:', (response as any).status);
-      router.navigate(['/error/404']);
-      return false;
+      return isValid;
     }),
-    catchError((error) => {
-      console.error('❌ TableDataGuard: Ошибка при проверке результата:', error);
-
-      // В зависимости от типа ошибки, перенаправляем на разные страницы
-      if (error?.status === 404) {
-        router.navigate(['/error/404']);
-      } else if (error?.status === 500 || error?.status === 505) {
-        router.navigate(['/error/500']);
-      } else {
-        router.navigate(['/error/404']);
-      }
-
+    catchError((error: any) => {
+      // Маршрутизация по типам ошибок
+      const errorRoute =
+        error?.status === 500 || error?.status === 505 ? '/error/500' : '/error/404';
+      router.navigate([errorRoute]);
       return of(false);
-    })
+    }),
+    shareReplay({ bufferSize: 1, refCount: true })
   );
 };

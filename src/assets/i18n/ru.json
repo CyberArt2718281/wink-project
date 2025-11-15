@@ -153,6 +153,8 @@
     "SEARCH_PLACEHOLDER": "Поиск по всем столбцам...",
     "CLEAR_FILTERS": "Очистить",
     "SHOWN": "Показано {{shown}} из {{total}} записей",
+    "SHOWN_RANGE": "Показано {{start}}-{{end}} из {{total}} записей",
+    "PAGINATION": "Навигация по страницам",
     "SELECTED": "Выбрано",
     "ROWS": "строк",
     "DESELECT": "Отменить выбор",
@@ -161,8 +163,8 @@
     "DUPLICATE": "Дублировать",
     "DELETE_ROW": "Удалить",
     "CONFIRM_EXPORT": "Подтверждение экспорта",
-    "EXPORT_CONFIRM_EXCEL": "Экспортировать",
-    "EXPORT_CONFIRM_CSV": "Экспортировать",
+    "EXPORT_CONFIRM_EXCEL": "Экспортировать в формате xslx",
+    "EXPORT_CONFIRM_CSV": "Экспортировать в формате csv",
     "RECORDS_FORMAT": "записей в формате?",
     "EXPORT": "Экспортировать",
     "NO_DATA": "Нет данных для отображения",
@@ -174,7 +176,8 @@
     "FROM": "из",
     "RECORDS_COUNT": "записей",
     "LOAD_ERROR": "Не удалось загрузить данные",
-    "EXPORT_EXCEL": "Экспорт в Excel"
+    "EXPORT_EXCEL": "Экспорт в Excel",
+    "FILTERS_DETAILS": "Фильтры успешно сброшены"
   },
   "ERROR_404": {
     "TITLE": "Страница не найдена",
@@ -215,7 +218,9 @@
     "SUCCESS": "Успешно",
     "WARNING": "Внимание",
     "INFO": "Информация",
-    "CONFIRM": "Подтвердить"
+    "CONFIRM": "Подтвердить",
+    "SEARCH": "Поиск",
+    "ACTIONS": "Действия"
   },
   "TABLE": {
     "SAVE_ERROR": "Ошибка при сохранении"

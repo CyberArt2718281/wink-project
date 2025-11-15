@@ -11,65 +11,72 @@ import { MessageService } from 'primeng/api';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
+interface ErrorConfig {
+  status: number | number[];
+  severity: 'error' | 'warn';
+  summary: string;
+  detail: (error: HttpErrorResponse) => string;
+  navigateTo?: string;
+}
+
 @Injectable()
 export class ErrorInterceptor implements HttpInterceptor {
+  private readonly errorConfigs: ErrorConfig[] = [
+    {
+      status: 404,
+      severity: 'error',
+      summary: 'Ошибка 404',
+      detail: () => 'Ресурс не найден',
+    },
+    {
+      status: [500, 505],
+      severity: 'error',
+      summary: 'Ошибка сервера',
+      detail: (error) => `Ошибка ${error.status}: ${error.statusText || 'Internal Server Error'}`,
+      navigateTo: '/error/500',
+    },
+    {
+      status: 0,
+      severity: 'error',
+      summary: 'Ошибка соединения',
+      detail: () => 'Проверьте ваше интернет-соединение',
+    },
+    {
+      status: [401, 403],
+      severity: 'warn',
+      summary: 'Доступ запрещён',
+      detail: () => 'У вас нет прав доступа к этому ресурсу',
+    },
+  ];
+
   constructor(private router: Router, private messageService: MessageService) {}
 
   intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
     return next.handle(request).pipe(
       catchError((error: HttpErrorResponse) => {
-        console.error('HTTP Error:', error);
+        const config = this.findErrorConfig(error.status);
 
-        // Обработка ошибок 404
-        if (error.status === 404) {
-          console.warn('404 Not Found');
+        if (config) {
           this.messageService.add({
-            severity: 'error',
-            summary: 'Ошибка 404',
-            detail: 'Ресурс не найден',
-            life: 3000,
+            severity: config.severity,
+            summary: config.summary,
+            detail: config.detail(error),
+            life: config.severity === 'error' ? 4000 : 3000,
           });
-        }
 
-        // Обработка ошибок 500 и 505
-        if (error.status === 500 || error.status === 505) {
-          console.error('Server Error:', error.status);
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Ошибка сервера',
-            detail: `Ошибка ${error.status}: ${error.statusText || 'Internal Server Error'}`,
-            life: 4000,
-          });
-          // Перенаправляем на страницу ошибки сервера
-          setTimeout(() => {
-            this.router.navigate(['/error/500']);
-          }, 1000);
-        }
-
-        // Обработка ошибок сети (0 статус)
-        if (error.status === 0) {
-          console.error('Network Error or CORS issue');
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Ошибка соединения',
-            detail: 'Проверьте ваше интернет-соединение',
-            life: 3000,
-          });
-        }
-
-        // Обработка ошибок 401, 403
-        if (error.status === 401 || error.status === 403) {
-          console.warn('Unauthorized or Forbidden');
-          this.messageService.add({
-            severity: 'warn',
-            summary: 'Доступ запрещён',
-            detail: 'У вас нет прав доступа к этому ресурсу',
-            life: 3000,
-          });
+          if (config.navigateTo) {
+            this.router.navigate([config.navigateTo]);
+          }
         }
 
         return throwError(() => error);
       })
+    );
+  }
+
+  private findErrorConfig(status: number): ErrorConfig | undefined {
+    return this.errorConfigs.find((config) =>
+      Array.isArray(config.status) ? config.status.includes(status) : config.status === status
     );
   }
 }

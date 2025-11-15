@@ -48,7 +48,7 @@
     "BASIC": "Basic",
     "FULL": "Full",
     "BASIC_DESC": "Minimal settings for quick upload",
-    "ADVANCED": "Advanced",
+    "ADVANCED": "Extended",
     "ADVANCED_DESC": "Additional options for fine-tuning",
     "CUSTOM": "Сustom",
     "FULL_DESC": "All available settings and features",
@@ -89,6 +89,8 @@
     "CLEAR_FILTERS": "Clear",
     "FILTERS_CLEARED": "Filters cleared",
     "SHOWN": "Showing {{shown}} of {{total}} records",
+    "SHOWN_RANGE": "Showing {{start}}-{{end}} of {{total}} records",
+    "PAGINATION": "Pagination",
     "SELECTED": "Selected",
     "ROWS": "rows",
     "DESELECT": "Deselect",
@@ -100,8 +102,8 @@
     "EXPORT_EXCEL": "Export to Excel",
     "EXPORT_CSV": "Export to CSV",
     "CONFIRM_EXPORT": "Confirm Export",
-    "EXPORT_CONFIRM_EXCEL": "Export",
-    "EXPORT_CONFIRM_CSV": "Export",
+    "EXPORT_CONFIRM_EXCEL": "Export in xlsx format",
+    "EXPORT_CONFIRM_CSV": "Export in Csv format ",
     "RECORDS_FORMAT": "records in format?",
     "EXPORT": "Export",
     "NO_DATA": "No data to display",
@@ -174,7 +176,8 @@
     "EXPORT_EXCEL_DETAIL": "Data successfully exported to Excel",
     "EXPORT_CSV_DETAIL": "Data successfully exported to CSV",
     "EXPORT_CONFIRM_SUBTEXT": "The file will be saved to your downloads",
-    "ITEMS_SELECTED": "selected items"
+    "ITEMS_SELECTED": "selected items",
+    "FILTERS_DETAILS": "Filters have been successfully reset."
   },
   "ERROR_404": {
     "TITLE": "Page not found",
@@ -215,6 +218,8 @@
     "SUCCESS": "Success",
     "WARNING": "Warning",
     "INFO": "Info",
-    "CONFIRM": "Confirm"
+    "CONFIRM": "Confirm",
+    "SEARCH": "Search",
+    "ACTIONS": "Actions"
   }
 }

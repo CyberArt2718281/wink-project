@@ -24,18 +24,17 @@ export const routes: Routes = [
   },
   {
     path: 'error/404',
-    component: NotFoundComponent,
+    loadComponent: () =>
+          import('./features/404/not-found.component').then((m) => m.NotFoundComponent),
   },
   {
     path: 'error/500',
-    component: InternalServerErrorComponent,
-  },
-  {
-    path: '505',
-    component: InternalServerErrorComponent,
+        loadComponent: () =>
+          import('./features/505/internal-server-error.component').then((m) => m.InternalServerErrorComponent),
   },
   {
     path: '**',
-    component: NotFoundComponent,
+        loadComponent: () =>
+          import('./features/404/not-found.component').then((m) => m.NotFoundComponent),
   },
 ];

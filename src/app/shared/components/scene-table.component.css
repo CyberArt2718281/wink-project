@@ -1,4 +1,3 @@
-
 :host ::ng-deep {
   .p-datatable .p-datatable-tbody > tr {
     transition: background-color 0.2s;
@@ -62,7 +61,7 @@
   }
 
   .p-dialog .p-dialog-header {
-    background: #1A1A1A;
+    background: #1a1a1a;
     border-bottom: 1px solid #333333;
     padding: 1.5rem;
   }
@@ -75,7 +74,7 @@
   }
 
   .p-dialog .p-dialog-header .p-dialog-header-icon {
-    color: #9CA3AF;
+    color: #9ca3af;
     background: transparent;
     border: none;
     width: 2rem;
@@ -90,19 +89,89 @@
   }
 
   .p-dialog .p-dialog-content {
-    background: #1A1A1A;
+    background: #1a1a1a;
     color: white;
     padding: 1.5rem;
     border-bottom: 1px solid #232323;
   }
 
   .p-dialog .p-dialog-footer {
-    background: #1A1A1A;
+    background: #1a1a1a;
     border-top: none;
     padding: 1.5rem;
   }
 }
-button{
+button {
   border-radius: 40px;
+}
 
+/* Стили для пагинатора */
+:host ::ng-deep {
+  .p-paginator {
+    background: transparent;
+    border: none;
+    padding: 0 !important;
+    justify-content: center;
+  }
+
+  .p-paginator .p-paginator-left-content,
+  .p-paginator .p-paginator-right-content {
+    display: none;
+  }
+
+  .p-paginator .p-paginator-pages {
+    gap: 0.25rem;
+  }
+
+  .p-paginator .p-paginator-page,
+  .p-paginator .p-paginator-next,
+  .p-paginator .p-paginator-prev,
+  .p-paginator .p-paginator-first,
+  .p-paginator .p-paginator-last {
+    color: #d1d5db;
+    background: #232323;
+    border: 1px solid #333333;
+    border-radius: 0.5rem;
+    transition: all 0.2s;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+    cursor: pointer;
+  }
+
+  .p-paginator .p-paginator-page:hover,
+  .p-paginator .p-paginator-next:hover,
+  .p-paginator .p-paginator-prev:hover,
+  .p-paginator .p-paginator-first:hover,
+  .p-paginator .p-paginator-last:hover {
+    background: #2a2a2a;
+    border-color: #444444;
+    color: white;
+  }
+
+  .p-paginator .p-paginator-page.p-highlight {
+    background: linear-gradient(135deg, #ff6600 0%, #ff8533 100%);
+    border-color: #ff6600;
+    color: white;
+    font-weight: 600;
+  }
+
+  .p-paginator .p-paginator-page.p-highlight:hover {
+    background: linear-gradient(135deg, #ff8533 0%, #ff6600 100%);
+  }
+
+  .p-paginator .p-paginator-rpp-options {
+    background: #232323;
+    border: 1px solid #333333;
+    border-radius: 0.5rem;
+    color: #d1d5db;
+  }
+
+  .p-paginator .p-paginator-rpp-options option {
+    background: #1a1a1a;
+    color: #d1d5db;
+  }
+
+  .p-paginator .p-paginator-rpp-options option:hover {
+    background: #232323;
+  }
 }

@@ -38,8 +38,6 @@ export class CeilService {
   updateCell(payload: CeilRequest): Observable<UpdatedCell> {
     const url = this.baseUrl ? `${this.baseUrl.replace(/\/+$/, '')}/cell` : `/cell`;
 
-    console.log('📤 Отправка PATCH запроса на:', url);
-    console.log('📦 Тело запроса:', JSON.stringify(payload));
 
     return this.http.patch<CeilSuccessResponse | CeilErrorResponse>(url, payload).pipe(
       map((res: any) => {
