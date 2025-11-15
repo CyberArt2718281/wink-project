@@ -1,33 +1,94 @@
-<p-toast position="top-center" key="confirm" (onClose)="onClose()" [baseZIndex]="5000"
-         class="w-full max-w-[95vw]  sm:max-w-md mx-auto px-2 inter-medium !rounded-[28px]">
+<p-toast
+  position="top-center"
+  key="confirm"
+  (onClose)="onClose()"
+  [baseZIndex]="5000"
+  class="w-full max-w-[95vw] sm:max-w-md mx-auto px-2 inter-medium !rounded-[28px]"
+>
   <ng-template let-message pTemplate="headless" let-closeFn="closeFn">
     <section
-      class="flex flex-col p-4 sm:p-6 gap-3 sm:gap-4 w-full bg-[#1A1A1A]  rounded-xl sm:rounded-2xl mx-auto backdrop-blur-lg inter-medium">
+      class="flex flex-col p-4 sm:p-6 gap-3 sm:gap-4 w-full bg-[#1A1A1A] rounded-xl sm:rounded-2xl mx-auto backdrop-blur-lg inter-medium"
+    >
       <div class="flex items-center gap-3 sm:gap-4">
-        <div class="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 bg-[#FF6600]/20 rounded-full shrink-0">
+        <div
+          class="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 bg-[#FF6600]/20 rounded-full shrink-0"
+        >
           <i class="pi pi-cloud-upload text-[#FF6600] text-lg sm:text-xl"></i>
         </div>
         <div class="flex-1 min-w-0">
-          <span
-            class="font-bold text-base sm:text-lg text-white block truncate inter-extra-bold">{{ message.summary }}</span>
-          <span class="text-xs sm:text-sm text-gray-400 inter-regular">{{ 'UPLOAD.PROCESSING' | translate }}</span>
+          <span class="font-bold text-base sm:text-lg text-white block truncate inter-extra-bold">{{
+            message.summary
+          }}</span>
+          <span class="text-xs sm:text-sm text-gray-400 inter-regular">{{
+            'UPLOAD.PROCESSING' | translate
+          }}</span>
         </div>
       </div>
       <div class="flex flex-col gap-2 sm:gap-3">
         @if (!error) {
-          <div class="flex justify-between text-xs sm:text-sm">
-            <span class="text-gray-400 inter-regular">{{ 'UPLOAD.PROGRESS' | translate }}</span>
-            <span class="text-white font-semibold inter-medium">{{ progress }}%</span>
+        <!-- Прогресс и информация -->
+        <div class="flex justify-between items-center gap-3">
+          <div class="flex-1 min-w-0">
+            <div class="flex justify-between text-xs sm:text-sm mb-1">
+              <span class="text-gray-400 inter-regular">{{ progressMessage }}</span>
+              <span class="text-white font-semibold inter-medium">{{ progress }}%</span>
+            </div>
+            <!-- Стадии обработки -->
+            <div class="flex gap-1 text-xs">
+              <span
+                [class]="
+                  'px-2 py-1 rounded-full inter-medium ' +
+                  (progressStage === 'analyzing'
+                    ? 'bg-blue-500/20 text-blue-400'
+                    : 'bg-gray-700/30 text-gray-400')
+                "
+              >
+                📤 Анализ
+              </span>
+              <span
+                [class]="
+                  'px-2 py-1 rounded-full inter-medium ' +
+                  (progressStage === 'waiting'
+                    ? 'bg-yellow-500/20 text-yellow-400'
+                    : 'bg-gray-700/30 text-gray-400')
+                "
+              >
+                ⏳ Обработка
+              </span>
+              <span
+                [class]="
+                  'px-2 py-1 rounded-full inter-medium ' +
+                  (progressStage === 'retrieving'
+                    ? 'bg-purple-500/20 text-purple-400'
+                    : 'bg-gray-700/30 text-gray-400')
+                "
+              >
+                📥 Получение
+              </span>
+            </div>
           </div>
-          <p-progressbar [value]="progress" [showValue]="false"
-                         [style]="{ height: '4px', backgroundColor: '#232323', borderRadius: '8px' }"
-                         class="[&>div]:bg-gradient-to-r [&>div]:from-[#FF6600] [&>div]:to-[#FF8533] [&>div]:rounded-full inter-medium ">
-          </p-progressbar>
+        </div>
+        <!-- Прогресс бар -->
+        <p-progressbar
+          [value]="progress"
+          [showValue]="false"
+          [style]="{ height: '6px', backgroundColor: '#232323', borderRadius: '8px' }"
+          [ngClass]="
+            progressStage === 'analyzing'
+              ? '[&>div]:bg-linear-to-r [&>div]:from-blue-500 [&>div]:to-blue-400'
+              : progressStage === 'waiting'
+              ? '[&>div]:bg-linear-to-r [&>div]:from-[#FF6600] [&>div]:to-[#FF8533]'
+              : '[&>div]:bg-linear-to-r [&>div]:from-green-500 [&>div]:to-green-400'
+          "
+        >
+        </p-progressbar>
         }
       </div>
       <div class="flex gap-2 sm:gap-3 justify-end pt-1 sm:pt-2">
-        <button (click)="showCancelConfirmation()"
-                class="px-4 py-2 bg-[#232323] text-gray-300 rounded-lg hover:bg-[#2A2A2A] hover:text-white transition-colors duration-200 font-medium inter-medium">
+        <button
+          (click)="showCancelConfirmation()"
+          class="px-4 py-2 bg-[#232323] text-gray-300 rounded-lg hover:bg-[#2A2A2A] hover:text-white transition-colors duration-200 font-medium inter-medium"
+        >
           {{ 'UPLOAD.CANCEL' | translate }}
         </button>
       </div>
@@ -36,8 +97,12 @@
 </p-toast>
 
 <!-- Toast для ошибок -->
-<p-toast position="top-center" key="error" [baseZIndex]="6000"
-         class="w-full max-w-[95vw] sm:max-w-md mx-auto px-2 inter-medium !rounded-[40px]"></p-toast>
+<p-toast
+  position="top-center"
+  key="error"
+  [baseZIndex]="6000"
+  class="w-full max-w-[95vw] sm:max-w-md mx-auto px-2 inter-medium !rounded-[40px]"
+></p-toast>
 
 <!-- Модалка подтверждения отмены -->
 <p-dialog
@@ -47,7 +112,8 @@
   [blockScroll]="false"
   [style]="{ width: '90vw', maxWidth: '400px' }"
   [baseZIndex]="7000"
-  styleClass="confirm-cancel-dialog !rounded-[28px] ">
+  styleClass="confirm-cancel-dialog !rounded-[28px] "
+>
   <div class="flex flex-col gap-4">
     <div class="flex items-center gap-3">
       <div class="flex items-center justify-center w-10 h-10 bg-red-500/20 rounded-full shrink-0">
@@ -57,14 +123,18 @@
     </div>
 
     <div class="flex gap-2 justify-end">
-      <button pButton
-              (click)="hideCancelConfirmation()"
-              class="p-button-text p-button-secondary !bg-[#232323] !text-gray-300 !border-[#232323] hover:!bg-[#2A2A2A] inter-medium !rounded-[40px]">
+      <button
+        pButton
+        (click)="hideCancelConfirmation()"
+        class="p-button-text p-button-secondary !bg-[#232323] !text-gray-300 !border-[#232323] hover:!bg-[#2A2A2A] inter-medium !rounded-[40px]"
+      >
         {{ 'UPLOAD.NO' | translate }}
       </button>
-      <button pButton
-              (click)="confirmCancel()"
-              class="!text-white !bg-red-500 !border-red-500 hover:!bg-red-600 hover:!border-red-600 inter-medium !rounded-[40px]">
+      <button
+        pButton
+        (click)="confirmCancel()"
+        class="!text-white !bg-red-500 !border-red-500 hover:!bg-red-600 hover:!border-red-600 inter-medium !rounded-[40px]"
+      >
         {{ 'UPLOAD.YES_CANCEL' | translate }}
       </button>
     </div>
@@ -73,49 +143,59 @@
 
 <!-- Основной контейнер -->
 <div
-  class="flex flex-col items-center justify-center min-h-[70vh] bg-gradient-to-br from-black to-[#0A0A0A] rounded-none p-4 sm:p-4 md:p-6 lg:p-8 inter-medium">
-
+  class="flex flex-col items-center justify-center min-h-[70vh] bg-gradient-to-br from-black to-[#0A0A0A] rounded-none p-4 sm:p-4 md:p-6 lg:p-8 inter-medium"
+>
   <!-- Заголовок и описание -->
   <div class="text-center mb-6 sm:mb-8 w-full max-w-2xl">
     <h1
-      class="text-2xl sm:text-3xl md:text-4xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent mb-3 sm:mb-4 px-2 py-8 inter-extra-bold">
+      class="text-2xl sm:text-3xl md:text-4xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent mb-3 sm:mb-4 px-2 py-8 inter-extra-bold"
+    >
       {{ 'UPLOAD.TITLE' | translate }}
     </h1>
-    <p
-      class="text-gray-400 text-sm sm:text-base md:text-lg px-2 inter-regular">{{ 'UPLOAD.SUPPORTED_FORMATS' | translate }}</p>
+    <p class="text-gray-400 text-sm sm:text-base md:text-lg px-2 inter-regular">
+      {{ 'UPLOAD.SUPPORTED_FORMATS' | translate }}
+    </p>
   </div>
 
   <!-- Карточка с информацией о пресете -->
-  <div class="w-full max-w-2xl mb-4 sm:mb-6 ">
+  <div class="w-full max-w-2xl mb-4 sm:mb-6">
     <div
-      class="bg-[#1A1A1A] border border-[#232323] rounded-lg sm:rounded-xl p-3 sm:p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
+      class="bg-[#1A1A1A] border border-[#232323] rounded-lg sm:rounded-xl p-3 sm:p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4"
+    >
       <div class="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
         <div class="w-2 h-6 sm:h-8 bg-[#FF6600] rounded-full shrink-0 gradient-badge"></div>
         <div class="min-w-0">
-          <h3
-            class="text-white font-semibold text-sm sm:text-base inter-medium">{{ 'UPLOAD.CURRENT_PRESET' | translate }}</h3>
-          <p
-            class="text-gray-400 text-xs sm:text-sm truncate inter-regular">{{ 'UPLOAD.PRESET_SETTINGS' | translate }}</p>
+          <h3 class="text-white font-semibold text-sm sm:text-base inter-medium">
+            {{ 'UPLOAD.CURRENT_PRESET' | translate }}
+          </h3>
+          <p class="text-gray-400 text-xs sm:text-sm truncate inter-regular">
+            {{ 'UPLOAD.PRESET_SETTINGS' | translate }}
+          </p>
         </div>
       </div>
-      <div class="flex items-center gap-2 sm:gap-4 w-full sm:w-auto justify-between sm:justify-normal">
-            <span
-              class="px-3 py-1 sm:px-4 sm:py-2 rounded-[40px] border border-[#232323] text-xs sm:text-sm font-medium whitespace-nowrap inter-medium"
-              [ngStyle]="getPresetStyle(selectedOption)">
-              {{ getPresetLabel(selectedOption) }}
-            </span>
+      <div
+        class="flex items-center gap-2 sm:gap-4 w-full sm:w-auto justify-between sm:justify-normal"
+      >
+        <span
+          class="px-3 py-1 sm:px-4 sm:py-2 rounded-[40px] border border-[#232323] text-xs sm:text-sm font-medium whitespace-nowrap inter-medium"
+          [ngStyle]="getPresetStyle(selectedOption)"
+        >
+          {{ getPresetLabel(selectedOption) }}
+        </span>
         <app-settings-upload (presetChange)="onPresetChange($event)"></app-settings-upload>
       </div>
     </div>
   </div>
 
   <!-- Область загрузки -->
-  <div class="w-full max-w-2xl ">
+  <div class="w-full max-w-2xl">
     <div
       class="group relative flex flex-col items-center justify-center h-48 sm:h-56 md:h-64 border-2 border-dashed border-[#232323] rounded-xl sm:rounded-2xl cursor-pointer transition-all duration-300 bg-[#1A1A1A] mb-4 sm:mb-6 overflow-hidden"
-      [class]="visible ?
-      'cursor-not-allowed opacity-60 border-[#232323] bg-[#1A1A1A]' :
-      'cursor-pointer hover:border-[#FF6600] hover:bg-[#1A1A1A]/50 border-[#232323] bg-[#1A1A1A]'"
+      [class]="
+        visible
+          ? 'cursor-not-allowed opacity-60 border-[#232323] bg-[#1A1A1A]'
+          : 'cursor-pointer hover:border-[#FF6600] hover:bg-[#1A1A1A]/50 border-[#232323] bg-[#1A1A1A]'
+      "
       (drop)="!visible && onDrop($event)"
       (dragover)="!visible && onDragOver($event)"
       (dragleave)="!visible && onDragLeave($event)"
@@ -123,30 +203,43 @@
       [class.border-[#FF6600]]="!visible && isDragOver"
       [class.bg-[#232323]]="!visible && isDragOver"
       [ngClass]="{
-  'ring-1': !visible && isDragOver,
-  'sm:ring-2': !visible && isDragOver
-}"
+        'ring-1': !visible && isDragOver,
+        'sm:ring-2': !visible && isDragOver
+      }"
     >
-
       <!-- Анимированный фон -->
-      <div class="absolute inset-0 opacity-0 transition-opacity duration-500"
-           [class]="visible ? 'opacity-0 ' : 'group-hover:opacity-100'">
+      <div
+        class="absolute inset-0 opacity-0 transition-opacity duration-500"
+        [class]="visible ? 'opacity-0 ' : 'group-hover:opacity-100'"
+      >
         <div
-          class="absolute top-0 left-0 w-20 h-20 sm:w-32 sm:h-32 bg-[#FF6600]/5 rounded-full blur-lg sm:blur-xl"></div>
+          class="absolute top-0 left-0 w-20 h-20 sm:w-32 sm:h-32 bg-[#FF6600]/5 rounded-full blur-lg sm:blur-xl"
+        ></div>
         <div
-          class="absolute bottom-0 right-0 w-20 h-20 sm:w-32 sm:h-32 bg-[#FF6600]/5 rounded-full blur-lg sm:blur-xl"></div>
+          class="absolute bottom-0 right-0 w-20 h-20 sm:w-32 sm:h-32 bg-[#FF6600]/5 rounded-full blur-lg sm:blur-xl"
+        ></div>
       </div>
 
       <!-- Контент -->
       <div class="relative z-10 text-center p-4 sm:p-6 w-full">
         <div
           class="w-12 h-12 sm:w-16 sm:h-16 bg-[#FF6600]/10 rounded-xl sm:rounded-2xl flex items-center justify-center mb-3 sm:mb-4 mx-auto transition-transform duration-300"
-          [class]="visible ? '' : 'group-hover:scale-105 sm:group-hover:scale-110'">
-          <svg class="w-6 h-6 sm:w-8 sm:h-8 text-[#FF6600]" viewBox="0 0 24 24" fill="none"
-               xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 16V4M12 4L8 8M12 4L16 8" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                  stroke-linejoin="round"/>
-            <rect x="4" y="16" width="16" height="4" rx="2" fill="currentColor"/>
+          [class]="visible ? '' : 'group-hover:scale-105 sm:group-hover:scale-110'"
+        >
+          <svg
+            class="w-6 h-6 sm:w-8 sm:h-8 text-[#FF6600]"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M12 16V4M12 4L8 8M12 4L16 8"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <rect x="4" y="16" width="16" height="4" rx="2" fill="currentColor" />
           </svg>
         </div>
 
@@ -158,85 +251,114 @@
         </p>
         <button
           class="px-4 py-2 sm:px-6 sm:py-3 rounded-[40px] font-semibold transition-all duration-200 border-none outline-none focus:ring-0 focus:border-0 focus:outline-none text-xs sm:text-sm md:text-base whitespace-nowrap inter-medium gradient-button"
-          [class]="visible ?
-          'bg-[#232323] text-gray-500 cursor-not-allowed opacity-70 inter-medium' :
-          'bg-[#FF6600] text-white hover:bg-[#FF8533] transform hover:scale-105 shadow-lg hover:shadow-[#FF6600]/25 inter-medium'"
+          [class]="
+            visible
+              ? 'bg-[#232323] text-gray-500 cursor-not-allowed opacity-70 inter-medium'
+              : 'bg-[#FF6600] text-white hover:bg-[#FF8533] transform hover:scale-105 shadow-lg hover:shadow-[#FF6600]/25 inter-medium'
+          "
           (click)="!visible && triggerFileInput(); $event.stopPropagation()"
-          [disabled]="visible">
+          [disabled]="visible"
+        >
           {{ visible ? ('UPLOAD.LOADING' | translate) : ('UPLOAD.CHOOSE_FILE' | translate) }}
         </button>
       </div>
 
-      <input #fileInput type="file"
-             class="absolute inset-0 opacity-0 cursor-pointer file-upload__choose-input"
-             (change)="onFileSelected($event)"
-             accept=".pdf,.docx"
-             [disabled]="visible"/>
+      <input
+        #fileInput
+        type="file"
+        class="absolute inset-0 opacity-0 cursor-pointer file-upload__choose-input"
+        (change)="onFileSelected($event)"
+        accept=".pdf,.docx"
+        [disabled]="visible"
+      />
     </div>
 
     <!-- Информация о загруженном файле -->
     @if (uploadedFile) {
-      <div class="bg-[#1A1A1A] border border-[#232323] rounded-xl sm:rounded-2xl p-4 sm:p-6 animate-fade-in"
-           id="file-info-block">
-        <div class="flex items-center gap-3 sm:gap-4 mb-3 sm:mb-4">
-          <div
-            class="w-10 h-10 sm:w-12 sm:h-12 bg-[#FF6600]/10 rounded-lg sm:rounded-xl flex items-center justify-center shrink-0">
-            <i class="pi pi-file text-[#FF6600] text-lg sm:text-xl"></i>
-          </div>
-          <div class="flex-1 min-w-0">
-            <h4 class="text-white font-semibold text-sm sm:text-base truncate inter-medium">{{ uploadedFile.name }}</h4>
-            <p class="text-gray-400 text-xs sm:text-sm inter-regular">{{ uploadedFileType }}
-              • {{ getFileSize(uploadedFile.size) }}</p>
-          </div>
-          <div
-            class="w-10 h-10 sm:w-12 sm:h-12 bg-green-500/10 rounded-lg sm:rounded-xl flex items-center justify-center shrink-0">
-            <i class="pi pi-check text-green-500 text-lg sm:text-xl"></i>
-          </div>
+    <div
+      class="bg-[#1A1A1A] border border-[#232323] rounded-xl sm:rounded-2xl p-4 sm:p-6 animate-fade-in"
+      id="file-info-block"
+    >
+      <div class="flex items-center gap-3 sm:gap-4 mb-3 sm:mb-4">
+        <div
+          class="w-10 h-10 sm:w-12 sm:h-12 bg-[#FF6600]/10 rounded-lg sm:rounded-xl flex items-center justify-center shrink-0"
+        >
+          <i class="pi pi-file text-[#FF6600] text-lg sm:text-xl"></i>
         </div>
-
-        <!-- Кнопка действия -->
-        <div class="flex flex-col sm:flex-row gap-2 sm:gap-3 mt-4 sm:mt-6">
-          <button
-            class="flex-1 px-4 py-2 sm:px-6 sm:py-3 bg-[#232323] text-gray-300 rounded-[40px] font-semibold transition-all duration-200 text-xs sm:text-sm border-none outline-none focus:ring-0 focus:border-0 focus:outline-none active:ring-0 active:border-0 active:outline-none inter-medium"
-            [ngClass]="{
-    'cursor-not-allowed opacity-70': isProcessing,
-    'hover:bg-[#2E2E2E] hover:text-white hover:scale-105 hover:shadow-md transform': !isProcessing
-  }"
-            (click)="!isProcessing && (uploadedFile = null)"
-            [disabled]="isProcessing">
-            {{ 'UPLOAD.DELETE' | translate }}
-          </button>
-          <button
-            class="flex-1 px-4 py-2 sm:px-6 sm:py-3 bg-[#FF6600] text-white rounded-[40px] font-semibold transition-all duration-200 flex items-center justify-center gap-1 sm:gap-2 text-xs sm:text-sm shadow-lg active:ring-0 active:border-0 active:outline-none inter-medium gradient-button"
-            [ngClass]="{
-              'hover:bg-[#FF8533] transform hover:scale-105 hover:shadow-[#FF6600]/25': !isProcessing,
-              'cursor-not-allowed opacity-70': isProcessing
-            }"
-            (click)="processData()"
-            [disabled]="isProcessing">
-            <i class="pi pi-cog text-xs sm:text-sm"></i>
-            {{ isProcessing ? ('UPLOAD.PROCESSING' | translate) : ('UPLOAD.PROCESS_DATA' | translate) }}
-          </button>
+        <div class="flex-1 min-w-0">
+          <h4 class="text-white font-semibold text-sm sm:text-base truncate inter-medium">
+            {{ uploadedFile.name }}
+          </h4>
+          <p class="text-gray-400 text-xs sm:text-sm inter-regular">
+            {{ uploadedFileType }} • {{ getFileSize(uploadedFile.size) }}
+          </p>
+        </div>
+        <div
+          class="w-10 h-10 sm:w-12 sm:h-12 bg-green-500/10 rounded-lg sm:rounded-xl flex items-center justify-center shrink-0"
+        >
+          <i class="pi pi-check text-green-500 text-lg sm:text-xl"></i>
         </div>
       </div>
+
+      <!-- Кнопка действия -->
+      <div class="flex flex-col sm:flex-row gap-2 sm:gap-3 mt-4 sm:mt-6">
+        <button
+          class="flex-1 px-4 py-2 sm:px-6 sm:py-3 bg-[#232323] text-gray-300 rounded-[40px] font-semibold transition-all duration-200 text-xs sm:text-sm border-none outline-none focus:ring-0 focus:border-0 focus:outline-none active:ring-0 active:border-0 active:outline-none inter-medium"
+          [ngClass]="{
+            'cursor-not-allowed opacity-70': isProcessing,
+            'hover:bg-[#2E2E2E] hover:text-white hover:scale-105 hover:shadow-md transform':
+              !isProcessing
+          }"
+          (click)="!isProcessing && (uploadedFile = null)"
+          [disabled]="isProcessing"
+        >
+          {{ 'UPLOAD.DELETE' | translate }}
+        </button>
+        <button
+          class="flex-1 px-4 py-2 sm:px-6 sm:py-3 bg-[#FF6600] text-white rounded-[40px] font-semibold transition-all duration-200 flex items-center justify-center gap-1 sm:gap-2 text-xs sm:text-sm shadow-lg active:ring-0 active:border-0 active:outline-none inter-medium gradient-button"
+          [ngClass]="{
+            'hover:bg-[#FF8533] transform hover:scale-105 hover:shadow-[#FF6600]/25': !isProcessing,
+            'cursor-not-allowed opacity-70': isProcessing
+          }"
+          (click)="processData()"
+          [disabled]="isProcessing"
+        >
+          <i class="pi pi-cog text-xs sm:text-sm"></i>
+          {{
+            isProcessing ? ('UPLOAD.PROCESSING' | translate) : ('UPLOAD.PROCESS_DATA' | translate)
+          }}
+        </button>
+      </div>
+    </div>
     }
 
     <!-- Подсказки -->
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3 md:gap-4 mt-6 sm:mt-8 py-8">
-      <div class="text-center p-3 sm:p-4 rounded-lg sm:rounded-xl bg-[#1A1A1A]/50 border border-[#232323] inter-medium">
+      <div
+        class="text-center p-3 sm:p-4 rounded-lg sm:rounded-xl bg-[#1A1A1A]/50 border border-[#232323] inter-medium"
+      >
         <i class="pi pi-shield text-[#FF6600] text-lg sm:text-xl mb-1 sm:mb-2"></i>
-        <h4 class="text-white font-semibold text-xs sm:text-sm mb-1 inter-medium">{{ 'UPLOAD.SAFE' | translate }}</h4>
+        <h4 class="text-white font-semibold text-xs sm:text-sm mb-1 inter-medium">
+          {{ 'UPLOAD.SAFE' | translate }}
+        </h4>
         <p class="text-gray-400 text-xs inter-regular">{{ 'UPLOAD.SAFE_DESC' | translate }}</p>
       </div>
-      <div class="text-center p-3 sm:p-4 rounded-lg sm:rounded-xl bg-[#1A1A1A]/50 border border-[#232323] inter-medium">
+      <div
+        class="text-center p-3 sm:p-4 rounded-lg sm:rounded-xl bg-[#1A1A1A]/50 border border-[#232323] inter-medium"
+      >
         <i class="pi pi-bolt text-[#FF6600] text-lg sm:text-xl mb-1 sm:mb-2"></i>
-        <h4 class="text-white font-semibold text-xs sm:text-sm mb-1 inter-medium">{{ 'UPLOAD.FAST' | translate }}</h4>
+        <h4 class="text-white font-semibold text-xs sm:text-sm mb-1 inter-medium">
+          {{ 'UPLOAD.FAST' | translate }}
+        </h4>
         <p class="text-gray-400 text-xs inter-regular">{{ 'UPLOAD.FAST_DESC' | translate }}</p>
       </div>
-      <div class="text-center p-3 sm:p-4 rounded-lg sm:rounded-xl bg-[#1A1A1A]/50 border border-[#232323] inter-medium">
+      <div
+        class="text-center p-3 sm:p-4 rounded-lg sm:rounded-xl bg-[#1A1A1A]/50 border border-[#232323] inter-medium"
+      >
         <i class="pi pi-mobile text-[#FF6600] text-lg sm:text-xl mb-1 sm:mb-2"></i>
-        <h4
-          class="text-white font-semibold text-xs sm:text-sm mb-1 inter-medium">{{ 'UPLOAD.AVAILABLE' | translate }}</h4>
+        <h4 class="text-white font-semibold text-xs sm:text-sm mb-1 inter-medium">
+          {{ 'UPLOAD.AVAILABLE' | translate }}
+        </h4>
         <p class="text-gray-400 text-xs inter-regular">{{ 'UPLOAD.AVAILABLE_DESC' | translate }}</p>
       </div>
     </div>

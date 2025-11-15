@@ -41,6 +41,8 @@ export class FileUploadComponent implements OnInit, OnDestroy {
   uploadedFile: File | null = null;
   uploadedFileType: string | null = null;
   progress: number = 0;
+  progressMessage: string = '';
+  progressStage: string = 'analyzing';
   visible: boolean = false;
   error: string | null = null;
   selectedOption: string | null = null;
@@ -271,6 +273,8 @@ export class FileUploadComponent implements OnInit, OnDestroy {
 
   private updateProgress(progressData: FileProcessingProgress): void {
     this.progress = Math.round(progressData.progress);
+    this.progressMessage = progressData.message;
+    this.progressStage = progressData.stage;
     this.cdr.markForCheck();
   }
 

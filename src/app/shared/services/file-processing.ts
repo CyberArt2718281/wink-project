@@ -1,15 +1,18 @@
-import {Injectable} from '@angular/core';
-import {from, Observable, Subject, throwError, timer} from 'rxjs';
-import {catchError, switchMap, take, takeUntil, tap} from 'rxjs/operators';
-import {FileAnalyze} from './file-analyze';
-import {Result} from './result';
-import {PostPreset} from '../../../types/Preset/presetType.type';
-import {SuccessResultResponse} from '../../../types/resultResponse.type';
+import { Injectable } from '@angular/core';
+import { from, Observable, Subject, throwError, timer } from 'rxjs';
+import { catchError, switchMap, take, takeUntil, tap } from 'rxjs/operators';
+import { PostPreset } from '../../../types/Preset/presetType.type';
+import { SuccessResultResponse } from '../../../types/resultResponse.type';
+import { FileAnalyze } from './file-analyze';
+import { Result } from './result';
 
 export interface FileProcessingProgress {
   stage: 'analyzing' | 'waiting' | 'retrieving' | 'completed';
   progress: number;
   message: string;
+  retryCount?: number;
+  totalRetries?: number;
+  estimatedTime?: number;
 }
 
 export interface FileProcessingError {
@@ -26,10 +29,7 @@ export class FileProcessing {
   private readonly RETRY_DELAY = 2000;
   private readonly TOTAL_TIMEOUT = 5 * 60 * 1000; // 5 минут
 
-  constructor(
-    private fileAnalyze: FileAnalyze,
-    private result: Result
-  ) {}
+  constructor(private fileAnalyze: FileAnalyze, private result: Result) {}
 
   /**
    * Полный процесс обработки файла
@@ -48,16 +48,17 @@ export class FileProcessing {
         console.log('✓ Файл успешно отправлен на анализ:', analyzeResponse.job_id);
         onProgress?.({
           stage: 'analyzing',
-          progress: Math.round(30),
-          message: 'Файл отправлен на обработку'
+          progress: 30,
+          message: 'Файл отправлен на обработку',
         });
       }),
       switchMap((analyzeResponse) => {
         const job_id = analyzeResponse.job_id;
         onProgress?.({
           stage: 'waiting',
-          progress: Math.round(40),
-          message: 'Ожидание обработки сервером...'
+          progress: 40,
+          message: 'Инициализация обработки...',
+          estimatedTime: Math.round((this.MAX_RETRIES * this.RETRY_DELAY) / 1000),
         });
         return this.pollResult(job_id, onProgress, cancel$);
       }),
@@ -65,13 +66,13 @@ export class FileProcessing {
         console.log('✓ Обработка файла завершена:', {
           job_id: successResponse.job_id,
           rows: successResponse.table.rows.length,
-          processing_time: successResponse.metadata.processing_time_seconds
+          processing_time: successResponse.metadata.processing_time_seconds,
         });
 
         onProgress?.({
           stage: 'completed',
           progress: 100,
-          message: 'Обработка завершена'
+          message: 'Обработка завершена',
         });
       }),
       catchError((error) => {
@@ -85,7 +86,7 @@ export class FileProcessing {
         const processingError: FileProcessingError = {
           status: 'error',
           stage: error.stage || 'analyzing',
-          message: error.message || error.detail || 'Неизвестная ошибка'
+          message: error.message || error.detail || 'Неизвестная ошибка',
         };
 
         return throwError(() => processingError);
@@ -115,18 +116,32 @@ export class FileProcessing {
         // Если это ProcessingResultResponse (status === 'processing')
         if ('status' in response && response.status === 'processing') {
           retryCount++;
-          const progress = Math.round(40 + (retryCount / this.MAX_RETRIES) * 50);
+          // Логарифмический рост вместо линейного для более реалистичного отображения
+          const progress = Math.round(
+            40 + (Math.log(retryCount + 1) / Math.log(this.MAX_RETRIES + 1)) * 50
+          );
 
           console.log(`⏳ Обработка... попытка ${retryCount}/${this.MAX_RETRIES}`);
+
+          // Расчет примерного оставшегося времени
+          const estimatedRemainingTime = Math.max(
+            0,
+            Math.round((this.MAX_RETRIES - retryCount) * (this.RETRY_DELAY / 1000))
+          );
 
           onProgress?.({
             stage: 'waiting',
             progress: Math.min(progress, 90),
-            message: `Обработка файла... (${retryCount}/${this.MAX_RETRIES})`
+            message: `Обработка файла... ${estimatedRemainingTime}с`,
+            retryCount,
+            totalRetries: this.MAX_RETRIES,
+            estimatedTime: estimatedRemainingTime,
           });
 
           if (retryCount >= this.MAX_RETRIES) {
-            const error = new Error('Превышено максимальное время ожидания обработки файла (5 минут)');
+            const error = new Error(
+              'Превышено максимальное время ожидания обработки файла (5 минут)'
+            );
             (error as any).stage = 'retrieving';
             throw error;
           }
@@ -147,7 +162,7 @@ export class FileProcessing {
             status: 'error',
             stage: 'retrieving',
             message: 'Операция отменена пользователем',
-            isCancelled: true
+            isCancelled: true,
           };
           return throwError(() => cancelError);
         }
