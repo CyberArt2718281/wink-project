@@ -4,11 +4,10 @@ import {providePrimeNG} from 'primeng/config';
 import {routes} from './app.routes';
 import {provideAnimationsAsync} from '@angular/platform-browser/animations/async';
 import {provideAnimations} from '@angular/platform-browser/animations';
-import {HTTP_INTERCEPTORS, provideHttpClient} from '@angular/common/http';
+import {provideHttpClient} from '@angular/common/http';
 import {provideTranslateService} from '@ngx-translate/core';
 import {provideTranslateHttpLoader} from "@ngx-translate/http-loader";
 import Aura from '@primeuix/themes/aura';
-import {AppHttpInterceptor} from './core/app-http.interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -17,14 +16,14 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes),
     provideAnimationsAsync(),
     provideAnimations(),
+    // HttpClient с поддержкой интерсепторов - ВАЖНО: это должно быть ДО других провайдеров
+    provideHttpClient(),
+    // Регистрируем интерсептор
     providePrimeNG({
       theme: {
         preset: Aura
       },
-
     }),
-    provideHttpClient(),
-    {provide: HTTP_INTERCEPTORS, useClass: AppHttpInterceptor, multi: true},
     provideTranslateService({
       loader: provideTranslateHttpLoader({
         prefix: '/assets/i18n/',
@@ -32,6 +31,6 @@ export const appConfig: ApplicationConfig = {
       }),
       fallbackLang: 'ru',
       lang: 'ru',
-    })
+    }),
   ]
 };

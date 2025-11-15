@@ -1,435 +1,235 @@
-<p-toast position="top-center" class="w-full max-w-[95vw] sm:max-w-md mx-auto px-2 !rounded-[40px] inter-medium"></p-toast>
-<p-confirmDialog styleClass="custom-confirm bg-[#232323] !rounded-[28px] text-white inter-medium" />
+<p-toast position="top-center" class="w-full max-w-[95vw] sm:max-w-md mx-auto px-2 rounded-[40px]! inter-medium"></p-toast>
+<p-confirmDialog [style]="{ width: '90vw', maxWidth: '500px' }" styleClass="!bg-[#1A1A1A] !border !border-[#232323] !rounded-2xl inter-medium"></p-confirmDialog>
 
-<div class="bg-black min-h-screen py-4 px-4 sm:p-4 md:p-6  lg:p-8 inter-regular">
-  <!-- Заголовок и управление -->
-  <div class="bg-[#1A1A1A] border border-[#232323] rounded-xl p-6 mb-6 lg:mb-8 mt-8">
-    <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
-      <div class="flex-1">
+<div class="bg-black min-h-screen py-4 px-4 sm:p-6 lg:p-8">
+  <!-- Заголовок -->
+  <div class="bg-[#1A1A1A] border border-[#232323] rounded-2xl p-6 mb-8 mt-8">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div>
         <div class="flex items-center gap-3 mb-3">
           <div class="w-2 h-8 bg-[#FF6600] rounded-full"></div>
           <h1 class="text-2xl sm:text-3xl font-bold text-white inter-extra-bold">
-            {{ 'SCENE_TABLE.TITLE' | translate }}
+            {{ 'SCENE_TABLE.ANALYSIS_RESULTS' | translate }}
           </h1>
         </div>
-        <p class="text-gray-400 text-sm sm:text-base ml-5 inter-regular">
-          {{ 'SCENE_TABLE.DESCRIPTION' | translate }}
-        </p>
+        <p class="text-gray-400 text-sm ml-5">{{ 'SCENE_TABLE.ANALYSIS_RESULTS_DESC' | translate }}</p>
       </div>
-      <div class="bg-[#232323] rounded-lg px-4 py-3 border border-[#333333] inter-medium">
+      <div class="bg-[#232323] rounded-xl px-4 py-3 border border-[#333333]">
         <div class="text-center">
-          <div class="text-[#FF6600] font-bold text-lg inter-extra-bold">{{ totalItems }}</div>
-          <div class="text-gray-400 text-xs inter-regular">{{ 'SCENE_TABLE.TOTAL_SCENES' | translate }}</div>
+          <div class="text-[#FF6600] font-bold text-lg inter-extra-bold">{{ totalRecords$ | async }}</div>
+          <div class="text-gray-400 text-xs">{{ 'SCENE_TABLE.RECORDS' | translate }}</div>
         </div>
       </div>
     </div>
   </div>
-  <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 gap-4">
-    <div class="flex-1 min-w-0">
-      <h2 class="text-2xl sm:text-3xl font-bold text-white mb-2 inter-extra-bold">{{ production.title }}</h2>
-      <div class="flex flex-wrap gap-4 text-gray-400 text-sm sm:text-base inter-regular">
-        <span class="flex items-center gap-1">
-          <i class="pi pi-user"></i>
-          {{ 'SCENE_TABLE.DIRECTOR' | translate }}: {{ production.director }}
-        </span>
-        <span class="flex items-center gap-1">
-          <i class="pi pi-dollar"></i>
-          {{ 'SCENE_TABLE.BUDGET' | translate }}: {{ production.totalBudget | currency:'USD':'symbol':'1.0-0' }}
-        </span>
-      </div>
-    </div>
-    <div class="flex flex-wrap gap-2 w-full lg:w-auto">
-      <button (click)="exportExcel()"
-              class="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-green-500 to-emerald-600 border-0 text-white hover:from-green-600 hover:to-emerald-500 transition-all duration-300 inter-medium rounded-[40px] shadow-lg hover:shadow-[0_6px_20px_rgba(34,197,94,0.4)] transform hover:-translate-y-0.5 active:translate-y-0">
-        <i class="pi pi-file-excel text-sm"></i>
-        {{ 'SCENE_TABLE.EXPORT_EXCEL' | translate }}
-      </button>
 
-      <!-- Кнопка экспорта CSV -->
-      <button (click)="exportCSV()"
-              class="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-500 to-cyan-600 border-0 text-white hover:from-blue-600 hover:to-cyan-500 transition-all duration-300 inter-medium rounded-[40px] shadow-lg hover:shadow-[0_6px_20px_rgba(59,130,246,0.4)] transform hover:-translate-y-0.5 active:translate-y-0">
-        <i class="pi pi-file text-sm"></i>
-        {{ 'SCENE_TABLE.EXPORT_CSV' | translate }}
-      </button>
-      <button (click)="showAddDialog()"
-              class="flex items-center gap-2 px-4 py-2 bg-[#FF6600] border border-[#FF6600] text-white hover:bg-[#FF8533] hover:border-[#FF8533] transition-all duration-200 inter-medium rounded gradient-button">
-        <i class="pi pi-plus"></i>
-        {{ 'SCENE_TABLE.ADD' | translate }}
-      </button>
+  <!-- Панель поиска и фильтров -->
+  <div class="bg-[#1A1A1A] border border-[#232323] rounded-2xl p-6 mb-8">
+    <div class="flex flex-col gap-4">
+      <!-- Строка поиска -->
+      <div class="flex flex-col sm:flex-row gap-4 items-stretch sm:items-center">
+        <p-iconfield iconPosition="left" class="flex-1">
+          <p-inputicon>
+            <i class="pi pi-search text-gray-400"></i>
+          </p-inputicon>
+          <input
+            pInputText
+            type="text"
+            [value]="searchText$ | async"
+            (input)="onSearch($any($event.target).value)"
+            [placeholder]="'SCENE_TABLE.SEARCH_PLACEHOLDER' | translate"
+            class="w-full bg-[#232323] text-white border-[#333333] rounded-xl"
+          />
+        </p-iconfield>
 
-      <button (click)="clearFilters()"
-              class="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-gray-500 to-gray-600 border-0 text-white hover:from-gray-600 hover:to-gray-700 transition-all duration-300 inter-medium rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 active:translate-y-0">
-        <i class="pi pi-filter-slash"></i>
-        {{ 'SCENE_TABLE.RESET_FILTERS' | translate }}
-      </button>
-    </div>
-  </div>
-
-  <!-- Фильтры -->
-  <div class="flex flex-col lg:flex-row gap-4 mb-6 p-4 bg-[#1A1A1A] border border-[#232323] rounded-xl inter-regular">
-    <div class="flex-1">
-      <label class="block text-sm font-medium mb-2 text-white inter-medium">{{ 'SCENE_TABLE.FILTER_CATEGORY' | translate }}</label>
-      <p-multiSelect
-        [options]="categoryOptions"
-        [(ngModel)]="selectedCategories"
-        optionLabel="label"
-        [placeholder]="'SCENE_TABLE.FILTER_ALL_CATEGORIES' | translate"
-        (onChange)="onFilterChange()"
-        class="w-full inter-regular"
-        styleClass="!bg-[#0A0A0A] !border-[#232323] !text-white [&_.p-multiselect-label]:!text-gray-300 inter-regular">
-      </p-multiSelect>
-    </div>
-    <div class="flex-1">
-      <label class="block text-sm font-medium mb-2 text-white inter-medium">{{ 'SCENE_TABLE.FILTER_STATUS' | translate }}</label>
-      <p-multiSelect
-        [options]="statusOptions"
-        [(ngModel)]="selectedStatuses"
-        optionLabel="label"
-        [placeholder]="'SCENE_TABLE.FILTER_ALL_STATUSES' | translate"
-        (onChange)="onFilterChange()"
-        class="w-full inter-regular"
-        styleClass="!bg-[#0A0A0A] !border-[#232323] !text-white [&_.p-multiselect-label]:!text-gray-300 inter-regular">
-      </p-multiSelect>
-    </div>
-    <div class="flex-1">
-      <label class="block text-sm font-medium mb-2 text-white inter-medium">{{ 'SCENE_TABLE.FILTER_SEARCH' | translate }}</label>
-      <p-iconField class="w-full inter-regular">
-        <p-inputIcon>
-          <i class="pi pi-search text-gray-400"></i>
-        </p-inputIcon>
-        <input
-          pInputText
-          [(ngModel)]="searchText"
-          (input)="onSearchChange()"
-          [placeholder]="'SCENE_TABLE.FILTER_SEARCH_PLACEHOLDER' | translate"
-          class="w-full !bg-[#0A0A0A] !border-[#232323] !text-white placeholder:!text-gray-500 inter-regular"/>
-      </p-iconField>
-    </div>
-  </div>
-
-  <!-- Статистика по категориям -->
-  <div class="mb-6">
-    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-3">
-      <div *ngFor="let category of categoryStats"
-           class="p-3 rounded-xl text-center cursor-pointer border-none transition-all duration-200 hover:scale-105 hover:border-[#FF6600] inter-medium"
-           [style.background]="getCategoryStyle(category.name).background"
-           (click)="filterByCategory(category.name)"
-           [title]="('SCENE_TABLE.FILTER_BY_CATEGORY' | translate) + ' ' + category.label">
-        <div class="text-xs sm:text-sm font-medium text-white inter-medium">{{ category.label }}</div>
-        <div class="text-lg font-bold text-white mt-1 inter-extra-bold">{{ category.count }}</div>
-        <div class="text-xs text-gray-300 mt-1 inter-medium">{{ category.totalCost | currency:'USD':'symbol':'1.0-0' }}</div>
+        <button
+          (click)="clearFilters()"
+          class="px-6 py-2.5 bg-[#232323] text-gray-300 border border-[#333333] rounded-xl hover:bg-[#333333] transition-all duration-200 flex items-center gap-2 inter-medium whitespace-nowrap cursor-pointer"
+        >
+          <i class="pi pi-filter-slash"></i>
+          {{ 'SCENE_TABLE.CLEAR_FILTERS' | translate }}
+        </button>
       </div>
     </div>
   </div>
 
   <!-- Таблица -->
-  <div class="bg-[#1A1A1A] border border-[#232323] rounded-xl overflow-hidden mb-8 inter-regular">
-    <p-table
-      #dt
-      [value]="filteredItems"
-      [paginator]="true"
-      [rows]="10"
-      [paginatorDropdownAppendTo]="'body'"
-      [rowsPerPageOptions]="[5, 10, 20]"
-      [globalFilterFields]="['name', 'contact', 'category']"
-      selectionMode="single"
-      [(selection)]="selectedItem"
-      dataKey="id"
-      [totalRecords]="totalRecords"
-      [currentPageReportTemplate]="'SCENE_TABLE.PAGINATION_TEMPLATE' | translate"
-      [loading]="loading"
-      sortMode="multiple"
-      styleClass="custom-table inter-regular">
-
-      <ng-template #header>
-        <tr class="bg-[#232323] border-b border-[#333333] inter-medium">
-          <th pSortableColumn="name" class="!border-[#333333] !text-white inter-medium">
-            <div class="flex items-center gap-2">
-              <span class="font-semibold inter-medium">{{ 'SCENE_TABLE.COLUMN_NAME' | translate }}</span>
-              <p-sortIcon field="name" class="!text-[#FF6600]"/>
-            </div>
-          </th>
-          <th pSortableColumn="category" class="!border-[#333333] !text-white inter-medium">
-            <div class="flex items-center gap-2">
-              <span class="font-semibold inter-medium">{{ 'SCENE_TABLE.COLUMN_CATEGORY' | translate }}</span>
-              <p-sortIcon field="category" class="!text-[#FF6600]"/>
-            </div>
-          </th>
-          <th pSortableColumn="cost" class="!border-[#333333] !text-white inter-medium">
-            <div class="flex items-center gap-2">
-              <span class="font-semibold inter-medium">{{ 'SCENE_TABLE.COLUMN_COST' | translate }}</span>
-              <p-sortIcon field="cost" class="!text-[#FF6600]"/>
-            </div>
-          </th>
-          <th pSortableColumn="status" class="!border-[#333333] !text-white inter-medium">
-            <div class="flex items-center gap-2">
-              <span class="font-semibold inter-medium">{{ 'SCENE_TABLE.COLUMN_STATUS' | translate }}</span>
-              <p-sortIcon field="status" class="!text-[#FF6600]"/>
-            </div>
-          </th>
-          <th pSortableColumn="contact" class="!border-[#333333] !text-white inter-medium">
-            <div class="flex items-center gap-2">
-              <span class="font-semibold inter-medium">{{ 'SCENE_TABLE.COLUMN_CONTACT' | translate }}</span>
-              <p-sortIcon field="contact" class="!text-[#FF6600]"/>
-            </div>
-          </th>
-          <th class="!border-[#333333] !text-white inter-medium">
-            <div class="flex items-center gap-2">
-              <span class="font-semibold inter-medium">{{ 'SCENE_TABLE.COLUMN_ACTIONS' | translate }}</span>
-            </div>
-          </th>
-        </tr>
-      </ng-template>
-
-      <ng-template pTemplate="body" let-item let-rowIndex="rowIndex">
-        <tr [pSelectableRow]="item" class="border-b border-[#232323] hover:bg-[#232323] transition-colors duration-200 inter-regular">
-          <td class="!border-[#232323] inter-regular">
-            <div class="flex items-center gap-3">
-              <i [class]="getCategoryIcon(item.category)"
-                 [style.color]="getCategoryStyle(item.category).background"
-                 class="text-lg"></i>
-              <div>
-                <div class="font-medium text-white inter-medium">{{ item.name }}</div>
-                <div class="text-xs text-gray-400 inter-regular">ID: {{ item.id }}</div>
+  <div class="bg-[#1A1A1A] border border-[#232323] rounded-2xl overflow-hidden" *ngIf="(columns$ | async)!.length > 0; else noData">
+    <div class="overflow-x-auto">
+      <table class="w-full">
+        <!-- Заголовок таблицы -->
+        <thead>
+          <tr class="bg-[#232323] border-b border-[#333333]">
+            <!-- Столбцы данных -->
+            <th 
+              *ngFor="let col of columns$ | async; trackBy: trackByString"
+              (click)="sortByColumn(col)"
+              class="px-4 sm:px-6 py-4 text-left text-white font-semibold inter-medium text-sm cursor-pointer hover:bg-[#2a2a2a] transition-colors duration-150"
+              [class.bg-[#2a2a2a]]="isSortActive(col)"
+            >
+              <div class="flex items-center justify-between gap-2">
+                <span>{{ col }}</span>
+                <i [class]="getSortIcon(col)"></i>
               </div>
-            </div>
-          </td>
-          <td class="!border-[#232323] inter-regular">
-            <p-tag [value]="getCategoryLabel(item.category)"
-                   [style]="getCategoryStyle(item.category)"
-                   styleClass="!border-0 !font-semibold inter-medium"/>
-          </td>
-          <td class="!border-[#232323] inter-regular">
-            <div class="flex items-center gap-2">
-              <span class="font-bold text-[#FF6600] inter-extra-bold">{{ item.cost | currency:'USD':'symbol':'1.0-0' }}</span>
-              <i class="pi pi-info-circle text-[#FF8533] cursor-pointer hover:text-[#FF6600] transition-colors"
-                 [title]="('SCENE_TABLE.CATEGORY_BUDGET' | translate) + ': ' + (getCategoryBudget(item.category) | currency:'USD':'symbol':'1.0-0')"></i>
-            </div>
-          </td>
-          <td class="!border-[#232323] inter-regular">
-            <p-tag [value]="getStatusLabel(item.status)"
-                   [style]="getStatusStyle(item.status)"
-                   styleClass="!border-0 !font-semibold inter-medium"/>
-          </td>
-          <td class="!border-[#232323] inter-regular">
-            <div class="flex items-center gap-2">
-              <i class="pi pi-user text-gray-500"></i>
-              <span class="text-sm text-gray-300 inter-regular" [class.text-gray-500]="!item.contact">
-                {{ item.contact || ('SCENE_TABLE.NOT_SPECIFIED' | translate) }}
-              </span>
-            </div>
-          </td>
-          <td class="!border-[#232323] inter-regular">
-            <div class="flex gap-2">
-              <p-button icon="pi pi-pencil"
-                        styleClass="p-button-rounded !bg-[#FF6600] !border-[#FF6600] !text-white hover:!bg-[#232323] hover:!border-[#232323] hover:!text-white transition-all duration-200 inter-medium"
-                        (click)="editItem(item)"
-                        [title]="'SCENE_TABLE.EDIT' | translate"/>
-              <p-button icon="pi pi-trash"
-                        styleClass="p-button-rounded !bg-[#FF4444] !border-[#FF4444] !text-white hover:!bg-[#232323] hover:!border-[#232323] hover:!text-white transition-all duration-200 inter-medium"
-                        (click)="confirmDelete(item)"
-                        [title]="'SCENE_TABLE.DELETE' | translate"/>
-              <p-button *ngIf="item.status !== 'completed'"
-                        icon="pi pi-check"
-                        styleClass="p-button-rounded !bg-[#00CC66] !border-[#00CC66] !text-white hover:!bg-[#232323] hover:!border-[#232323] hover:!text-white transition-all duration-200 inter-medium"
-                        (click)="markAsCompleted(item)"
-                        [title]="'SCENE_TABLE.MARK_COMPLETED' | translate"/>
-            </div>
-          </td>
-        </tr>
-      </ng-template>
+            </th>
+          </tr>
+        </thead>
+        <!-- Тело таблицы -->
+        <tbody>
+          <tr 
+            *ngFor="let row of filteredRows$ | async; let i = index; trackBy: trackByIndex"
+            class="border-b border-[#232323] hover:bg-[#232323]/50 transition-colors duration-150"
+            [class.bg-[#0a0a0a]]="i % 2 === 0"
+            [class.bg-[#FF6600]/10]="isRowSelected(i)"
+          >
+            <!-- Ячейки данных -->
+            <td 
+              *ngFor="let col of columns$ | async; trackBy: trackByString" 
+              class="px-4 sm:px-6 py-4 text-gray-300 text-sm inter-regular"
+              (dblclick)="enableEditing(i, col)"
+            >
+              <!-- Режим редактирования -->
+              <ng-container *ngIf="isCellEditing(i, col)">
+                <ng-container *ngIf="(editingCell$ | async) as editingCell">
+                  <div class="flex items-center gap-2">
+                    <input
+                      type="text"
+                      [value]="editingCell.value"
+                      (input)="editingCell.value = $any($event.target).value"
+                      (keydown.enter)="saveEditing()"
+                      (keydown.escape)="cancelEditing()"
+                      class="bg-[#232323] border-2 border-[#FF6600] rounded-lg px-3 py-2 text-white text-sm w-full focus:outline-none focus:border-[#FF8533] focus:shadow-lg focus:shadow-[#FF6600]/30 transition-all duration-200 inter-medium"
+                      [disabled]="editingCell.isLoading"
+                      autofocus
+                    />
+                    <div class="flex gap-2 shrink-0">
+                      <button
+                        (click)="saveEditing()"
+                        [disabled]="editingCell.isLoading"
+                        class="p-2 bg-green-600/90 hover:bg-green-600 text-white rounded-lg transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                        [title]="'COMMON.SAVE' | translate"
+                      >
+                        <i class="pi pi-check text-sm"></i>
+                      </button>
+                      <button
+                        (click)="cancelEditing()"
+                        [disabled]="editingCell.isLoading"
+                        class="p-2 bg-red-600/90 hover:bg-red-600 text-white rounded-lg transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                        [title]="'COMMON.CANCEL' | translate"
+                      >
+                        <i class="pi pi-times text-sm"></i>
+                      </button>
+                    </div>
+                  </div>
+                </ng-container>
+              </ng-container>
 
-      <ng-template pTemplate="emptymessage">
-        <tr>
-          <td colspan="6" class="text-center p-8 inter-regular">
-            <div class="flex flex-col items-center justify-center text-gray-500 inter-regular">
-              <i class="pi pi-inbox text-4xl mb-2 text-gray-600"></i>
-              <div class="text-lg text-gray-400 inter-medium">{{ 'SCENE_TABLE.NOT_FOUND' | translate }}</div>
-              <p class="text-sm mt-1 text-gray-500 inter-regular">{{ 'SCENE_TABLE.NOT_FOUND_HINT' | translate }}</p>
-            </div>
-          </td>
-        </tr>
-      </ng-template>
+              <!-- Режим отображения -->
+              <div *ngIf="!isCellEditing(i, col)" class="flex items-center gap-2">
+                <!-- Индикатор загрузки -->
+                <i *ngIf="isCellLoading(i, col)" class="pi pi-spin pi-spinner text-[#FF6600] text-xs"></i>
+                
+                <div [ngSwitch]="true" class="flex-1">
+                  <!-- Процент с цветовым кодированием -->
+                  <span 
+                    *ngSwitchCase="isPercentageValue(row[col])"
+                    [ngStyle]="getPercentageStyle(row[col])"
+                    class="inline-block px-3 py-1 rounded-lg bg-opacity-20 inter-medium"
+                    [style.background]="getPercentageStyle(row[col])?.['color'] + '33'"
+                  >
+                    {{ getCellValue(row, col) }}
+                  </span>
 
-      <ng-template pTemplate="summary">
-        <div class="flex flex-col lg:flex-row justify-between items-center p-4 bg-[#232323] border-t border-[#333333] inter-regular">
-          <div class="text-sm text-gray-300 mb-2 lg:mb-0 inter-regular">
-            {{ 'SCENE_TABLE.SUMMARY_TOTAL_COST' | translate }}
-            <span class="font-bold text-[#FF6600] inter-extra-bold">{{ totalCost | currency:'USD':'symbol':'1.0-0' }}</span>
-          </div>
-          <div class="text-sm text-gray-300 inter-regular">
-            {{ 'SCENE_TABLE.SUMMARY_ITEMS' | translate }} {{ totalItems }} | {{ 'SCENE_TABLE.SUMMARY_CONFIRMED' | translate }} {{ confirmedCount }} | {{ 'SCENE_TABLE.SUMMARY_COMPLETED' | translate }} {{ completedCount }}
-          </div>
-        </div>
-      </ng-template>
-    </p-table>
-  </div>
-</div>
+                  <!-- Статус с иконкой -->
+                  <span 
+                    *ngSwitchCase="isStatusColumn(col) && row[col]"
+                    class="inline-flex items-center gap-2 px-3 py-1 rounded-lg text-white text-xs inter-medium"
+                    [ngStyle]="getStatusStyle(row[col])"
+                  >
+                    <i [class]="getStatusIcon(row[col])"></i>
+                    {{ getCellValue(row, col) }}
+                  </span>
 
-<!-- Диалог добавления/редактирования -->
-<p-dialog
-  [header]="editingItem ? ('SCENE_TABLE.EDIT_DIALOG_TITLE' | translate) : ('SCENE_TABLE.ADD_DIALOG_TITLE' | translate)"
-  [(visible)]="showDialog"
-  [style]="{ width: '500px' }"
-  [modal]="true"
-  [draggable]="false"
-  [resizable]="false"
-  [contentStyle]="{ 'overflow': 'visible' }"
-  styleClass="custom-dialog inter-regular !rounded-[28px]">
-
-  <div class="grid gap-4 inter-regular" *ngIf="formItem">
-    <div>
-      <label class="block text-sm font-medium mb-2 text-white inter-medium">{{ 'SCENE_TABLE.FORM_NAME' | translate }} *</label>
-      <input pInputText [(ngModel)]="formItem.name"
-             class="w-full !bg-[#1A1A1A] !border-[#232323] !text-white placeholder:!text-gray-500 inter-regular"
-             [placeholder]="'SCENE_TABLE.FORM_NAME_PLACEHOLDER' | translate"/>
+                  <!-- Обычный текст -->
+                  <span *ngSwitchDefault class="inter-regular">
+                    {{ getCellValue(row, col) }}
+                  </span>
+                </div>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
 
-    <div>
-      <label class="block text-sm font-medium mb-2 text-white inter-medium">{{ 'SCENE_TABLE.FORM_CATEGORY' | translate }} *</label>
-      <p-select
-        [options]="categoryOptions"
-        [(ngModel)]="formItem.category"
-        optionLabel="label"
-        optionValue="value"
-        [placeholder]="'SCENE_TABLE.FORM_CATEGORY_PLACEHOLDER' | translate"
-        styleClass="!bg-[#1A1A1A] !border-[#232323] !text-white [&_.p-dropdown-label]:!text-gray-300 inter-regular">
-      </p-select>
-    </div>
-
-    <div>
-      <label class="block text-sm font-medium mb-2 text-white inter-medium">{{ 'SCENE_TABLE.FORM_COST' | translate }} ($) *</label>
-      <input pInputText type="number" [(ngModel)]="formItem.cost"
-             class="w-full !bg-[#1A1A1A] !border-[#232323] !text-white placeholder:!text-gray-500 inter-regular"
-             [placeholder]="'SCENE_TABLE.FORM_COST_PLACEHOLDER' | translate" min="0"/>
-    </div>
-
-    <div>
-      <label class="block text-sm font-medium mb-2 text-white inter-medium">{{ 'SCENE_TABLE.FORM_STATUS' | translate }} *</label>
-      <p-select
-        [options]="statusOptions"
-        [(ngModel)]="formItem.status"
-        optionLabel="label"
-        optionValue="value"
-        [placeholder]="'SCENE_TABLE.FORM_STATUS_PLACEHOLDER' | translate"
-        styleClass="!bg-[#1A1A1A] !border-[#232323] !text-white [&_.p-dropdown-label]:!text-gray-300 inter-regular">
-      </p-select>
-    </div>
-
-    <div>
-      <label class="block text-sm font-medium mb-2 text-white inter-medium">{{ 'SCENE_TABLE.FORM_CONTACT' | translate }}</label>
-      <input pInputText [(ngModel)]="formItem.contact"
-             class="w-full !bg-[#1A1A1A] !border-[#232323] !text-white placeholder:!text-gray-500 inter-regular"
-             [placeholder]="'SCENE_TABLE.FORM_CONTACT_PLACEHOLDER' | translate"/>
+    <!-- Информация о пагинации -->
+    <div class="bg-[#232323] border-t border-[#333333] px-4 sm:px-6 py-3 flex items-center justify-between">
+      <span class="text-gray-400 text-sm inter-regular">
+        {{ 'SCENE_TABLE.SHOWN' | translate : { shown: (filteredRows$ | async)!.length, total: (allRecords$ | async) } }}
+      </span>
     </div>
   </div>
 
-  <ng-template pTemplate="footer">
-    <div class="flex justify-between w-full inter-regular">
-      <p-button [label]="'SCENE_TABLE.DIALOG_CANCEL' | translate" icon="pi pi-times" (click)="showDialog = false"
-                styleClass="w-full sm:flex-1 px-3 sm:px-4 py-2 sm:py-3 !bg-[#232323] !text-gray-300   hover:!bg-[#2A2A2A] hover:!text-white !transition-all duration-200 border !border-[#333333] text-sm sm:text-base  !inter-medium !rounded-[40px]"/>
-      <p-button
-        [label]="editingItem ? ('SCENE_TABLE.DIALOG_UPDATE' | translate) : ('SCENE_TABLE.DIALOG_ADD' | translate)"
-        icon="pi pi-check"
-        (click)="saveItem()"
-        [disabled]="!isFormValid() || (editingItem && !isFormChanged())"
-        styleClass="!bg-[#FF6600] !border-[#FF6600] !text-white hover:!bg-[#FF8533] hover:!border-[#FF8533] transition-all duration-200 inter-medium gradient-button !rounded-[40px]"/>
-    </div>
-  </ng-template>
-</p-dialog>
+  <!-- Кнопки экспорта -->
+  <div class="flex flex-col sm:flex-row gap-3 mt-8" *ngIf="(columns$ | async)!.length > 0">
+    <button
+      (click)="showExcelExportDialog()"
+      class="flex items-center justify-center gap-2 px-6 py-3 bg-linear-to-r from-[#FF6600] to-[#FF8533] text-white rounded-xl font-semibold inter-medium hover:shadow-lg hover:shadow-[#FF6600]/50 transition-all duration-200 transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer"
+    >
+      <i class="pi pi-file-excel"></i>
+      {{ 'SCENE_TABLE.EXPORT_EXCEL' | translate }}
+    </button>
 
-<!-- Диалог подтверждения экспорта -->
-<p-dialog
-  header="{{ 'SCENE_TABLE.EXPORT_CONFIRM_TITLE' | translate }}"
-  [(visible)]="showExportDialog"
-  [modal]="true"
-  [style]="{ width: '95vw', maxWidth: '420px' }"
-  [breakpoints]="{ '960px': '95vw', '640px': '95vw' }"
-  [draggable]="false"
-  [resizable]="false"
-  styleClass="export-confirm-dialog inter-regular !rounded-[28px]"
-  [contentStyle]="{
-    'border-radius': '12px',
-    'overflow': 'hidden',
-    'max-height': '90vh'
-  }">
+    <button
+      (click)="showCsvExportDialog()"
+      class="flex items-center justify-center gap-2 px-6 py-3 bg-[#232323] text-white border border-[#333333] rounded-xl font-semibold inter-medium hover:bg-[#333333] transition-all duration-200 cursor-pointer"
+    >
+      <i class="pi pi-file"></i>
+      {{ 'SCENE_TABLE.EXPORT_CSV' | translate }}
+    </button>
+  </div>
 
-  <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 mb-4 inter-regular">
-    <div class="flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 bg-[#FF6600]/20 rounded-lg sm:rounded-xl shrink-0 mx-auto sm:mx-0">
-      <i class="pi pi-file-export text-[#FF6600] text-lg sm:text-xl"></i>
-    </div>
-    <div class="flex-1 text-center sm:text-left">
-      <p class="text-white text-sm sm:text-base leading-relaxed inter-regular">{{ exportMessage }}</p>
-      <p class="text-gray-400 text-xs sm:text-sm mt-1 sm:mt-1 inter-regular">
-        {{ 'SCENE_TABLE.EXPORT_CONFIRM_SUBTEXT' | translate }}
+  <!-- Диалог подтверждения экспорта -->
+  <ng-container *ngIf="(showExportDialog$ | async) as showDialog">
+    <p-dialog
+      [visible]="showDialog || false"
+      (visibleChange)="hideExportDialog()"
+      [header]="'SCENE_TABLE.CONFIRM_EXPORT' | translate"
+      [modal]="true"
+      [style]="{ width: '90vw', maxWidth: '400px' }"
+      styleClass="!bg-[#1A1A1A] !border !border-[#232323] !rounded-2xl inter-medium"
+    >
+    <div class="text-gray-300 mb-6">
+      <p *ngIf="(exportType$ | async) === 'excel'" class="inter-regular">
+        {{ 'SCENE_TABLE.EXPORT_CONFIRM_EXCEL' | translate : { count: (filteredRows$ | async)!.length } }}
+      </p>
+      <p *ngIf="(exportType$ | async) === 'csv'" class="inter-regular">
+        {{ 'SCENE_TABLE.EXPORT_CONFIRM_CSV' | translate : { count: (filteredRows$ | async)!.length } }}
       </p>
     </div>
-  </div>
-
-  <ng-template pTemplate="footer">
-    <div class="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full inter-regular">
+    <div class="flex gap-3 justify-end">
       <button
-        (click)="showExportDialog = false"
-        class="w-full sm:flex-1 px-3 sm:px-4 py-2 sm:py-3 bg-[#232323] text-gray-300 rounded-lg font-medium hover:bg-[#2A2A2A] hover:text-white transition-all duration-200 border border-[#333333] text-sm sm:text-base inter-medium">
-        {{ 'SCENE_TABLE.DIALOG_CANCEL' | translate }}
+        (click)="hideExportDialog()"
+        class="px-4 py-2 bg-[#232323] text-gray-300 border border-[#333333] rounded-lg hover:bg-[#333333] transition-all inter-medium cursor-pointer"
+      >
+        {{ 'COMMON.CANCEL' | translate }}
       </button>
       <button
         (click)="confirmExport()"
-        class="w-full sm:flex-1 px-3 sm:px-4 py-2 sm:py-3 bg-[#FF6600] text-white rounded-lg font-medium hover:bg-[#FF8533] transition-all duration-200 border border-[#FF6600] shadow-lg hover:shadow-[#FF6600]/25 text-sm sm:text-base inter-medium gradient-button">
-        <div class="flex items-center justify-center gap-2">
-          <i class="pi pi-download text-sm sm:text-base"></i>
-          <span class="whitespace-nowrap">{{ 'SCENE_TABLE.EXPORT_CONFIRM_BUTTON' | translate }}</span>
-        </div>
+        class="px-4 py-2 bg-[#FF6600] text-white rounded-lg hover:bg-[#FF8533] transition-all inter-medium cursor-pointer"
+      >
+        {{ 'COMMON.CONFIRM' | translate }}
       </button>
+    </div>
+    </p-dialog>
+  </ng-container>
+
+  <!-- Пустая таблица -->
+  <ng-template #noData>
+    <div class="bg-[#1A1A1A] border border-[#232323] rounded-2xl p-12 text-center">
+      <i class="pi pi-inbox text-5xl text-gray-500 mb-4 block"></i>
+      <p class="text-gray-400 text-lg inter-medium">{{ 'SCENE_TABLE.NO_DATA' | translate }}</p>
+      <p class="text-gray-500 text-sm inter-regular mt-2">{{ 'SCENE_TABLE.NO_DATA_DESC' | translate }}</p>
     </div>
   </ng-template>
-</p-dialog>
-
-<!-- Диалог подтверждения удаления -->
-<p-dialog
-  header="{{ 'SCENE_TABLE.CONFIRM_DELETE_HEADER' | translate }}"
-  [(visible)]="showDeleteDialog"
-  [modal]="true"
-  [style]="{ width: '95vw', maxWidth: '420px' }"
-  [breakpoints]="{ '960px': '95vw', '640px': '95vw' }"
-  [draggable]="false"
-  [resizable]="false"
-  styleClass="delete-confirm-dialog inter-regular !rounded-[28px]"
-  [contentStyle]="{
-    'border-radius': '12px',
-    'overflow': 'hidden',
-    'max-height': '90vh'
-  }">
-
-  <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 mb-4 inter-regular">
-    <div class="flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 bg-red-500/20 rounded-lg sm:rounded-xl shrink-0 mx-auto sm:mx-0">
-      <i class="pi pi-exclamation-triangle text-red-500 text-lg sm:text-xl"></i>
-    </div>
-    <div class="flex-1 text-center sm:text-left">
-      <p class="text-white text-sm sm:text-base leading-relaxed inter-regular">
-        {{ 'SCENE_TABLE.CONFIRM_DELETE' | translate: {name: itemToDelete?.name} }}
-      </p>
-      <p class="text-gray-400 text-xs sm:text-sm mt-2 inter-regular">
-        {{ 'SCENE_TABLE.CONFIRM_DELETE_WARNING' | translate }}
-      </p>
-    </div>
-  </div>
-
-  <ng-template pTemplate="footer">
-    <div class="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full inter-regular">
-      <button
-        (click)="cancelDelete()"
-        class="w-full sm:flex-1 px-3 sm:px-4 py-2 sm:py-3 bg-[#232323] text-gray-300 rounded-lg font-medium hover:bg-[#2A2A2A] hover:text-white transition-all duration-200 border border-[#333333] text-sm sm:text-base inter-medium">
-        {{ 'SCENE_TABLE.DIALOG_CANCEL' | translate }}
-      </button>
-      <button
-        (click)="deleteItem()"
-        class="w-full sm:flex-1 px-3 sm:px-4 py-2 sm:py-3 bg-red-500 text-white rounded-lg font-medium hover:bg-red-600 transition-all duration-200 border border-red-500 shadow-lg hover:shadow-red-500/25 text-sm sm:text-base inter-medium">
-        <div class="flex items-center justify-center gap-2">
-          <i class="pi pi-trash text-sm sm:text-base"></i>
-          <span class="whitespace-nowrap">{{ 'SCENE_TABLE.CONFIRM_DELETE_ACCEPT' | translate }}</span>
-        </div>
-      </button>
-    </div>
-  </ng-template>
-</p-dialog>
+</div>

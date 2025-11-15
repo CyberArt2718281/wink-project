@@ -1,53 +1,48 @@
-import {Component, inject, OnInit} from '@angular/core';
-import {CommonModule} from '@angular/common';
-import {TableModule} from 'primeng/table';
-import {ButtonModule} from 'primeng/button';
-import {TagModule} from 'primeng/tag';
-import {InputTextModule} from 'primeng/inputtext';
-import {IconFieldModule} from 'primeng/iconfield';
-import {InputIconModule} from 'primeng/inputicon';
-import {DialogModule} from 'primeng/dialog';
-import {FormsModule} from '@angular/forms';
-import {MultiSelectModule} from 'primeng/multiselect';
-import {SelectModule} from 'primeng/select';
-import {ConfirmDialogModule} from 'primeng/confirmdialog';
-import {ConfirmationService, MessageService} from 'primeng/api';
-import {ToastModule} from 'primeng/toast';
-import * as XLSX from 'xlsx';
-import {saveAs} from 'file-saver-es';
+import { CommonModule } from '@angular/common';
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { ConfirmationService, MessageService } from 'primeng/api';
+import { ButtonModule } from 'primeng/button';
+import { PrimeNG } from 'primeng/config';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { DialogModule } from 'primeng/dialog';
+import { IconFieldModule } from 'primeng/iconfield';
+import { InputIconModule } from 'primeng/inputicon';
+import { InputTextModule } from 'primeng/inputtext';
+import { MultiSelectModule } from 'primeng/multiselect';
+import { SelectModule } from 'primeng/select';
+import { TableModule } from 'primeng/table';
+import { TagModule } from 'primeng/tag';
+import { ToastModule } from 'primeng/toast';
+import { BehaviorSubject, Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged, map, takeUntil } from 'rxjs/operators';
+import { SuccessResultResponse } from '../../../types/resultResponse.type';
+import { CeilRequest, CeilService } from '../services/ceil.service';
+import { ExportService } from '../services/export.service';
 
-import {TranslateModule, TranslateService} from '@ngx-translate/core';
-import {PrimeNG} from 'primeng/config';
-
-// Интерфейсы
-export interface FilmingItem {
-  id: number;
-  name: string;
-  cost: number;
-  status: 'planned' | 'confirmed' | 'completed';
-  contact?: string;
-  category: string;
+interface EditingCell {
+  rowIndex: number;
+  columnName: string;
+  value: any;
+  originalValue: any;
+  isLoading: boolean;
+  error: string | null;
 }
 
-export interface FilmingCategory {
-  name: string;
-  items: FilmingItem[];
-  budget: number;
-}
-
-export interface FilmingProduction {
-  title: string;
-  director: string;
-  totalBudget: number;
-  categories: {
-    locations: FilmingCategory;
-    characters: FilmingCategory;
-    extras: FilmingCategory;
-    props: FilmingCategory;
-    transportation: FilmingCategory;
-    animals: FilmingCategory;
-    stunts: FilmingCategory;
-  };
+interface TableState {
+  columns: string[];
+  rows: any[];
+  filteredRows: any[];
+  searchText: string;
+  sortColumn: string | null;
+  sortOrder: 'asc' | 'desc';
+  selectedRows: Set<number>;
+  editingCell: EditingCell | null;
+  loading: boolean;
+  savingCells: Set<string>;
+  showExportDialog: boolean;
+  exportType: 'excel' | 'csv' | null;
 }
 
 @Component({
@@ -67,482 +62,605 @@ export interface FilmingProduction {
     SelectModule,
     ConfirmDialogModule,
     ToastModule,
-    TranslateModule
+    TranslateModule,
   ],
   providers: [ConfirmationService, MessageService],
   templateUrl: './scene-table.component.html',
   styleUrls: ['./scene-table.component.css'],
 })
-export class FilmingTableComponent implements OnInit {
-  production: FilmingProduction = {
-    title: 'Последний рассвет',
-    director: 'Иван Петров',
-    totalBudget: 5000000,
-    categories: {
-      locations: {
-        name: 'Локации',
-        budget: 1200000,
-        items: [
-          {
-            id: 1,
-            name: 'Заброшенный завод',
-            cost: 500000,
-            status: 'confirmed',
-            contact: 'Мария +7-999-123-45-67',
-            category: 'locations'
-          },
-          {id: 2, name: 'Городская площадь', cost: 300000, status: 'planned', category: 'locations'}
-        ]
-      },
-      characters: {
-        name: 'Персонажи',
-        budget: 2000000,
-        items: [
-          {id: 3, name: 'Джон Смит', cost: 1000000, status: 'confirmed', category: 'characters'},
-          {id: 4, name: 'Анна Джонс', cost: 500000, status: 'confirmed', category: 'characters'}
-        ]
-      },
-      extras: {
-        name: 'Массовка',
-        budget: 300000,
-        items: [
-          {id: 5, name: 'Статисты для митинга', cost: 150000, status: 'planned', category: 'extras'},
-          {id: 6, name: 'Актеры для кафе', cost: 60000, status: 'confirmed', category: 'extras'}
-        ]
-      },
-      props: {
-        name: 'Реквизит',
-        budget: 400000,
-        items: [
-          {id: 7, name: 'Исторический реквизит', cost: 200000, status: 'confirmed', category: 'props'},
-          {id: 8, name: 'Оружие (муляжи)', cost: 80000, status: 'planned', category: 'props'}
-        ]
-      },
-      transportation: {
-        name: 'Транспорт',
-        budget: 350000,
-        items: [
-          {id: 9, name: 'Грузовик для оборудования', cost: 120000, status: 'confirmed', category: 'transportation'},
-          {id: 10, name: 'Автобус для массовки', cost: 90000, status: 'planned', category: 'transportation'}
-        ]
-      },
-      animals: {
-        name: 'Животные',
-        budget: 250000,
-        items: [
-          {id: 11, name: 'Лошади', cost: 150000, status: 'confirmed', contact: 'Конный клуб', category: 'animals'},
-          {id: 12, name: 'Собаки', cost: 50000, status: 'planned', category: 'animals'}
-        ]
-      },
-      stunts: {
-        name: 'Трюки/Пиротехника',
-        budget: 400000,
-        items: [
-          {id: 13, name: 'Каскадеры', cost: 250000, status: 'confirmed', category: 'stunts'},
-          {id: 14, name: 'Пиротехника', cost: 100000, status: 'planned', category: 'stunts'}
-        ]
-      }
-    }
+export class FilmingTableComponent implements OnInit, OnDestroy {
+  private readonly translate = inject(TranslateService);
+  private readonly primeng = inject(PrimeNG);
+  private readonly messageService = inject(MessageService);
+  private readonly ceilService = inject(CeilService);
+  private readonly exportService = inject(ExportService);
+  private readonly destroy$ = new Subject<void>();
+  private readonly search$ = new Subject<string>();
+  private jobId: string | null = null;
+
+  // State management с BehaviorSubject
+  private readonly initialState: TableState = {
+    columns: [],
+    rows: [],
+    filteredRows: [],
+    searchText: '',
+    sortColumn: null,
+    sortOrder: 'asc',
+    selectedRows: new Set(),
+    editingCell: null,
+    loading: false,
+    savingCells: new Set(),
+    showExportDialog: false,
+    exportType: null,
   };
 
-  allItems: FilmingItem[] = [];
-  filteredItems: FilmingItem[] = [];
+  private readonly state$ = new BehaviorSubject<TableState>(this.initialState);
 
-  selectedCategories: any[] = [];
-  selectedStatuses: any[] = [];
-  searchText: string = '';
+  // Selectors
+  columns$ = this.state$.pipe(map((state) => state.columns));
+  filteredRows$ = this.state$.pipe(map((state) => state.filteredRows));
+  selectedRows$ = this.state$.pipe(map((state) => state.selectedRows));
+  editingCell$ = this.state$.pipe(map((state) => state.editingCell));
+  loading$ = this.state$.pipe(map((state) => state.loading));
+  searchText$ = this.state$.pipe(map((state) => state.searchText));
+  showExportDialog$ = this.state$.pipe(map((state) => state.showExportDialog));
+  exportType$ = this.state$.pipe(map((state) => state.exportType));
+  sortColumn$ = this.state$.pipe(map((state) => state.sortColumn));
+  sortOrder$ = this.state$.pipe(map((state) => state.sortOrder));
 
-  loading: boolean = false;
-  showDialog: boolean = false;
-  editingItem: FilmingItem | null = null;
-  selectedItem: FilmingItem | null = null;
+  selectedCount$ = this.selectedRows$.pipe(map((selectedRows) => selectedRows.size));
+  allRecords$ = this.state$.pipe(map((state) => state.rows.length));
+  totalRecords$ = this.filteredRows$.pipe(map((rows) => rows.length));
 
-  formItem: any = {};
-
-
-  categoryOptions = [
-    {label: 'Локации', value: 'locations'},
-    {label: 'Персонажи', value: 'characters'},
-    {label: 'Массовка', value: 'extras'},
-    {label: 'Реквизит', value: 'props'},
-    {label: 'Транспорт', value: 'transportation'},
-    {label: 'Животные', value: 'animals'},
-    {label: 'Трюки', value: 'stunts'}
-  ];
-
-  statusOptions = [
-    {label: 'Запланировано', value: 'planned'},
-    {label: 'Подтверждено', value: 'confirmed'},
-    {label: 'Завершено', value: 'completed'}
-  ];
-  showExportDialog: boolean = false;
-  exportType: 'excel' | 'csv' | null = null;
-  exportMessage: string = '';
-
-  showDeleteDialog: boolean = false;
-  itemToDelete: FilmingItem | null = null;
-
-  translate = inject(TranslateService);
-  private primeng = inject(PrimeNG);
-
-  private messageService = inject(MessageService);
-
-  constructor() {
-    this.loadAllItems();
+  ngOnInit(): void {
+    this.loadDataFromServer();
+    this.initSearchDebounce();
   }
 
-  ngOnInit() {
-    this.applyFilters();
-    // Сбрасываем выделение при инициализации
-    setTimeout(() => {
-      this.selectedItem = null;
-    });
-    this.translate.get('SCENE_TABLE.ITEMS_SELECTED').subscribe(translated => {
-      this.primeng.setTranslation({
-        selectionMessage: `{0} ${translated}`,
-        emptyFilterMessage: 'Нет совпадений',
-        emptySearchMessage: 'Нет результатов',
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  /**
+   * Инициализация поиска с дебаунсингом
+   */
+  private initSearchDebounce(): void {
+    this.search$
+      .pipe(debounceTime(300), distinctUntilChanged(), takeUntil(this.destroy$))
+      .subscribe((searchText) => {
+        this.updateSearch(searchText);
       });
-    });
   }
 
-  clearSelection(): void {
-    this.selectedItem = null;
-  }
+  /**
+   * Загружает данные с сервера из localStorage
+   */
+  private loadDataFromServer(): void {
+    try {
+      const storedData = localStorage.getItem('processedTableData');
 
-  get categoryStats(): any[] {
-    return this.categoryOptions.map(option => {
-      const items = this.allItems.filter(item => item.category === option.value);
-      return {
-        name: option.value,
-        label: option.label,
-        count: items.length,
-        totalCost: items.reduce((sum, item) => sum + item.cost, 0)
-      };
-    });
-  }
+      if (storedData) {
+        const serverResponse: SuccessResultResponse = JSON.parse(storedData);
 
-  private loadAllItems(): void {
-    this.allItems = [];
-    Object.values(this.production.categories).forEach(category => {
-      this.allItems.push(...category.items);
-    });
-    this.filteredItems = [...this.allItems];
-  }
+        this.jobId = serverResponse.job_id;
 
-  onFilterChange(): void {
-    this.applyFilters();
-  }
+        const columns = serverResponse.table.columns;
+        const rows = JSON.parse(JSON.stringify(serverResponse.table.rows));
 
-  onSearchChange(): void {
-    this.applyFilters();
-  }
+        this.setState({
+          columns,
+          rows,
+          filteredRows: [...rows],
+          loading: false,
+        });
 
-  private applyFilters(): void {
-    this.loading = true;
-
-    let filtered = [...this.allItems];
-
-    if (this.selectedCategories.length > 0) {
-      const selectedValues = this.selectedCategories.map(c => c.value);
-      filtered = filtered.filter(item => selectedValues.includes(item.category));
+        console.log('📊 Данные загружены:', {
+          jobId: this.jobId,
+          columns: columns.length,
+          rowsCount: rows.length,
+        });
+      } else {
+        console.warn('⚠️ Нет данных в localStorage');
+        this.setState({
+          columns: [],
+          rows: [],
+          filteredRows: [],
+        });
+      }
+    } catch (error) {
+      console.error('❌ Ошибка при загрузке данных:', error);
+      this.messageService.add({
+        severity: 'error',
+        summary: this.translate.instant('COMMON.ERROR') || 'Ошибка',
+        detail: this.translate.instant('TABLE.LOAD_ERROR') || 'Не удалось загрузить данные',
+        life: 3000,
+      });
     }
+  }
 
-    if (this.selectedStatuses.length > 0) {
-      const selectedValues = this.selectedStatuses.map(s => s.value);
-      filtered = filtered.filter(item => selectedValues.includes(item.status));
-    }
+  /**
+   * Обновляет состояние компонента
+   */
+  private setState(partial: Partial<TableState>): void {
+    const current = this.state$.value;
+    this.state$.next({ ...current, ...partial });
+  }
 
-    if (this.searchText) {
-      const searchLower = this.searchText.toLowerCase();
-      filtered = filtered.filter(item =>
-        item.name.toLowerCase().includes(searchLower) ||
-        (item.contact && item.contact.toLowerCase().includes(searchLower)) ||
-        this.getCategoryLabel(item.category).toLowerCase().includes(searchLower)
+  /**
+   * Поиск по всем столбцам
+   */
+  onSearch(searchText: string): void {
+    this.setState({ searchText });
+    this.search$.next(searchText);
+  }
+
+  /**
+   * Обновляет результаты поиска
+   */
+  private updateSearch(searchText: string): void {
+    const state = this.state$.value;
+    let filtered = [...state.rows];
+
+    if (searchText.trim()) {
+      const searchLower = searchText.toLowerCase();
+      filtered = filtered.filter((row) =>
+        Object.values(row).some((value) => String(value).toLowerCase().includes(searchLower))
       );
     }
 
-    this.filteredItems = filtered;
-    this.loading = false;
+    if (state.sortColumn) {
+      filtered = this.sortRows(filtered, state.sortColumn, state.sortOrder);
+    }
 
-    this.clearSelection();
+    this.setState({ filteredRows: filtered });
   }
 
+  /**
+   * Сортировка строк
+   */
+  private sortRows(rows: any[], columnName: string, sortOrder: 'asc' | 'desc'): any[] {
+    return [...rows].sort((a, b) => {
+      let valueA = a[columnName];
+      let valueB = b[columnName];
+
+      if (valueA === null || valueA === undefined) valueA = '';
+      if (valueB === null || valueB === undefined) valueB = '';
+
+      let comparison = 0;
+
+      if (!isNaN(Number(valueA)) && !isNaN(Number(valueB))) {
+        comparison = Number(valueA) - Number(valueB);
+      } else {
+        const strA = String(valueA).toLowerCase();
+        const strB = String(valueB).toLowerCase();
+        comparison = strA.localeCompare(strB, 'ru');
+      }
+
+      return sortOrder === 'asc' ? comparison : -comparison;
+    });
+  }
+
+  /**
+   * Сортировка по столбцу
+   */
+  sortByColumn(columnName: string): void {
+    const state = this.state$.value;
+    let newOrder: 'asc' | 'desc' = 'asc';
+
+    if (state.sortColumn === columnName) {
+      newOrder = state.sortOrder === 'asc' ? 'desc' : 'asc';
+    }
+
+    const sortedRows = this.sortRows(state.filteredRows, columnName, newOrder);
+
+    this.setState({
+      sortColumn: columnName,
+      sortOrder: newOrder,
+      filteredRows: sortedRows,
+    });
+  }
+
+  /**
+   * Получить иконку сортировки для столбца
+   */
+  getSortIcon(columnName: string): string {
+    const state = this.state$.value;
+    if (state.sortColumn !== columnName) {
+      return 'pi pi-sort text-gray-500';
+    }
+
+    return state.sortOrder === 'asc'
+      ? 'pi pi-sort-amount-up text-[#FF6600]'
+      : 'pi pi-sort-amount-down text-[#FF6600]';
+  }
+
+  /**
+   * Проверить, активна ли сортировка для столбца
+   */
+  isSortActive(columnName: string): boolean {
+    return this.state$.value.sortColumn === columnName;
+  }
+
+  /**
+   * Очистить фильтры и сортировку
+   */
   clearFilters(): void {
-    this.selectedCategories = [];
-    this.selectedStatuses = [];
-    this.searchText = '';
-    this.applyFilters();
+    const state = this.state$.value;
+    this.setState({
+      searchText: '',
+      filteredRows: [...state.rows],
+      sortColumn: null,
+      sortOrder: 'asc',
+      selectedRows: new Set(),
+    });
+
     this.messageService.add({
       severity: 'info',
-      summary: this.translate.instant('SCENE_TABLE.RESET_FILTERS'),
-      detail: this.translate.instant('SCENE_TABLE.FILTERS_CLEARED')
+      summary: this.translate.instant('SCENE_TABLE.FILTERS_CLEARED') || 'Фильтры очищены',
+      life: 2000,
     });
   }
 
-  filterByCategory(category: string): void {
-    this.selectedCategories = [this.categoryOptions.find(opt => opt.value === category)];
-    this.applyFilters();
+  /**
+   * Выбрать все строки
+   */
+  selectAllRows(): void {
+    const state = this.state$.value;
+    const selectedRows = new Set<number>();
+    state.filteredRows.forEach((_, index) => selectedRows.add(index));
+    this.setState({ selectedRows });
   }
 
-  showAddDialog(): void {
-    this.editingItem = null;
-    this.formItem = {
-      id: this.generateId(),
-      name: '',
-      cost: 0,
-      status: 'planned',
-      category: 'locations'
-    };
-    this.showDialog = true;
+  /**
+   * Отменить выбор всех строк
+   */
+  deselectAllRows(): void {
+    this.setState({ selectedRows: new Set() });
   }
 
-  editItem(item: FilmingItem): void {
-    this.editingItem = item;
-    this.formItem = {...item};
-    this.showDialog = true;
-  }
+  /**
+   * Переключить выбор строки
+   */
+  toggleRowSelection(rowIndex: number): void {
+    const state = this.state$.value;
+    const selectedRows = new Set(state.selectedRows);
 
-  confirmDelete(item: FilmingItem): void {
-    this.itemToDelete = item;
-    this.showDeleteDialog = true;
-  }
-
-  deleteItem(): void {
-    if (!this.itemToDelete) return;
-
-    const item = this.itemToDelete;
-    const category = this.production.categories[item.category as keyof typeof this.production.categories];
-    category.items = category.items.filter(i => i.id !== item.id);
-
-    this.loadAllItems();
-    this.applyFilters();
-
-    this.messageService.add({
-      severity: 'success',
-      summary: this.translate.instant('SCENE_TABLE.DELETE_SUCCESS'),
-      detail: this.translate.instant('SCENE_TABLE.DELETE_DETAIL', {name: item.name})
-    });
-
-    this.showDeleteDialog = false;
-    this.itemToDelete = null;
-  }
-
-  cancelDelete(): void {
-    this.showDeleteDialog = false;
-    this.itemToDelete = null;
-  }
-
-  markAsCompleted(item: FilmingItem): void {
-    const category = this.production.categories[item.category as keyof typeof this.production.categories];
-    const foundItem = category.items.find(i => i.id === item.id);
-    if (foundItem) {
-      foundItem.status = 'completed';
-      this.loadAllItems();
-      this.applyFilters();
-      this.messageService.add({
-        severity: 'success',
-        summary: this.translate.instant('SCENE_TABLE.MARK_COMPLETED_SUCCESS'),
-        detail: this.translate.instant('SCENE_TABLE.MARK_COMPLETED_DETAIL', {name: item.name})
-      });
-    }
-  }
-
-  saveItem(): void {
-    if (!this.isFormValid()) return;
-
-    const category = this.production.categories[this.formItem.category as keyof typeof this.production.categories];
-
-    if (this.editingItem) {
-      const index = category.items.findIndex(item => item.id === this.editingItem!.id);
-      if (index !== -1) {
-        category.items[index] = {...this.formItem};
-      }
-      this.messageService.add({
-        severity: 'success',
-        summary: this.translate.instant('SCENE_TABLE.UPDATE_SUCCESS'),
-        detail: this.translate.instant('SCENE_TABLE.UPDATE_DETAIL', {name: this.formItem.name})
-      });
+    if (selectedRows.has(rowIndex)) {
+      selectedRows.delete(rowIndex);
     } else {
-      category.items.push({...this.formItem});
-      this.messageService.add({
-        severity: 'success',
-        summary: this.translate.instant('SCENE_TABLE.ADD_SUCCESS'),
-        detail: this.translate.instant('SCENE_TABLE.ADD_DETAIL', {name: this.formItem.name})
-      });
+      selectedRows.add(rowIndex);
     }
 
-    this.loadAllItems();
-    this.applyFilters();
-    this.showDialog = false;
+    this.setState({ selectedRows });
   }
 
-  // Экспорт данных
-  exportExcel(): void {
-    this.exportType = 'excel';
-    this.exportMessage = this.translate.instant('SCENE_TABLE.EXPORT_EXCEL_CONFIRM', {
-      count: this.filteredItems.length
-    });
-    this.showExportDialog = true;
+  /**
+   * Проверить, выбрана ли строка
+   */
+  isRowSelected(rowIndex: number): boolean {
+    return this.state$.value.selectedRows.has(rowIndex);
   }
 
-  exportCSV(): void {
-    this.exportType = 'csv';
-    this.exportMessage = this.translate.instant('SCENE_TABLE.EXPORT_CSV_CONFIRM', {
-      count: this.filteredItems.length
-    });
-    this.showExportDialog = true;
+  /**
+   * Показать диалог экспорта Excel
+   */
+  showExcelExportDialog(): void {
+    this.setState({ showExportDialog: true, exportType: 'excel' });
   }
 
+  /**
+   * Показать диалог экспорта CSV
+   */
+  showCsvExportDialog(): void {
+    this.setState({ showExportDialog: true, exportType: 'csv' });
+  }
+
+  /**
+   * Подтвердить экспорт
+   */
   confirmExport(): void {
-    if (!this.exportType) return;
+    const state = this.state$.value;
 
-    this.showExportDialog = false;
-
-    if (this.exportType === 'excel') {
-      this.performExcelExport();
-    } else if (this.exportType === 'csv') {
-      this.performCSVExport();
+    if (!this.jobId) {
+      this.messageService.add({
+        severity: 'error',
+        summary: this.translate.instant('COMMON.ERROR') || 'Ошибка',
+        detail: 'Job ID не найден. Перезагрузите страницу',
+        life: 3000,
+      });
+      return;
     }
 
-    this.exportType = null;
-  }
+    // Показываем индикатор загрузки
+    this.setState({ loading: true });
 
-  private performExcelExport(): void {
-    const data = this.prepareExportData();
-    const worksheet = XLSX.utils.json_to_sheet(data);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Production Data');
+    console.log('🔄 [SceneTable] Начало экспорта:', {
+      jobId: this.jobId,
+      format: state.exportType,
+      recordCount: state.filteredRows.length,
+    });
 
-    const excelBuffer = XLSX.write(workbook, {bookType: 'xlsx', type: 'array'});
-    const blob = new Blob([excelBuffer], {type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
-    saveAs(blob, `production_data_${new Date().toISOString().split('T')[0]}.xlsx`);
+    let format: 'csv' | 'xlsx' = 'csv';
+    if (state.exportType === 'excel') {
+      format = 'xlsx';
+    }
 
-    this.messageService.add({
-      severity: 'success',
-      summary: this.translate.instant('SCENE_TABLE.EXPORT_SUCCESS'),
-      detail: this.translate.instant('SCENE_TABLE.EXPORT_EXCEL_DETAIL')
+    // Подписываемся на Observable с правильной обработкой ошибок
+    this.exportService.downloadExport(this.jobId, format).subscribe({
+      next: () => {
+        console.log('✅ [SceneTable] Экспорт успешен');
+
+        this.messageService.add({
+          severity: 'success',
+          summary: this.translate.instant('SCENE_TABLE.EXPORT_SUCCESS') || 'Экспорт успешен',
+          detail: `Файл ${state.exportType?.toUpperCase()} скачан`,
+          life: 3000,
+        });
+
+        this.setState({ showExportDialog: false, exportType: null, loading: false });
+      },
+      error: (err: any) => {
+        console.error('❌ [SceneTable] Ошибка при экспорте:', err);
+
+        const errorMessage =
+          err?.message || err?.detail || `Ошибка при экспорте ${state.exportType?.toUpperCase()}`;
+
+        this.messageService.add({
+          severity: 'error',
+          summary: this.translate.instant('COMMON.ERROR') || 'Ошибка',
+          detail: errorMessage,
+          life: 5000,
+        });
+
+        this.setState({ loading: false });
+      },
+      complete: () => {
+        console.log('📤 [SceneTable] Запрос экспорта завершен');
+      },
     });
   }
 
-  private performCSVExport(): void {
-    const data = this.prepareExportData();
-    const worksheet = XLSX.utils.json_to_sheet(data);
-    const csvOutput = XLSX.utils.sheet_to_csv(worksheet);
-
-    const blob = new Blob(['\uFEFF' + csvOutput], {type: 'text/csv;charset=utf-8;'});
-    saveAs(blob, `production_data_${new Date().toISOString().split('T')[0]}.csv`);
-
-    this.messageService.add({
-      severity: 'success',
-      summary: this.translate.instant('SCENE_TABLE.EXPORT_SUCCESS'),
-      detail: this.translate.instant('SCENE_TABLE.EXPORT_CSV_DETAIL')
-    });
+  /**
+   * Скрыть диалог экспорта
+   */
+  hideExportDialog(): void {
+    this.setState({ showExportDialog: false });
   }
 
-  private prepareExportData(): any[] {
-    return this.filteredItems.map(item => ({
-      'ID': item.id,
-      'Название': item.name,
-      'Категория': this.getCategoryLabel(item.category),
-      'Стоимость ($)': item.cost,
-      'Статус': this.getStatusLabel(item.status),
-      'Контакт': item.contact || 'Не указан'
-    }));
+  /**
+   * Получить значение ячейки с форматированием
+   */
+  getCellValue(row: any, column: string): any {
+    const value = row[column];
+
+    if (value === null || value === undefined) {
+      return '—';
+    }
+
+    return value;
   }
 
-  // Вспомогательные методы
-  private generateId(): number {
-    return Math.max(...this.allItems.map(item => item.id), 0) + 1;
+  /**
+   * Проверить, является ли значение процентом
+   */
+  isPercentageValue(value: any): boolean {
+    return String(value).includes('%');
   }
 
-  isFormValid(): boolean {
-    return !!(this.formItem.name && this.formItem.cost && this.formItem.status && this.formItem.category);
+  /**
+   * Получить стиль для процентов
+   */
+  getPercentageStyle(value: any): any {
+    const numValue = parseInt(String(value));
+
+    if (numValue >= 80) {
+      return { color: '#10b981' };
+    } else if (numValue >= 60) {
+      return { color: '#f59e0b' };
+    } else {
+      return { color: '#ef4444' };
+    }
   }
 
-  isFormChanged(): boolean {
-    if (!this.editingItem) return true;
-    // Сравниваем только значимые поля
+  /**
+   * Проверить, является ли столбец статусом
+   */
+  isStatusColumn(columnName: string): boolean {
     return (
-      this.formItem.name !== this.editingItem.name ||
-      this.formItem.category !== this.editingItem.category ||
-      this.formItem.cost !== this.editingItem.cost ||
-      this.formItem.status !== this.editingItem.status ||
-      this.formItem.contact !== this.editingItem.contact
+      columnName.toLowerCase().includes('status') || columnName.toLowerCase().includes('статус')
     );
   }
 
-  getCategoryLabel(category: string): string {
-    const found = this.categoryOptions.find(opt => opt.value === category);
-    return found ? found.label : category;
+  /**
+   * Получить стиль статуса
+   */
+  getStatusStyle(value: any): any {
+    const status = String(value).toLowerCase();
+
+    if (status.includes('success') || status.includes('завершен')) {
+      return { 'background-color': '#10b981', color: '#fff' };
+    } else if (status.includes('pending') || status.includes('ожидание')) {
+      return { 'background-color': '#f59e0b', color: '#fff' };
+    } else if (status.includes('error') || status.includes('ошибка')) {
+      return { 'background-color': '#ef4444', color: '#fff' };
+    }
+
+    return { 'background-color': '#6b7280', color: '#fff' };
   }
 
-  getCategoryIcon(category: string): string {
-    const icons: { [key: string]: string } = {
-      'locations': 'pi pi-map-marker',
-      'characters': 'pi pi-users',
-      'extras': 'pi pi-user',
-      'props': 'pi pi-box',
-      'transportation': 'pi pi-truck',
-      'animals': 'pi pi-heart',
-      'stunts': 'pi pi-bolt'
+  /**
+   * Получить иконку статуса
+   */
+  getStatusIcon(value: any): string {
+    const status = String(value).toLowerCase();
+
+    if (status.includes('success') || status.includes('завершен')) {
+      return 'pi pi-check-circle';
+    } else if (status.includes('pending') || status.includes('ожидание')) {
+      return 'pi pi-clock';
+    } else if (status.includes('error') || status.includes('ошибка')) {
+      return 'pi pi-times-circle';
+    }
+
+    return 'pi pi-info-circle';
+  }
+
+  /**
+   * Получить уникальный ключ ячейки для отслеживания загрузки
+   */
+  private getCellKey(rowIndex: number, columnName: string): string {
+    return `${rowIndex}:${columnName}`;
+  }
+
+  /**
+   * Включить режим редактирования для ячейки
+   */
+  enableEditing(rowIndex: number, columnName: string): void {
+    const state = this.state$.value;
+    if (state.editingCell) {
+      this.cancelEditing();
+    }
+
+    const value = state.filteredRows[rowIndex][columnName];
+
+    const editingCell: EditingCell = {
+      rowIndex,
+      columnName,
+      value,
+      originalValue: value,
+      isLoading: false,
+      error: null,
     };
-    return icons[category] || 'pi pi-tag';
+
+    this.setState({ editingCell });
   }
 
-  getCategoryStyle(category: string): any {
-    const styles: { [key: string]: any } = {
-      'locations': {'background': '#3B82F6', 'color': 'white'},
-      'characters': {'background': '#10B981', 'color': 'white'},
-      'extras': {'background': '#F59E0B', 'color': 'white'},
-      'props': {'background': '#8B5CF6', 'color': 'white'},
-      'transportation': {'background': '#EF4444', 'color': 'white'},
-      'animals': {'background': '#6B7280', 'color': 'white'},
-      'stunts': {'background': '#EC4899', 'color': 'white'}
+  /**
+   * Сохранить изменения редактирования и отправить на сервер
+   */
+  saveEditing(): void {
+    const state = this.state$.value;
+    const editingCell = state.editingCell;
+
+    if (!editingCell) return;
+
+    if (editingCell.value === editingCell.originalValue) {
+      this.cancelEditing();
+      return;
+    }
+
+    if (!this.jobId) {
+      this.messageService.add({
+        severity: 'error',
+        summary: this.translate.instant('COMMON.ERROR') || 'Ошибка',
+        detail: 'Job ID не найден. Перезагрузите страницу',
+        life: 3000,
+      });
+      return;
+    }
+
+    const cellKey = this.getCellKey(editingCell.rowIndex, editingCell.columnName);
+    const savingCells = new Set(state.savingCells);
+    savingCells.add(cellKey);
+
+    this.setState({
+      editingCell: { ...editingCell, isLoading: true },
+      savingCells,
+    });
+
+    const payload: CeilRequest = {
+      job_id: this.jobId,
+      row: editingCell.rowIndex,
+      column: editingCell.columnName,
+      value: String(editingCell.value),
     };
-    return styles[category] || {'background': '#6B7280', 'color': 'white'};
+
+    console.log('📤 Отправка запроса на обновление ячейки:', payload);
+
+    this.ceilService
+      .updateCell(payload)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (updatedCell) => {
+          console.log('✅ Ячейка обновлена на сервере:', updatedCell);
+
+          this.messageService.add({
+            severity: 'success',
+            summary: this.translate.instant('SCENE_TABLE.CHANGES_SAVED') || 'Изменения сохранены',
+            detail: `${editingCell.columnName}: ${editingCell.value}`,
+            life: 2000,
+          });
+
+          savingCells.delete(cellKey);
+          this.setState({ editingCell: null, savingCells });
+        },
+        error: (err) => {
+          console.error('❌ Ошибка при сохранении:', err);
+
+          // Откатываем значение в случае ошибки
+          const filteredRows = [...state.filteredRows];
+          filteredRows[editingCell.rowIndex][editingCell.columnName] = editingCell.originalValue;
+
+          const rows = [...state.rows];
+          rows[editingCell.rowIndex][editingCell.columnName] = editingCell.originalValue;
+
+          const errorMessage =
+            err?.message || this.translate.instant('TABLE.SAVE_ERROR') || 'Ошибка при сохранении';
+
+          this.messageService.add({
+            severity: 'error',
+            summary: this.translate.instant('COMMON.ERROR') || 'Ошибка',
+            detail: errorMessage,
+            life: 4000,
+          });
+
+          savingCells.delete(cellKey);
+          this.setState({ editingCell: null, savingCells, filteredRows, rows });
+        },
+      });
+
+    // Оптимистичное обновление UI
+    const filteredRows = [...state.filteredRows];
+    filteredRows[editingCell.rowIndex][editingCell.columnName] = editingCell.value;
+
+    const rows = [...state.rows];
+    rows[editingCell.rowIndex][editingCell.columnName] = editingCell.value;
+
+    this.setState({ filteredRows, rows });
   }
 
-  getCategoryBudget(category: string): number {
-    return this.production.categories[category as keyof typeof this.production.categories]?.budget || 0;
+  /**
+   * Отменить редактирование
+   */
+  cancelEditing(): void {
+    this.setState({ editingCell: null });
   }
 
-  getStatusLabel(status: string): string {
-    const labels: { [key: string]: string } = {
-      'planned': 'Запланировано',
-      'confirmed': 'Подтверждено',
-      'completed': 'Завершено'
-    };
-    return labels[status] || status;
+  /**
+   * Проверить, находится ли ячейка в режиме редактирования
+   */
+  isCellEditing(rowIndex: number, columnName: string): boolean {
+    const editingCell = this.state$.value.editingCell;
+    return editingCell?.rowIndex === rowIndex && editingCell?.columnName === columnName;
   }
 
-  getStatusStyle(status: string): any {
-    const styles: { [key: string]: any } = {
-      'planned': {'background': '#F59E0B', 'color': 'white'},
-      'confirmed': {'background': '#3B82F6', 'color': 'white'},
-      'completed': {'background': '#10B981', 'color': 'white'}
-    };
-    return styles[status] || {'background': '#6B7280', 'color': 'white'};
+  /**
+   * Проверить, загружается ли ячейка
+   */
+  isCellLoading(rowIndex: number, columnName: string): boolean {
+    const cellKey = this.getCellKey(rowIndex, columnName);
+    return this.state$.value.savingCells.has(cellKey);
   }
 
-  // Геттеры для статистики
-  get totalItems(): number {
-    return this.filteredItems.length;
+  /**
+   * TrackBy функции для оптимизации *ngFor
+   */
+  trackByString(index: number, value: string): string {
+    return value;
   }
 
-  get totalCost(): number {
-    return this.filteredItems.reduce((sum, item) => sum + item.cost, 0);
-  }
-
-  get confirmedCount(): number {
-    return this.filteredItems.filter(item => item.status === 'confirmed').length;
-  }
-
-  get completedCount(): number {
-    return this.filteredItems.filter(item => item.status === 'completed').length;
-  }
-
-  get totalRecords(): number {
-    return this.filteredItems.length;
+  trackByIndex(index: number, value: any): number {
+    return index;
   }
 }

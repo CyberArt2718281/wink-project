@@ -1,7 +1,8 @@
 import {Routes} from '@angular/router';
 import {Layout} from './shared/layout/layout/layout';
 import {FileUploadComponent} from './features/file-upload/file-upload.component';
-import {serverErrorGuard} from './core/guard/server-error.guard';
+import {TableDataGuard} from './core/guard/table-data.guard';
+
 
 export const routes: Routes = [
 
@@ -15,16 +16,8 @@ export const routes: Routes = [
       },
       {
         path: 'table',
+        canActivate: [TableDataGuard],
         loadComponent: () => import('./features/table/table.component').then(m => m.TableComponent)
-      },
-      {
-        path: '404',
-        loadComponent: () => import('./features/404/not-found.component').then(m => m.NotFoundComponent)
-      },
-      {
-        path: '505',
-        canActivate: [serverErrorGuard],
-        loadComponent: () => import('./features/505/internal-server-error.component').then(m => m.InternalServerErrorComponent),
       },
     ]
   },

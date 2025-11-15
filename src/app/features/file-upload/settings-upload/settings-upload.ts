@@ -171,7 +171,7 @@ export class SettingsUpload implements OnInit {
         });
         break;
 
-      case 'advanced':
+      case 'extended':
         this.allColumns.forEach(col => {
           if (!col.id.includes('cost_breakdown') && !col.category.includes('custom')) {
             col.selected = true;

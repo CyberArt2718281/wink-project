@@ -188,20 +188,27 @@ export class FileUploadComponent implements OnInit, OnDestroy {
   showError(message: string) {
     this.error = message;
     const errorTitle = this.translate.instant('UPLOAD.ERROR_TITLE');
+
+    // Закрываем модалку с прогресс баром
+    this.messageService.clear('confirm');
+    this.visible = false;
+    this.isProcessing = false;
+    this.progress = 0;
+    this.isFileInputDisabled = false;
+    this.uploadedFile = null;
+    this.uploadedFileType = null;
+
+    this.cdr.detectChanges();
+
+    // Показываем ошибку в виде тоста
     this.messageService.add({
       key: 'error',
       severity: 'error',
       summary: errorTitle,
       detail: message,
-      life: 300000,
+      life: 5000,
       styleClass: 'bg-[#1A1A1A] text-white border border-[#FF6600]/20 rounded-xl backdrop-blur-lg text-sm'
     });
-    this.cdr.detectChanges();
-    this.visible = false;
-    this.uploadedFile = null;
-    this.uploadedFileType = null;
-    this.isProcessing = false;
-    this.isFileInputDisabled = false;
   }
 
   /**
@@ -237,7 +244,7 @@ export class FileUploadComponent implements OnInit, OnDestroy {
 
     // Создаем конфиг для анализа
     const config: PostPreset = {
-      preset: (this.selectedOption || 'basic') as 'basic' | 'advanced' | 'full' | 'custom',
+      preset: (this.selectedOption || 'basic') as 'basic' | 'extended' | 'full' | 'custom',
       ...(this.selectedOption === 'custom' && {custom_columns: this.selectedColumns})
     };
 
@@ -317,7 +324,12 @@ export class FileUploadComponent implements OnInit, OnDestroy {
     };
 
     localStorage.setItem('processedTableData', JSON.stringify(processedData));
-    console.log('✅ Данные сохранены в localStorage');
+    // Также сохраняем jobId отдельно для проверки в guard
+    localStorage.setItem('jobId', result.job_id);
+    console.log('✅ Данные сохранены в localStorage:', {
+      job_id: result.job_id,
+      rows: result.table.rows.length
+    });
 
     // Даем время пользователю увидеть 100% прогресс
     setTimeout(() => {
@@ -360,7 +372,7 @@ export class FileUploadComponent implements OnInit, OnDestroy {
     switch (preset) {
       case 'basic':
         return this.translate.instant('SETTINGS_UPLOAD.BASIC');
-      case 'advanced':
+      case 'extended':
         return this.translate.instant('SETTINGS_UPLOAD.ADVANCED');
       case 'custom':
         return this.translate.instant('SETTINGS_UPLOAD.CUSTOM');

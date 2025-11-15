@@ -20,8 +20,7 @@ interface LanguageOption {
     CommonModule,
     TranslateModule,
     SelectModule,
-    FormsModule,
-
+    FormsModule
   ],
   templateUrl: './header.html',
   styleUrl: './header.css',
@@ -33,18 +32,7 @@ export class Header implements OnInit, OnDestroy {
   languageService = inject(LanguageService);
   translate = inject(TranslateService);
   router = inject(Router);
-  selectStyleOption={
-    select: {
-      option: {
-        selectedBackground: '#FF6600', // активный/выбранный фон
-        hoverBackground: '#FFD5B3'    // фон при наведении
-      },
-      panel: {
-        background: '#232323',        // фон выпадающего
-        border: '#FF6600'             // бордер панельки
-      }
-    }
-  }
+
   languageOptions: LanguageOption[] = [
     { code: 'ru', label: 'Русский' },
     { code: 'en', label: 'English' }
