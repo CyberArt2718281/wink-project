@@ -298,6 +298,7 @@ export class FilmingTableComponent implements OnInit, OnDestroy {
     this.messageService.add({
       severity: 'info',
       summary: this.translate.instant('SCENE_TABLE.FILTERS_CLEARED') || 'Фильтры очищены',
+      detail: this.translate.instant('SCENE_TABLE.FILTERS_DETAILS') || 'Все фильтры были сброшены до значений по умолчанию.',
       life: 2000,
     });
   }

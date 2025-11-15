@@ -1,12 +1,13 @@
 <header
-  class="w-full bg-black flex items-center justify-between sticky top-0 z-40 border-b border-[#232323] backdrop-blur-sm bg-black/95 py-4 px-4 sm:p-4 md:p-6  lg:p-8">
+  class="w-full bg-black/95 flex items-center justify-between sticky top-0 z-40 border-b border-[#232323] backdrop-blur-sm py-4 px-4 sm:p-4 md:p-6 lg:p-8"
+>
   <!-- Логотип -->
   <div class="logo">
-    <a  style="text-decoration: none; outline: none;" routerLink="/">
+    <a style="text-decoration: none; outline: none" routerLink="/">
       <picture class="flex items-center">
-        <source srcset="assets/images/logo.avif" type="image/avif">
-        <source srcset="assets/images/logo.webp" type="image/webp">
-        <source srcset="assets/images/logo.svg" type="image/svg+xml">
+        <source srcset="assets/images/logo.avif" type="image/avif" />
+        <source srcset="assets/images/logo.webp" type="image/webp" />
+        <source srcset="assets/images/logo.svg" type="image/svg+xml" />
         <img
           src="assets/images/logo.svg"
           alt="Логотип"
@@ -15,10 +16,7 @@
         />
       </picture>
     </a>
-
   </div>
-
-
 
   <!-- Правая часть: языковой селект и бургер -->
   <div class="flex items-center justify-center">
@@ -31,18 +29,23 @@
         optionLabel="label"
         [appendTo]="'body'"
         styleClass="!bg-[#1A1A1A] !border-[#232323] !text-white [&_.p-dropdown-label]:!text-gray-300 [&_.p-dropdown-panel]:!bg-[#1A1A1A] [&_.p-dropdown-panel]:!border-[#232323] min-w-[100px] !rounded-[40px]"
-        [dropdownIcon]="'pi pi-globe'">
-        <ng-template pTemplate="selectedItem" >
-          <div class="flex items-center gap-2 !justify-center">
-            <i [class]="selectedLanguage.code === 'ru' ? 'pi pi-home  !text-[#FF6600]' : 'pi  pi-language !text-[#FF6600]'"
+        [dropdownIcon]="'pi pi-globe'"
+      >
+        <ng-template pTemplate="selectedItem">
+          <div class="flex items-center gap-2 justify-center!">
+            <i
+              [class]="
+                selectedLanguage.code === 'ru'
+                  ? 'pi pi-home text-[#FF6600]!'
+                  : 'pi pi-language text-[#FF6600]!'
+              "
             ></i>
-            <span class="text-white text-sm inter-medium ">{{ selectedLanguage.label }}</span>
+            <span class="text-white text-sm inter-medium">{{ selectedLanguage.label }}</span>
           </div>
         </ng-template>
         <ng-template let-language pTemplate="item">
-          <div class="flex items-center gap-2 ">
-            <i [class]="language.code === 'ru' ? 'pi pi-home   ' : 'pi pi-language '"
-            ></i>
+          <div class="flex items-center gap-2">
+            <i [class]="language.code === 'ru' ? 'pi pi-home   ' : 'pi pi-language '"></i>
             <span class="text-white inter-medium">{{ language.label }}</span>
           </div>
         </ng-template>
@@ -55,50 +58,63 @@
         class="p-2 rounded-lg cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#FF6600] focus:ring-opacity-50 transition-all duration-200 hover:bg-[#232323]"
         (click)="toggleMenu()"
         [attr.aria-label]="'HEADER.MENU' | translate"
-        [attr.aria-expanded]="menuOpen">
+        [attr.aria-expanded]="menuOpen"
+      >
         @if (!menuOpen) {
-          <svg class="w-7 h-7 text-[#FF6600]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
-          </svg>
+        <svg
+          class="w-7 h-7 text-[#FF6600]"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+        >
+          <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
         } @else {
-          <svg class="w-7 h-7 text-[#FF6600]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
-          </svg>
+        <svg
+          class="w-7 h-7 text-[#FF6600]"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+        >
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+        </svg>
         }
       </button>
 
       @if (menuOpen) {
-        <div
-          class="absolute right-0 top-12 bg-[#1A1A1A] shadow-2xl rounded-xl py-4 px-6 flex flex-col gap-3 z-50 w-64 border border-[#232323] animate-slide-fade-in">
-          <!-- Мобильный языковой селект -->
-          <div class="mb-2">
-            <p-select
-              [options]="languageOptions"
-              [(ngModel)]="selectedLanguage"
-              (onChange)="onLanguageChange($event)"
-              optionLabel="label"
-              [appendTo]="'body'"
-              styleClass="!bg-[#232323] !border-[#333333] !text-white [&_.p-dropdown-label]:!text-gray-300 [&_.p-dropdown-panel]:!bg-[#1A1A1A] [&_.p-dropdown-panel]:!border-[#232323] w-full inter-regular"
-              [dropdownIcon]="'pi pi-globe'">
-              <ng-template pTemplate="selectedItem">
-                <div class="flex items-center gap-2">
-                  <i [class]="selectedLanguage.code === 'ru' ? 'pi pi-home  ' : 'pi pi pi-language '"
-                  ></i>
-                  <span class="text-white text-sm inter-medium">{{ selectedLanguage.label }}</span>
-                </div>
-              </ng-template>
-              <ng-template let-language pTemplate="item">
-                <div class="flex items-center gap-2">
-                  <i [class]="language.code === 'ru' ? 'pi pi-home   ' : 'pi pi-language'"
-                  ></i>
-                  <span class="text-white inter-medium">{{ language.label }}</span>
-                </div>
-              </ng-template>
-            </p-select>
-          </div>
-
-
+      <div
+        class="absolute right-0 top-12 bg-[#1A1A1A] shadow-2xl rounded-xl py-4 px-6 flex flex-col gap-3 z-50 w-64 border border-[#232323] animate-slide-fade-in"
+      >
+        <!-- Мобильный языковой селект -->
+        <div class="mb-2">
+          <p-select
+            [options]="languageOptions"
+            [(ngModel)]="selectedLanguage"
+            (onChange)="onLanguageChange($event)"
+            optionLabel="label"
+            [appendTo]="'body'"
+            styleClass="!bg-[#232323] !border-[#333333] !text-white [&_.p-dropdown-label]:!text-gray-300 [&_.p-dropdown-panel]:!bg-[#1A1A1A] [&_.p-dropdown-panel]:!border-[#232323] w-full inter-regular"
+            [dropdownIcon]="'pi pi-globe'"
+          >
+            <ng-template pTemplate="selectedItem">
+              <div class="flex items-center gap-2">
+                <i
+                  [class]="selectedLanguage.code === 'ru' ? 'pi pi-home  ' : 'pi pi pi-language '"
+                ></i>
+                <span class="text-white text-sm inter-medium">{{ selectedLanguage.label }}</span>
+              </div>
+            </ng-template>
+            <ng-template let-language pTemplate="item">
+              <div class="flex items-center gap-2">
+                <i [class]="language.code === 'ru' ? 'pi pi-home   ' : 'pi pi-language'"></i>
+                <span class="text-white inter-medium">{{ language.label }}</span>
+              </div>
+            </ng-template>
+          </p-select>
         </div>
+      </div>
       }
     </div>
   </div>

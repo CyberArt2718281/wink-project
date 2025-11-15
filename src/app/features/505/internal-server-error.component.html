@@ -28,7 +28,10 @@
       </div>
 
       <!-- Детали ошибки сервера -->
-      <div class="error-details server-error-details animate-fade-in-up" style="animation-delay: 0.6s">
+      <div
+        class="error-details server-error-details animate-fade-in-up"
+        style="animation-delay: 0.6s"
+      >
         <div class="detail-item error-item">
           <i class="pi pi-server text-red-500"></i>
           <span>{{ 'ERROR_505.DETAIL_1' | translate }}</span>
@@ -40,6 +43,10 @@
         <div class="detail-item error-item">
           <i class="pi pi-cog text-blue-500"></i>
           <span>{{ 'ERROR_505.DETAIL_3' | translate }}</span>
+        </div>
+        <div class="detail-item error-item">
+          <i class="pi pi-clock text-purple-500"></i>
+          <span>{{ 'ERROR_505.DETAIL_4' | translate }}</span>
         </div>
       </div>
 
@@ -56,45 +63,22 @@
 
       <!-- Кнопки действий -->
       <div class="error-actions animate-fade-in-up" style="animation-delay: 0.8s">
-        <button pButton
-                class="action-button primary  gradient-button"
-                (click)="reloadPage()"
-                icon="pi pi-refresh">
+        <button
+          pButton
+          class="action-button primary gradient-button"
+          (click)="reloadPage()"
+          icon="pi pi-refresh"
+        >
           {{ 'ERROR_505.RELOAD_PAGE' | translate }}
         </button>
-        <button pButton
-                class="action-button secondary gradient-button"
-                (click)="goHome()"
-                icon="pi pi-home">
+        <button
+          pButton
+          class="action-button secondary gradient-button"
+          (click)="goHome()"
+          icon="pi pi-home"
+        >
           {{ 'ERROR_505.GO_HOME' | translate }}
         </button>
-        <button pButton
-                class="action-button tertiary gradient-button"
-                (click)="contactSupport()"
-                icon="pi pi-envelope">
-          {{ 'ERROR_505.CONTACT_SUPPORT' | translate }}
-        </button>
-      </div>
-
-      <!-- Таймер автоматического обновления -->
-      <div class="auto-reload animate-fade-in-up" style="animation-delay: 0.9s">
-        <div class="reload-timer">
-          <i class="pi pi-clock timer-icon"></i>
-          <span class="timer-text">{{ 'ERROR_505.AUTO_RELOAD' | translate }}</span>
-          <div class="timer-progress">
-            <div class="timer-bar"></div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Анимированный сервер -->
-    <div class="server-animation">
-      <div class="server-rack">
-        <div class="server-led server-led-1"></div>
-        <div class="server-led server-led-2"></div>
-        <div class="server-led server-led-3"></div>
-        <div class="server-light"></div>
       </div>
     </div>
   </div>

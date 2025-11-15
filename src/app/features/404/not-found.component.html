@@ -42,20 +42,28 @@
           <i class="pi pi-search text-[#FF6600]"></i>
           <span>{{ 'ERROR_404.DETAIL_3' | translate }}</span>
         </div>
+        <div class="detail-item">
+          <i class="pi pi-map text-[#FF6600]"></i>
+          <span>{{ 'ERROR_404.DETAIL_4' | translate }}</span>
+        </div>
       </div>
 
       <!-- Кнопки действий -->
       <div class="error-actions animate-fade-in-up" style="animation-delay: 0.7s">
-        <button pButton
-                class="action-button primary gradient-button"
-                (click)="goHome()"
-                icon="pi pi-home">
+        <button
+          pButton
+          class="action-button primary gradient-button"
+          (click)="goHome()"
+          icon="pi pi-home"
+        >
           {{ 'ERROR_404.GO_HOME' | translate }}
         </button>
-        <button pButton
-                class="action-button secondary gradient-button"
-                (click)="goBack()"
-                icon="pi pi-arrow-left">
+        <button
+          pButton
+          class="action-button secondary gradient-button"
+          (click)="goBack()"
+          icon="pi pi-arrow-left"
+        >
           {{ 'ERROR_404.GO_BACK' | translate }}
         </button>
       </div>
@@ -64,7 +72,7 @@
       <div class="error-help animate-fade-in-up" style="animation-delay: 0.8s">
         <p class="help-text">
           {{ 'ERROR_404.HELP_TEXT' | translate }}
-          <a routerLink="/upload" class="help-link">{{ 'ERROR_404.UPLOAD_PAGE' | translate }}</a>
+          <a routerLink="/" class="help-link">{{ 'ERROR_404.UPLOAD_PAGE' | translate }}</a>
           {{ 'ERROR_404.OR_TEXT' | translate }}
           <a routerLink="/table" class="help-link">{{ 'ERROR_404.TABLE_PAGE' | translate }}</a>
         </p>

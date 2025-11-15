@@ -71,7 +71,6 @@
     "SELECTED": "Selected",
     "COLUMNS": "columns",
     "ADD": "Add",
-    "CUSTOM": "Custom",
     "CUSTOM_DESC": "Select the required columns manually",
     "REMOVE_COLUMN": "Remove column"
   },
@@ -81,12 +80,15 @@
     "TOTAL_SCENES": "Total scenes",
     "DIRECTOR": "Director",
     "BUDGET": "Budget",
+    "ANALYSIS_RESULTS": "Analysis Results",
+    "ANALYSIS_RESULTS_DESC": "Complete table with document processing results",
     "RESULTS_TITLE": "Analysis Results",
     "RESULTS_SUBTITLE": "Complete table with document processing results",
     "RECORDS": "Records",
     "SEARCH_PLACEHOLDER": "Search all columns...",
     "CLEAR_FILTERS": "Clear",
     "FILTERS_CLEARED": "Filters cleared",
+    "SHOWN": "Showing {{shown}} of {{total}} records",
     "SELECTED": "Selected",
     "ROWS": "rows",
     "DESELECT": "Deselect",
@@ -104,7 +106,6 @@
     "EXPORT": "Export",
     "NO_DATA": "No data to display",
     "NO_DATA_DESC": "Upload a file for analysis and results will be displayed here",
-    "EXPORT_SUCCESS": "Export successful",
     "CHANGES_SAVED": "Changes saved",
     "SAVE_HINT": "Save (Enter)",
     "CANCEL_HINT": "Cancel (Esc)",
@@ -175,27 +176,13 @@
     "EXPORT_CONFIRM_SUBTEXT": "The file will be saved to your downloads",
     "ITEMS_SELECTED": "selected items"
   },
-  "COMMON": {
-    "ERROR": "Error",
-    "CANCEL": "Cancel",
-    "SAVE": "Save",
-    "DELETE": "Delete",
-    "EDIT": "Edit",
-    "CLOSE": "Close",
-    "LOADING": "Loading...",
-    "SUCCESS": "Success",
-    "WARNING": "Warning",
-    "INFO": "Info"
-  },
-  "TABLE": {
-    "SAVE_ERROR": "Error saving changes"
-  },
   "ERROR_404": {
     "TITLE": "Page not found",
     "DESCRIPTION": "Sorry, the requested page does not exist or has been removed.",
     "DETAIL_1": "Check the address for typos.",
     "DETAIL_2": "The page may have been moved or deleted.",
     "DETAIL_3": "Try using search or go to the home page.",
+    "DETAIL_4": "Use the navigation menu to find the desired page.",
     "GO_HOME": "Home",
     "GO_BACK": "Back",
     "HELP_TEXT": "You can go to the page ",
@@ -209,6 +196,7 @@
     "DETAIL_1": "The server is temporarily unavailable or overloaded.",
     "DETAIL_2": "Try refreshing the page or come back later.",
     "DETAIL_3": "Try refreshing the page later or contact support.",
+    "DETAIL_4": "If the problem persists, contact the support team.",
     "MESSAGE_TITLE": "Possible actions",
     "MESSAGE_TEXT": "You can try reloading the page, go to the home page, or contact support.",
     "RELOAD_PAGE": "Reload page",
@@ -217,27 +205,16 @@
     "AUTO_RELOAD": "Auto-reloading in a few seconds..."
   },
   "COMMON": {
-    "SAVE": "Save",
+    "ERROR": "Error",
     "CANCEL": "Cancel",
-    "CONFIRM": "Confirm",
-    "ERROR": "Error"
-  },
-  "SCENE_TABLE": {
-    "ANALYSIS_RESULTS": "Analysis Results",
-    "ANALYSIS_RESULTS_DESC": "Full table with document processing results",
-    "RECORDS": "Records",
-    "SEARCH_PLACEHOLDER": "Search across all columns...",
-    "CLEAR_FILTERS": "Clear Filters",
-    "FILTERS_CLEARED": "Filters cleared",
-    "SHOWN": "Showing {{shown}} of {{total}} records",
-    "EXPORT_EXCEL": "Export to Excel",
-    "EXPORT_CSV": "Export to CSV",
-    "CONFIRM_EXPORT": "Confirm Export",
-    "EXPORT_CONFIRM_EXCEL": "Export {{count}} records to Excel format?",
-    "EXPORT_CONFIRM_CSV": "Export {{count}} records to CSV format?",
-    "EXPORT_SUCCESS": "Export successful",
-    "CHANGES_SAVED": "Changes saved",
-    "NO_DATA": "No data to display",
-    "NO_DATA_DESC": "Upload a file for analysis and results will be displayed here"
+    "SAVE": "Save",
+    "DELETE": "Delete",
+    "EDIT": "Edit",
+    "CLOSE": "Close",
+    "LOADING": "Loading...",
+    "SUCCESS": "Success",
+    "WARNING": "Warning",
+    "INFO": "Info",
+    "CONFIRM": "Confirm"
   }
 }

@@ -1,11 +1,11 @@
-import {Component, inject, OnDestroy, OnInit} from '@angular/core';
-import {NavigationEnd, Router, RouterModule} from '@angular/router';
-import {CommonModule} from '@angular/common';
-import {SelectModule} from 'primeng/select';
-import {FormsModule} from '@angular/forms';
-import {TranslateModule, TranslateService} from '@ngx-translate/core';
-import {filter, Subscription} from 'rxjs';
-import {LanguageService} from '../../../core/language.service';
+import { CommonModule } from '@angular/common';
+import { ChangeDetectionStrategy, Component, inject, OnDestroy, OnInit } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { NavigationEnd, Router, RouterModule } from '@angular/router';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { SelectModule } from 'primeng/select';
+import { filter, Subscription } from 'rxjs';
+import { LanguageService } from '../../../core/language.service';
 
 interface LanguageOption {
   code: string;
@@ -15,15 +15,10 @@ interface LanguageOption {
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [
-    RouterModule,
-    CommonModule,
-    TranslateModule,
-    SelectModule,
-    FormsModule
-  ],
+  imports: [RouterModule, CommonModule, TranslateModule, SelectModule, FormsModule],
   templateUrl: './header.html',
   styleUrl: './header.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Header implements OnInit, OnDestroy {
   menuOpen: boolean = false;
@@ -35,7 +30,7 @@ export class Header implements OnInit, OnDestroy {
 
   languageOptions: LanguageOption[] = [
     { code: 'ru', label: 'Русский' },
-    { code: 'en', label: 'English' }
+    { code: 'en', label: 'English' },
   ];
 
   selectedLanguage: LanguageOption = this.languageOptions[0];
@@ -44,46 +39,44 @@ export class Header implements OnInit, OnDestroy {
   private languageSubscription!: Subscription;
 
   ngOnInit() {
-    // Инициализация выбранного языка
-    let currentLang = localStorage.getItem('app-language') || this.languageService.getCurrentLanguage();
-    if (!currentLang) currentLang = 'ru';
-    this.languageService.setLanguage(currentLang); // Установить язык в сервисе
-    this.selectedLanguage = this.languageOptions.find(lang => lang.code === currentLang) || this.languageOptions[0];
+    const currentLang =
+      localStorage.getItem('app-language') || this.languageService.getCurrentLanguage() || 'ru';
+    this.languageService.setLanguage(currentLang);
+    this.selectedLanguage =
+      this.languageOptions.find((lang) => lang.code === currentLang) || this.languageOptions[0];
 
-    // Инициализация текущего маршрута сразу
     this.currentRoute = this.router.url;
 
-    // Отслеживание изменений маршрута
     this.routerSubscription = this.router.events
-      .pipe(filter(event => event instanceof NavigationEnd))
+      .pipe(filter((event) => event instanceof NavigationEnd))
       .subscribe((event: any) => {
         this.currentRoute = event.url;
       });
 
-    // Отслеживание изменений языка
-    this.languageSubscription = this.languageService.getLanguage$().subscribe(lang => {
+    this.languageSubscription = this.languageService.getLanguage$().subscribe((lang) => {
       this.translate.use(lang);
-      this.selectedLanguage = this.languageOptions.find(option => option.code === lang) || this.languageOptions[0];
-      localStorage.setItem('app-language', lang); // Сохранять язык в localStorage
+      this.selectedLanguage =
+        this.languageOptions.find((option) => option.code === lang) || this.languageOptions[0];
+      localStorage.setItem('app-language', lang);
     });
   }
 
-  toggleMenu() {
+  toggleMenu(): void {
     this.menuOpen = !this.menuOpen;
   }
 
-  closeMenu() {
+  closeMenu(): void {
     this.menuOpen = false;
   }
 
-  onLanguageChange(event: any) {
-    if (event.value && event.value.code) {
+  onLanguageChange(event: any): void {
+    if (event.value?.code) {
       this.languageService.setLanguage(event.value.code);
-      localStorage.setItem('app-language', event.value.code); // Сохранять язык при смене
+      localStorage.setItem('app-language', event.value.code);
     }
   }
 
-  setLanguage(lang: string) {
+  setLanguage(lang: string): void {
     this.languageService.setLanguage(lang);
   }
 
@@ -95,12 +88,8 @@ export class Header implements OnInit, OnDestroy {
     return this.currentRoute === route;
   }
 
-  ngOnDestroy() {
-    if (this.routerSubscription) {
-      this.routerSubscription.unsubscribe();
-    }
-    if (this.languageSubscription) {
-      this.languageSubscription.unsubscribe();
-    }
+  ngOnDestroy(): void {
+    this.routerSubscription?.unsubscribe();
+    this.languageSubscription?.unsubscribe();
   }
 }

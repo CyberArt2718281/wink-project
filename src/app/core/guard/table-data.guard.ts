@@ -1,8 +1,8 @@
-import {inject} from '@angular/core';
-import {CanActivateFn, Router} from '@angular/router';
-import {Result} from '../../shared/services/result';
-import {catchError, of} from 'rxjs';
-import {map} from 'rxjs/operators';
+import { inject } from '@angular/core';
+import { CanActivateFn, Router } from '@angular/router';
+import { catchError, of } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { Result } from '../../shared/services/result';
 
 export const TableDataGuard: CanActivateFn = (route, state) => {
   const result = inject(Result);
@@ -14,13 +14,13 @@ export const TableDataGuard: CanActivateFn = (route, state) => {
 
   console.log('🔐 TableDataGuard: Проверка доступа', {
     hasStoredData: !!storedData,
-    hasJobId: !!storedJobId
+    hasJobId: !!storedJobId,
   });
 
-  // Если нет данных в localStorage, блокируем доступ
+  // Если нет данных в localStorage, перенаправляем на 404
   if (!storedData || !storedJobId) {
     console.warn('❌ TableDataGuard: Нет данных в localStorage');
-    router.navigate(['']);
+    router.navigate(['/error/404']);
     return false;
   }
 
@@ -29,7 +29,7 @@ export const TableDataGuard: CanActivateFn = (route, state) => {
     map((response) => {
       console.log('✅ TableDataGuard: Результат получен:', {
         status: (response as any).status,
-        job_id: (response as any).job_id
+        job_id: (response as any).job_id,
       });
 
       // Если статус 'completed', пропускаем
@@ -39,12 +39,21 @@ export const TableDataGuard: CanActivateFn = (route, state) => {
       }
 
       console.warn('❌ TableDataGuard: Неверный статус:', (response as any).status);
-      router.navigate(['']);
+      router.navigate(['/error/404']);
       return false;
     }),
     catchError((error) => {
       console.error('❌ TableDataGuard: Ошибка при проверке результата:', error);
-      router.navigate(['']);
+
+      // В зависимости от типа ошибки, перенаправляем на разные страницы
+      if (error?.status === 404) {
+        router.navigate(['/error/404']);
+      } else if (error?.status === 500 || error?.status === 505) {
+        router.navigate(['/error/500']);
+      } else {
+        router.navigate(['/error/404']);
+      }
+
       return of(false);
     })
   );

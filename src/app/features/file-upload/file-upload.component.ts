@@ -1,16 +1,29 @@
-import {ChangeDetectorRef, Component, ElementRef, inject, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {MessageService} from 'primeng/api';
-import {SettingsUpload} from './settings-upload/settings-upload';
-import {CommonModule} from '@angular/common';
-import {Router} from '@angular/router';
-import {SharedModule} from '../../shared/shared-module';
-import {TranslateModule, TranslateService} from '@ngx-translate/core';
-import {LanguageService} from '../../core/language.service';
-import {DialogModule} from 'primeng/dialog';
-import {FileProcessing, FileProcessingError, FileProcessingProgress} from '../../shared/services/file-processing';
-import {Subject} from 'rxjs';
-import {takeUntil} from 'rxjs/operators';
-import {PostPreset} from '../../../types/Preset/presetType.type';
+import { CommonModule } from '@angular/common';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  inject,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
+import { Router } from '@angular/router';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { MessageService } from 'primeng/api';
+import { DialogModule } from 'primeng/dialog';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+import { PostPreset } from '../../../types/Preset/presetType.type';
+import { LanguageService } from '../../core/language.service';
+import {
+  FileProcessing,
+  FileProcessingError,
+  FileProcessingProgress,
+} from '../../shared/services/file-processing';
+import { SharedModule } from '../../shared/shared-module';
+import { SettingsUpload } from './settings-upload/settings-upload';
 
 @Component({
   selector: 'app-file-upload',
@@ -19,15 +32,16 @@ import {PostPreset} from '../../../types/Preset/presetType.type';
   providers: [MessageService],
   styleUrls: ['./file-upload.component.css'],
   templateUrl: './file-upload.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FileUploadComponent implements OnInit, OnDestroy {
   @ViewChild('fileInput') fileInput?: ElementRef<HTMLInputElement>;
+
   isDragOver = false;
   uploadedFile: File | null = null;
   uploadedFileType: string | null = null;
   progress: number = 0;
   visible: boolean = false;
-  timeOut: any = null;
   error: string | null = null;
   selectedOption: string | null = null;
   selectedColumns: string[] = [];
@@ -35,10 +49,15 @@ export class FileUploadComponent implements OnInit, OnDestroy {
   showCancelDialog: boolean = false;
   isFileInputDisabled: boolean = false;
 
-  // Subject для отмены операции
   private cancel$ = new Subject<void>();
   private destroy$ = new Subject<void>();
   private processingSubscription: any = null;
+  private timeOut: ReturnType<typeof setTimeout> | null = null;
+
+  private readonly ALLOWED_FILE_TYPES = [
+    'application/pdf',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  ];
 
   messageService = inject(MessageService);
   cdr = inject(ChangeDetectorRef);
@@ -48,36 +67,41 @@ export class FileUploadComponent implements OnInit, OnDestroy {
   fileProcessing = inject(FileProcessing);
 
   constructor() {
-    this.languageService.getLanguage$().subscribe(lang => {
-      this.translate.use(lang);
-      if (this.visible && !this.error) {
-        this.translate.get('UPLOAD.PROCESSING').subscribe((processingText: string) => {
-          this.messageService.clear('confirm');
-          this.messageService.add({
-            key: 'confirm',
-            sticky: true,
-            severity: 'custom',
-            summary: processingText,
-            styleClass: 'backdrop-blur-lg rounded-2xl'
-          });
-        });
-      }
-    });
+    this.languageService
+      .getLanguage$()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((lang) => {
+        this.translate.use(lang);
+        if (this.visible && !this.error) {
+          this.updateProcessingMessage();
+        }
+      });
   }
 
-  ngOnInit() {
-    this.selectedOption = localStorage.getItem('settings-upload-preset') || 'basic';
-    this.selectedColumns = JSON.parse(localStorage.getItem('settings-upload-columns') || '[]');
-    this.timeOut = setTimeout(() => {
-      this.cdr.detectChanges();
-    }, 0);
+  ngOnInit(): void {
+    this.selectedOption = localStorage.getItem('settings-upload-preset') ?? 'basic';
+    this.selectedColumns = JSON.parse(localStorage.getItem('settings-upload-columns') ?? '[]');
+    this.timeOut = setTimeout(() => this.cdr.markForCheck(), 0);
   }
 
-  ngOnDestroy() {
+  ngOnDestroy(): void {
     this.cleanup();
     this.destroy$.next();
     this.destroy$.complete();
     this.cancel$.complete();
+  }
+
+  private updateProcessingMessage(): void {
+    this.translate.get('UPLOAD.PROCESSING').subscribe((processingText: string) => {
+      this.messageService.clear('confirm');
+      this.messageService.add({
+        key: 'confirm',
+        sticky: true,
+        severity: 'custom',
+        summary: processingText,
+        styleClass: 'backdrop-blur-lg rounded-2xl',
+      });
+    });
   }
 
   private cleanup(): void {
@@ -85,86 +109,73 @@ export class FileUploadComponent implements OnInit, OnDestroy {
       clearTimeout(this.timeOut);
       this.timeOut = null;
     }
-    // Отписываемся от текущей обработки
-    if (this.processingSubscription) {
-      this.processingSubscription.unsubscribe();
-      this.processingSubscription = null;
-    }
+    this.processingSubscription?.unsubscribe();
+    this.processingSubscription = null;
   }
 
-  // Показать модалку подтверждения отмены
-  showCancelConfirmation() {
+  showCancelConfirmation(): void {
     this.showCancelDialog = true;
+    this.cdr.markForCheck();
   }
 
-  // Скрыть модалку подтверждения отмены
-  hideCancelConfirmation() {
+  hideCancelConfirmation(): void {
     this.showCancelDialog = false;
+    this.cdr.markForCheck();
   }
 
-  // Подтвердить отмену
-  confirmCancel() {
+  confirmCancel(): void {
     this.hideCancelConfirmation();
-    console.log('🛑 Пользователь подтвердил отмену обработки');
-    this.cancel$.next(); // Отправляем сигнал отмены
+    this.cancel$.next();
     this.onClose();
   }
 
-  triggerFileInput() {
+  triggerFileInput(): void {
     if (!this.isFileInputDisabled) {
       this.fileInput?.nativeElement.click();
     }
   }
 
-  onDragOver(event: DragEvent) {
+  onDragOver(event: DragEvent): void {
     if (!this.isFileInputDisabled) {
       event.preventDefault();
       this.isDragOver = true;
     }
   }
 
-  onDragLeave(event: DragEvent) {
+  onDragLeave(event: DragEvent): void {
     event.preventDefault();
     this.isDragOver = false;
   }
 
-  onDrop(event: DragEvent) {
+  onDrop(event: DragEvent): void {
     event.preventDefault();
     this.isDragOver = false;
-    if (!this.isFileInputDisabled && event.dataTransfer?.files && event.dataTransfer.files.length > 0) {
-      this.processFile(event.dataTransfer.files[0]);
+    const file = event.dataTransfer?.files?.[0];
+    if (!this.isFileInputDisabled && file) {
+      this.processFile(file);
     }
   }
 
-  onFileSelected(event: Event) {
+  onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
-    if (!input.files || input.files.length === 0) return;
-    this.processFile(input.files[0]);
-    input.value = '';
+    const file = input.files?.[0];
+    if (file) {
+      this.processFile(file);
+      input.value = '';
+    }
   }
 
-  /**
-   * Шаг 1: Валидация файла
-   */
-  processFile(file: File) {
-    const allowedTypes = [
-      'application/pdf',
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-    ];
-
-    // Валидация типа
-    if (!allowedTypes.includes(file.type)) {
+  processFile(file: File): void {
+    if (!this.ALLOWED_FILE_TYPES.includes(file.type)) {
       this.showError(this.translate.instant('UPLOAD.ERROR_TYPE'));
       return;
     }
 
-    // Валидация размера (20 MB)
     if (file.size > 20 * 1024 * 1024) {
       this.showError(this.translate.instant('UPLOAD.ERROR_SIZE'));
       return;
     }
 
-    // Валидация расширения
     if (!file.name.match(/\.(pdf|docx)$/i)) {
       this.showError(this.translate.instant('UPLOAD.ERROR_EXTENSION'));
       return;
@@ -175,21 +186,19 @@ export class FileUploadComponent implements OnInit, OnDestroy {
     this.uploadedFileType = file.type === 'application/pdf' ? 'PDF' : 'DOCX';
     this.isProcessing = false;
     this.progress = 0;
+    this.cdr.markForCheck();
 
-    // Скроллим к блоку информации о файле
     setTimeout(() => {
-      const infoBlock = document.getElementById('file-info-block');
-      if (infoBlock) {
-        infoBlock.scrollIntoView({behavior: 'smooth', block: 'center'});
-      }
+      document
+        .getElementById('file-info-block')
+        ?.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }, 100);
   }
 
-  showError(message: string) {
+  showError(message: string): void {
     this.error = message;
     const errorTitle = this.translate.instant('UPLOAD.ERROR_TITLE');
 
-    // Закрываем модалку с прогресс баром
     this.messageService.clear('confirm');
     this.visible = false;
     this.isProcessing = false;
@@ -197,121 +206,79 @@ export class FileUploadComponent implements OnInit, OnDestroy {
     this.isFileInputDisabled = false;
     this.uploadedFile = null;
     this.uploadedFileType = null;
+    this.cdr.markForCheck();
 
-    this.cdr.detectChanges();
-
-    // Показываем ошибку в виде тоста
     this.messageService.add({
       key: 'error',
       severity: 'error',
       summary: errorTitle,
       detail: message,
       life: 5000,
-      styleClass: 'bg-[#1A1A1A] text-white border border-[#FF6600]/20 rounded-xl backdrop-blur-lg text-sm'
+      styleClass:
+        'bg-[#1A1A1A] text-white border border-[#FF6600]/20 rounded-xl backdrop-blur-lg text-sm',
     });
   }
 
-  /**
-   * Шаг 2: Инициализация обработки и показ модалки
-   */
-  processData() {
+  processData(): void {
     if (!this.uploadedFile) {
       this.showError('Файл не выбран');
       return;
     }
 
-    // Инициализация обработки
     this.isProcessing = true;
     this.isFileInputDisabled = true;
-    this.progress = Math.round(10);
+    this.progress = 10;
     this.visible = true;
     this.error = null;
+    this.cdr.markForCheck();
 
-    // Показываем модалку с прогрессом
     const processingTitle = this.translate.instant('UPLOAD.PROCESSING');
     this.messageService.add({
       key: 'confirm',
       sticky: true,
       severity: 'custom',
       summary: processingTitle,
-      styleClass: 'backdrop-blur-lg rounded-2xl'
+      styleClass: 'backdrop-blur-lg rounded-2xl',
     });
 
     this.cleanup();
-
-    // Создаем новый Subject для отмены на каждую операцию
     this.cancel$ = new Subject<void>();
 
-    // Создаем конфиг для анализа
     const config: PostPreset = {
-      preset: (this.selectedOption || 'basic') as 'basic' | 'extended' | 'full' | 'custom',
-      ...(this.selectedOption === 'custom' && {custom_columns: this.selectedColumns})
+      preset: (this.selectedOption ?? 'basic') as 'basic' | 'extended' | 'full' | 'custom',
+      ...(this.selectedOption === 'custom' && { custom_columns: this.selectedColumns }),
     };
 
-    console.log('🚀 Начинаем обработку файла:', {
-      file: this.uploadedFile.name,
-      config: config
-    });
-
-    /**
-     * Шаг 3-4: Отправка на анализ и опрос результата
-     */
-    this.processingSubscription = this.fileProcessing.processFile(
-      this.uploadedFile,
-      config,
-      (progressData: FileProcessingProgress) => {
-        this.updateProgress(progressData);
-      },
-      this.cancel$ // Передаем Subject для отмены
-    ).pipe(
-      takeUntil(this.destroy$)
-    ).subscribe({
-      next: (result) => {
-        console.log('✅ Обработка завершена успешно:', result);
-        /**
-         * Шаг 5: При успехе - сохранение данных в localStorage и переход на /table
-         */
-        this.completeProcessing(result);
-      },
-      error: (error: FileProcessingError | any) => {
-        // Проверяем, если это отмена пользователем - просто закрываем модалку
-        if (error && error.isCancelled) {
-          console.log('ℹ️ Операция отменена пользователем');
-          this.onClose();
-          return;
-        }
-
-        console.error('❌ Ошибка при обработке:', error);
-        /**
-         * Шаг 6: При ошибке - показ красного тоста и очистка
-         */
-        this.showError(error.message || this.translate.instant('UPLOAD.ERROR_UNKNOWN'));
-      }
-    });
+    this.processingSubscription = this.fileProcessing
+      .processFile(
+        this.uploadedFile,
+        config,
+        (progressData: FileProcessingProgress) => this.updateProgress(progressData),
+        this.cancel$
+      )
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (result) => this.completeProcessing(result),
+        error: (error: FileProcessingError | any) => {
+          if (error?.isCancelled) {
+            this.onClose();
+            return;
+          }
+          this.showError(error?.message ?? this.translate.instant('UPLOAD.ERROR_UNKNOWN'));
+        },
+      });
   }
 
-  /**
-   * Обновление прогресса из сервиса
-   */
   private updateProgress(progressData: FileProcessingProgress): void {
     this.progress = Math.round(progressData.progress);
-    console.log(`📊 Прогресс: ${progressData.stage} - ${this.progress}% - ${progressData.message}`);
     this.cdr.markForCheck();
   }
 
-  /**
-   * Шаг 5: Завершение обработки - сохранение данных и переход на таблицу
-   */
   private completeProcessing(result: any): void {
-    console.log('💾 Сохраняем данные в localStorage...');
-
-    // Сразу устанавливаем 100%
     this.progress = 100;
     this.cdr.markForCheck();
-
     this.cleanup();
 
-    // Сохраняем обработанные данные в localStorage
     const processedData = {
       job_id: result.job_id,
       preset: result.preset,
@@ -320,18 +287,12 @@ export class FileUploadComponent implements OnInit, OnDestroy {
       metadata: result.metadata,
       uploadedFileName: this.uploadedFile?.name,
       uploadedFileType: this.uploadedFileType,
-      processedAt: new Date().toISOString()
+      processedAt: new Date().toISOString(),
     };
 
     localStorage.setItem('processedTableData', JSON.stringify(processedData));
-    // Также сохраняем jobId отдельно для проверки в guard
     localStorage.setItem('jobId', result.job_id);
-    console.log('✅ Данные сохранены в localStorage:', {
-      job_id: result.job_id,
-      rows: result.table.rows.length
-    });
 
-    // Даем время пользователю увидеть 100% прогресс
     setTimeout(() => {
       this.messageService.clear('confirm');
       this.visible = false;
@@ -341,22 +302,14 @@ export class FileUploadComponent implements OnInit, OnDestroy {
       this.uploadedFileType = null;
       this.isFileInputDisabled = false;
 
-      // Переход на страницу таблицы
-      console.log('🔄 Переходим на страницу таблицы...');
       this.router.navigate(['/table']).then(() => {
-        window.scrollTo({top: 0, behavior: 'auto'});
+        window.scrollTo({ top: 0, behavior: 'auto' });
       });
     }, 800);
   }
 
-  /**
-   * Закрыть модалку - отмена операции
-   */
-  onClose() {
-    // Проверяем, есть ли активная обработка
+  onClose(): void {
     if (this.isProcessing) {
-      console.log('🛑 Отмена обработки файла');
-      // Отправляем сигнал отмены
       this.cancel$.next();
     }
 
@@ -366,36 +319,43 @@ export class FileUploadComponent implements OnInit, OnDestroy {
     this.progress = 0;
     this.messageService.clear('confirm');
     this.isFileInputDisabled = false;
+    this.cdr.markForCheck();
   }
 
   getPresetLabel(preset: string | null): string {
-    switch (preset) {
-      case 'basic':
-        return this.translate.instant('SETTINGS_UPLOAD.BASIC');
-      case 'extended':
-        return this.translate.instant('SETTINGS_UPLOAD.ADVANCED');
-      case 'custom':
-        return this.translate.instant('SETTINGS_UPLOAD.CUSTOM');
-      case 'full':
-        return this.translate.instant('SETTINGS_UPLOAD.FULL');
-      default:
-        return this.translate.instant('SETTINGS_UPLOAD.BASIC');
-    }
+    const labels: { [key: string]: string } = {
+      basic: 'SETTINGS_UPLOAD.BASIC',
+      extended: 'SETTINGS_UPLOAD.ADVANCED',
+      custom: 'SETTINGS_UPLOAD.CUSTOM',
+      full: 'SETTINGS_UPLOAD.FULL',
+    };
+    return this.translate.instant(labels[preset ?? 'basic'] ?? labels['basic']);
   }
 
   getPresetStyle(preset: string | null): { [key: string]: string } {
-    switch (preset) {
-      case 'basic':
-        return {background: 'rgba(255, 102, 0, 0.1)', color: '#FF6600', borderColor: 'rgba(255, 102, 0, 0.3)'};
-      case 'advanced':
-        return {background: 'rgba(255, 133, 51, 0.1)', color: '#FF8533', borderColor: 'rgba(255, 133, 51, 0.3)'};
-      case 'custom':
-        return {background: 'rgba(255, 163, 102, 0.1)', color: '#FFA366', borderColor: 'rgba(255, 163, 102, 0.3)'};
-      case 'full':
-        return {background: 'rgba(255, 193, 182, 0.1)', color: '#FFA399', borderColor: 'rgba(255, 193, 152, 0.3)'};
-      default:
-        return {background: 'rgba(255, 102, 0, 0.1)', color: '#FF6600', borderColor: 'rgba(255, 102, 0, 0.3)'};
-    }
+    const styles: { [key: string]: { [key: string]: string } } = {
+      basic: {
+        background: 'rgba(255, 102, 0, 0.1)',
+        color: '#FF6600',
+        borderColor: 'rgba(255, 102, 0, 0.3)',
+      },
+      extended: {
+        background: 'rgba(255, 133, 51, 0.1)',
+        color: '#FF8533',
+        borderColor: 'rgba(255, 133, 51, 0.3)',
+      },
+      custom: {
+        background: 'rgba(255, 163, 102, 0.1)',
+        color: '#FFA366',
+        borderColor: 'rgba(255, 163, 102, 0.3)',
+      },
+      full: {
+        background: 'rgba(255, 193, 182, 0.1)',
+        color: '#FFA399',
+        borderColor: 'rgba(255, 193, 152, 0.3)',
+      },
+    };
+    return styles[preset ?? 'basic'] ?? styles['basic'];
   }
 
   getFileSize(bytes: number): string {
@@ -406,13 +366,13 @@ export class FileUploadComponent implements OnInit, OnDestroy {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   }
 
-  onPresetChange(preset: string) {
+  onPresetChange(preset: string): void {
     this.selectedOption = preset;
     localStorage.setItem('settings-upload-preset', preset);
     this.cdr.markForCheck();
   }
 
-  onColumnsChange(event: { preset: string }) {
+  onColumnsChange(event: { preset: string }): void {
     this.selectedOption = event.preset;
     localStorage.setItem('settings-upload-preset', event.preset);
     this.cdr.markForCheck();
