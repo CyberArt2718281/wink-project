@@ -67,16 +67,11 @@ export class SceneTableComponent implements OnInit, OnDestroy {
   private readonly search$ = new Subject<string>();
   private readonly collator = new Intl.Collator('ru');
   private jobId: string | null = null;
-
-  // ViewChild для селекта столбцов
-  @ViewChild('columnMultiSelect') columnMultiSelect: any;
-
   // Публичное свойство для двусторонней привязки с инпутом
   currentSearchText = '';
 
-  // Пагинация и видимость столбцов
+  // Пагинация
   pageSize = 10;
-  visibleColumns: string[] = [];
 
   // State management с BehaviorSubject
   private readonly initialState: TableState = {
@@ -189,6 +184,13 @@ export class SceneTableComponent implements OnInit, OnDestroy {
 
     // Инициализируем пагинацию - сортируем по первому столбцу
     setTimeout(() => {
+      this.translate.get('SCENE_TABLE.ITEMS_SELECTED').subscribe((translated) => {
+        this.primeng.setTranslation({
+          selectionMessage: `{0} ${translated}`,
+          emptyFilterMessage: 'Нет совпадений',
+          emptySearchMessage: 'Нет результатов',
+        });
+      });
       const firstColumn = this.state$.value.columns[0];
       if (firstColumn) {
         this.sortByColumn(firstColumn);
@@ -227,9 +229,6 @@ export class SceneTableComponent implements OnInit, OnDestroy {
         const columns = serverResponse.table.columns;
         const rows = JSON.parse(JSON.stringify(serverResponse.table.rows));
 
-        // Инициализируем видимые столбцы
-        this.visibleColumns = [...columns];
-
         // Устанавливаем первый столбец как активный для сортировки
         const firstColumn = columns.length > 0 ? columns[0] : null;
 
@@ -247,7 +246,6 @@ export class SceneTableComponent implements OnInit, OnDestroy {
           rows: [],
           filteredRows: [],
         });
-        this.visibleColumns = [];
       }
     } catch (error) {
       this.messageService.add({
@@ -382,10 +380,7 @@ export class SceneTableComponent implements OnInit, OnDestroy {
     // Очищаем текст поиска синхронно
     this.currentSearchText = '';
 
-    // Сбрасываем видимые столбцы на все
-    this.visibleColumns = [...state.columns];
-
-    // Принудительно обновляем селект столбцов
+    // Принудительно обновляем UI
     this.cdr.markForCheck();
 
     // Сразу обновляем поиск с пустой строкой (без задержки debounce)
@@ -820,28 +815,13 @@ export class SceneTableComponent implements OnInit, OnDestroy {
     });
   }
 
-  /**
-   * Обновление видимых столбцов
-   */
-  onVisibleColumnsChange(visibleCols: string[]): void {
-    // Если попытка снять последний столбец - игнорируем
-    if (visibleCols.length === 0) {
-      // Ничего не происходит, visibleColumns остаётся без изменений
-      return;
-    }
-    this.visibleColumns = visibleCols;
-  }
+
 
   /**
-   * Фильтрация отображаемых столбцов
+   * Получение всех столбцов для отображения
    */
   getVisibleColumns(): string[] {
-    const allColumns = this.state$.value.columns;
-    if (this.visibleColumns.length === 0) {
-      this.visibleColumns = [...allColumns];
-      return allColumns;
-    }
-    return allColumns.filter((col) => this.visibleColumns.includes(col));
+    return this.state$.value.columns;
   }
 
   /**
