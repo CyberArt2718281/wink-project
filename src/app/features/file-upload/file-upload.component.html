@@ -3,7 +3,7 @@
   key="confirm"
   (onClose)="onClose()"
   [baseZIndex]="5000"
-  class="w-full max-w-[95vw] sm:max-w-md mx-auto px-2 inter-medium !rounded-[28px]"
+  class="w-full max-w-[95vw] sm:max-w-md mx-auto px-2 inter-medium rounded-[28px]!"
 >
   <ng-template let-message pTemplate="headless" let-closeFn="closeFn">
     <section
@@ -103,7 +103,7 @@
   position="top-center"
   key="error"
   [baseZIndex]="6000"
-  class="w-full max-w-[95vw] sm:max-w-md mx-auto px-2 inter-medium !rounded-[40px]"
+  class="w-full max-w-[95vw] sm:max-w-md mx-auto px-2 inter-medium rounded-[40px]!"
 ></p-toast>
 
 <!-- Модалка подтверждения отмены -->
@@ -128,14 +128,14 @@
       <button
         pButton
         (click)="hideCancelConfirmation()"
-        class="p-button-text p-button-secondary !bg-[#232323] !text-gray-300 !border-[#232323] hover:!bg-[#2A2A2A] inter-medium !rounded-[40px]"
+        class="p-button-text p-button-secondary bg-[#232323]! text-gray-300! border-[#232323]! hover:bg-[#2A2A2A]! inter-medium rounded-[40px]!"
       >
         {{ 'UPLOAD.NO' | translate }}
       </button>
       <button
         pButton
         (click)="confirmCancel()"
-        class="!text-white !bg-red-500 !border-red-500 hover:!bg-red-600 hover:!border-red-600 inter-medium !rounded-[40px]"
+        class="text-white! bg-red-500! border-red-500! hover:bg-red-600! hover:border-red-600! inter-medium rounded-[40px]!"
       >
         {{ 'UPLOAD.YES_CANCEL' | translate }}
       </button>
@@ -145,12 +145,12 @@
 
 <!-- Основной контейнер -->
 <div
-  class="flex flex-col items-center justify-center min-h-[70vh] bg-gradient-to-br from-black to-[#0A0A0A] rounded-none p-4 sm:p-4 md:p-6 lg:p-8 inter-medium"
+  class="flex flex-col items-center justify-center min-h-[70vh] bg-linear-to-br from-black to-[#0A0A0A] rounded-none p-4 sm:p-4 md:p-6 lg:p-8 inter-medium"
 >
   <!-- Заголовок и описание -->
   <div class="text-center mb-6 sm:mb-8 w-full max-w-2xl">
     <h1
-      class="text-2xl sm:text-3xl md:text-4xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent mb-3 sm:mb-4 px-2 py-8 inter-extra-bold"
+      class="text-2xl sm:text-3xl md:text-4xl font-bold bg-linear-to-r from-white to-gray-300 bg-clip-text text-transparent mb-3 sm:mb-4 px-2 py-8 inter-extra-bold"
     >
       {{ 'UPLOAD.TITLE' | translate }}
     </h1>
@@ -245,14 +245,14 @@
           </svg>
         </div>
 
-        <h3 class="text-white font-semibold text-base sm:text-lg mb-1 sm:mb-2 px-2 inter-medium">
+        <h3 class="text-white font-semibold text-base sm:text-lg mb-1 sm:mb-2 px-2 inter-medium min-h-7 flex items-center justify-center">
           {{ visible ? ('UPLOAD.LOADING' | translate) : ('UPLOAD.DRAG_FILE' | translate) }}
         </h3>
-        <p class="text-gray-400 text-xs sm:text-sm mb-3 sm:mb-4 px-2 inter-regular">
+        <p class="text-gray-400 text-xs sm:text-sm mb-3 sm:mb-4 px-2 inter-regular min-h-5 flex items-center justify-center">
           {{ visible ? ('UPLOAD.PLEASE_WAIT' | translate) : ('UPLOAD.OR_SELECT' | translate) }}
         </p>
         <button
-          class="px-4 py-2 sm:px-6 sm:py-3 rounded-[40px] font-semibold transition-all duration-200 border-none outline-none focus:ring-0 focus:border-0 focus:outline-none text-xs sm:text-sm md:text-base whitespace-nowrap inter-medium gradient-button"
+          class="px-4 py-2 sm:px-6 sm:py-3 rounded-[40px] font-semibold transition-all duration-200 border-none outline-none focus:ring-0 focus:border-0 focus:outline-none text-xs sm:text-sm md:text-base whitespace-nowrap inter-medium gradient-button min-h-11 min-w-40"
           [class]="
             visible
               ? 'bg-[#232323] text-gray-500 cursor-not-allowed opacity-70 inter-medium'
@@ -343,12 +343,12 @@
     }
 
     <!-- Подсказки -->
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3 md:gap-4 mt-6 sm:mt-8 py-8">
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3 md:gap-4 mt-6 sm:mt-8 py-8 min-h-[140px]">
       <div
         class="text-center p-3 sm:p-4 rounded-lg sm:rounded-xl bg-[#1A1A1A]/50 border border-[#232323] inter-medium"
       >
         <i class="pi pi-shield text-[#FF6600] text-lg sm:text-xl mb-1 sm:mb-2 shrink-0"></i>
-        <h4 class="text-white font-semibold text-xs sm:text-sm mb-1 inter-medium">
+        <h4 class="text-white font-semibold text-xs sm:text-sm mb-1 inter-medium min-h-5">
           {{ 'UPLOAD.SAFE' | translate }}
         </h4>
         <p class="text-gray-400 text-xs inter-regular">{{ 'UPLOAD.SAFE_DESC' | translate }}</p>
@@ -357,7 +357,7 @@
         class="text-center p-3 sm:p-4 rounded-lg sm:rounded-xl bg-[#1A1A1A]/50 border border-[#232323] inter-medium"
       >
         <i class="pi pi-bolt text-[#FF6600] text-lg sm:text-xl mb-1 sm:mb-2 shrink-0"></i>
-        <h4 class="text-white font-semibold text-xs sm:text-sm mb-1 inter-medium">
+        <h4 class="text-white font-semibold text-xs sm:text-sm mb-1 inter-medium min-h-5">
           {{ 'UPLOAD.FAST' | translate }}
         </h4>
         <p class="text-gray-400 text-xs inter-regular">{{ 'UPLOAD.FAST_DESC' | translate }}</p>
@@ -366,7 +366,7 @@
         class="text-center p-3 sm:p-4 rounded-lg sm:rounded-xl bg-[#1A1A1A]/50 border border-[#232323] inter-medium"
       >
         <i class="pi pi-mobile text-[#FF6600] text-lg sm:text-xl mb-1 sm:mb-2 shrink-0"></i>
-        <h4 class="text-white font-semibold text-xs sm:text-sm mb-1 inter-medium">
+        <h4 class="text-white font-semibold text-xs sm:text-sm mb-1 inter-medium min-h-5">
           {{ 'UPLOAD.AVAILABLE' | translate }}
         </h4>
         <p class="text-gray-400 text-xs inter-regular">{{ 'UPLOAD.AVAILABLE_DESC' | translate }}</p>

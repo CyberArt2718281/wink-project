@@ -2,7 +2,7 @@
   <button
     pButton
     [label]="'SETTINGS_UPLOAD.BUTTON' | translate"
-    class="settings-button !bg-[#1A1A1A] !border-[#232323] !text-gray-300 !text-xs sm:!text-sm hover:!bg-[#232323] hover:!text-white transition-all duration-200 inter-regular !rounded-[40px]"
+    class="settings-button bg-[#1A1A1A]! border-[#232323]! text-gray-300! text-xs! sm:text-sm! hover:bg-[#232323]! hover:text-white! transition-all duration-200 inter-regular rounded-[40px]! min-h-11 min-w-32"
     (click)="openModal()"
   >
     <i class="pi pi-cog mr-1 sm:mr-2 shrink-0"></i>
@@ -53,7 +53,7 @@
             </h4>
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3">
               <label
-                class="preset-option flex flex-col p-3 sm:p-4 rounded-lg border-2 border-[#232323] hover:border-[#FF6600] cursor-pointer transition-all duration-200 group has-[:checked]:border-[#FF6600] has-[:checked]:bg-[#FF6600]/5 inter-regular"
+                class="preset-option flex flex-col p-3 sm:p-4 rounded-lg border-2 border-[#232323] hover:border-[#FF6600] cursor-pointer transition-all duration-200 group has-checked:border-[#FF6600] has-checked:bg-[#FF6600]/5 inter-regular"
               >
                 <input
                   type="radio"
@@ -65,14 +65,14 @@
                 />
                 <div class="flex items-center gap-2 sm:gap-3 mb-2">
                   <div
-                    class="w-3 h-3 sm:w-4 sm:h-4 rounded-full border-2 border-[#232323] group-has-[:checked]:border-[#FF6600] group-has-[:checked]:bg-[#FF6600] flex items-center justify-center"
+                    class="w-3 h-3 sm:w-4 sm:h-4 rounded-full border-2 border-[#232323] group-has-checked:border-[#FF6600] group-has-checked:bg-[#FF6600] flex items-center justify-center"
                   >
                     <div
-                      class="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-white opacity-0 group-has-[:checked]:opacity-100 transition-opacity"
+                      class="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-white opacity-0 group-has-checked:opacity-100 transition-opacity"
                     ></div>
                   </div>
                   <span
-                    class="font-medium text-white group-has-[:checked]:text-[#FF6600] text-xs sm:text-sm inter-medium"
+                    class="font-medium text-white group-has-checked:text-[#FF6600] text-xs sm:text-sm inter-medium"
                     >{{ 'SETTINGS_UPLOAD.BASIC' | translate }}</span
                   >
                 </div>
@@ -82,7 +82,7 @@
               </label>
 
               <label
-                class="preset-option flex flex-col p-3 sm:p-4 rounded-lg border-2 border-[#232323] hover:border-[#FF6600] cursor-pointer transition-all duration-200 group has-[:checked]:border-[#FF6600] has-[:checked]:bg-[#FF6600]/5 inter-regular"
+                class="preset-option flex flex-col p-3 sm:p-4 rounded-lg border-2 border-[#232323] hover:border-[#FF6600] cursor-pointer transition-all duration-200 group has-checked:border-[#FF6600] has-checked:bg-[#FF6600]/5 inter-regular"
               >
                 <input
                   type="radio"
@@ -94,14 +94,14 @@
                 />
                 <div class="flex items-center gap-2 sm:gap-3 mb-2">
                   <div
-                    class="w-3 h-3 sm:w-4 sm:h-4 rounded-full border-2 border-[#232323] group-has-[:checked]:border-[#FF6600] group-has-[:checked]:bg-[#FF6600] flex items-center justify-center"
+                    class="w-3 h-3 sm:w-4 sm:h-4 rounded-full border-2 border-[#232323] group-has-checked:border-[#FF6600] group-has-checked:bg-[#FF6600] flex items-center justify-center"
                   >
                     <div
-                      class="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-white opacity-0 group-has-[:checked]:opacity-100 transition-opacity"
+                      class="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-white opacity-0 group-has-checked:opacity-100 transition-opacity"
                     ></div>
                   </div>
                   <span
-                    class="font-medium text-white group-has-[:checked]:text-[#FF6600] text-xs sm:text-sm inter-medium"
+                    class="font-medium text-white group-has-checked:text-[#FF6600] text-xs sm:text-sm inter-medium"
                     >{{ 'SETTINGS_UPLOAD.ADVANCED' | translate }}</span
                   >
                 </div>
@@ -110,7 +110,7 @@
                 </p>
               </label>
               <label
-                class="preset-option flex flex-col p-3 sm:p-4 rounded-lg border-2 border-[#232323] hover:border-[#FF6600] cursor-pointer transition-all duration-200 group has-[:checked]:border-[#FF6600] has-[:checked]:bg-[#FF6600]/5 inter-regular"
+                class="preset-option flex flex-col p-3 sm:p-4 rounded-lg border-2 border-[#232323] hover:border-[#FF6600] cursor-pointer transition-all duration-200 group has-checked:border-[#FF6600] has-checked:bg-[#FF6600]/5 inter-regular"
               >
                 <input
                   type="radio"
@@ -122,14 +122,14 @@
                 />
                 <div class="flex items-center gap-2 sm:gap-3 mb-2">
                   <div
-                    class="w-3 h-3 sm:w-4 sm:h-4 rounded-full border-2 border-[#232323] group-has-[:checked]:border-[#FF6600] group-has-[:checked]:bg-[#FF6600] flex items-center justify-center"
+                    class="w-3 h-3 sm:w-4 sm:h-4 rounded-full border-2 border-[#232323] group-has-checked:border-[#FF6600] group-has-checked:bg-[#FF6600] flex items-center justify-center"
                   >
                     <div
-                      class="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-white opacity-0 group-has-[:checked]:opacity-100 transition-opacity"
+                      class="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-white opacity-0 group-has-checked:opacity-100 transition-opacity"
                     ></div>
                   </div>
                   <span
-                    class="font-medium text-white group-has-[:checked]:text-[#FF6600] text-xs sm:text-sm inter-medium"
+                    class="font-medium text-white group-has-checked:text-[#FF6600] text-xs sm:text-sm inter-medium"
                     >{{ 'SETTINGS_UPLOAD.FULL' | translate }}</span
                   >
                 </div>

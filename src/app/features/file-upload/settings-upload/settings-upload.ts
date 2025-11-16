@@ -150,8 +150,6 @@ export class SettingsUpload implements OnInit {
   ];
 
   private allColumnsCache: Column[] | null = null;
-  private selectedColumnCountCache: number = -1;
-  private selectedColumnNamesCache: string[] | null = null;
 
   readonly amberSwitch = {
     handle: {

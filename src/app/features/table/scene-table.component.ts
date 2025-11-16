@@ -6,7 +6,6 @@ import {
   inject,
   OnDestroy,
   OnInit,
-  ViewChild,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
@@ -18,7 +17,6 @@ import { DialogModule } from 'primeng/dialog';
 import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
 import { InputTextModule } from 'primeng/inputtext';
-import { MultiSelectModule } from 'primeng/multiselect';
 import { PaginatorModule } from 'primeng/paginator';
 import { SelectModule } from 'primeng/select';
 import { TableModule } from 'primeng/table';
@@ -44,7 +42,6 @@ import { ExportService } from '../../shared/services/export.service';
     InputIconModule,
     DialogModule,
     FormsModule,
-    MultiSelectModule,
     SelectModule,
     ConfirmDialogModule,
     ToastModule,
@@ -67,7 +64,6 @@ export class SceneTableComponent implements OnInit, OnDestroy {
   private readonly search$ = new Subject<string>();
   private readonly collator = new Intl.Collator('ru');
   private jobId: string | null = null;
-  // Публичное свойство для двусторонней привязки с инпутом
   currentSearchText = '';
 
   // Пагинация

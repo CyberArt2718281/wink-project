@@ -1,9 +1,9 @@
-<footer class="w-full bg-black py-4 px-4 sm:p-4 md:p-6 lg:p-8 border-t border-gray-800">
+<footer class="w-full bg-black py-4 px-4 sm:p-4 md:p-6 lg:p-8 border-t border-gray-800 min-h-60">
   <div class="max-w-7xl mx-auto">
     <!-- Основной контент -->
-    <div class="flex flex-col lg:flex-row items-start justify-between gap-8 mb-8">
+    <div class="flex flex-col lg:flex-row items-start justify-between gap-8 mb-8 min-h-[140px]">
       <!-- Логотип и описание -->
-      <div class="flex-1 max-w-md">
+      <div class="flex-1 max-w-md min-h-[100px]">
         <div class="flex items-center gap-3 mb-4">
           <div class="logo">
             <a style="text-decoration: none; outline: none" routerLink="/">
@@ -14,27 +14,30 @@
                 <img
                   src="assets/images/logo.svg"
                   alt="Логотип"
+                  width="120"
+                  height="32"
                   class="w-auto h-8 sm:h-8 md:h-8 lg:h-8"
-                  loading="lazy"
+                  loading="eager"
+                  decoding="sync"
                 />
               </picture>
             </a>
           </div>
         </div>
-        <p class="text-gray-400 text-sm leading-relaxed inter-regular">
+        <p class="text-gray-400 text-sm leading-relaxed inter-regular min-h-16">
           {{ 'FOOTER.DESCRIPTION' | translate }}
         </p>
       </div>
     </div>
 
     <!-- Разделитель -->
-    <div class="border-t border-gray-800 my-6"></div>
+    <div class="border-t border-gray-800 my-6 h-px"></div>
 
     <!-- Нижняя часть -->
-    <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+    <div class="flex flex-col md:flex-row items-center justify-between gap-4 min-h-12">
       <!-- Копирайт и версия -->
-      <div class="flex flex-col sm:flex-row items-center gap-4 text-sm">
-        <span class="text-gray-400 inter-medium"
+      <div class="flex flex-col sm:flex-row items-center gap-4 text-sm min-h-6">
+        <span class="text-gray-400 inter-medium min-h-6 inline-block"
           >&copy; 2025 Wink Project. {{ 'FOOTER.RIGHTS' | translate }}</span
         >
       </div>
