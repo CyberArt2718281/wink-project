@@ -69,7 +69,6 @@ export class FileProcessing {
         });
       }),
       catchError((error) => {
-
         // Если это отмена пользователем, пробросим её как есть
         if (error && error.isCancelled) {
           return throwError(() => error);
@@ -101,6 +100,11 @@ export class FileProcessing {
       switchMap((response) => {
         // Если это SuccessResultResponse (status === 'completed')
         if ('status' in response && response.status === 'completed') {
+          onProgress?.({
+            stage: 'retrieving',
+            progress: 95,
+            message: 'Получение результатов...',
+          });
           return from(Promise.resolve(response as SuccessResultResponse));
         }
 
@@ -111,7 +115,6 @@ export class FileProcessing {
           const progress = Math.round(
             40 + (Math.log(retryCount + 1) / Math.log(this.MAX_RETRIES + 1)) * 50
           );
-
 
           // Расчет примерного оставшегося времени
           const estimatedRemainingTime = Math.max(

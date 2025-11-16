@@ -55,6 +55,7 @@ export class FileUploadComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
   private processingSubscription: any = null;
   private timeOut: ReturnType<typeof setTimeout> | null = null;
+  private timeouts: Set<ReturnType<typeof setTimeout>> = new Set();
 
   private readonly ALLOWED_FILE_TYPES = [
     'application/pdf',
@@ -113,6 +114,9 @@ export class FileUploadComponent implements OnInit, OnDestroy {
     }
     this.processingSubscription?.unsubscribe();
     this.processingSubscription = null;
+    // Очищаем все ожидающие таймауты
+    this.timeouts.forEach(timeout => clearTimeout(timeout));
+    this.timeouts.clear();
   }
 
   showCancelConfirmation(): void {
@@ -281,7 +285,6 @@ export class FileUploadComponent implements OnInit, OnDestroy {
   private completeProcessing(result: any): void {
     this.progress = 100;
     this.cdr.markForCheck();
-    this.cleanup();
 
     const processedData = {
       job_id: result.job_id,
@@ -297,7 +300,16 @@ export class FileUploadComponent implements OnInit, OnDestroy {
     localStorage.setItem('processedTableData', JSON.stringify(processedData));
     localStorage.setItem('jobId', result.job_id);
 
-    setTimeout(() => {
+    // Обновляем стадию на 'retrieving' с небольшой задержкой
+    const timeout1 = setTimeout(() => {
+      this.progressStage = 'retrieving';
+      this.cdr.markForCheck();
+      this.timeouts.delete(timeout1);
+    }, 100);
+    this.timeouts.add(timeout1);
+
+    const timeout2 = setTimeout(() => {
+      this.cleanup();
       this.messageService.clear('confirm');
       this.visible = false;
       this.isProcessing = false;
@@ -309,7 +321,9 @@ export class FileUploadComponent implements OnInit, OnDestroy {
       this.router.navigate(['/table']).then(() => {
         window.scrollTo({ top: 0, behavior: 'auto' });
       });
+      this.timeouts.delete(timeout2);
     }, 800);
+    this.timeouts.add(timeout2);
   }
 
   onClose(): void {
@@ -321,6 +335,8 @@ export class FileUploadComponent implements OnInit, OnDestroy {
     this.visible = false;
     this.isProcessing = false;
     this.progress = 0;
+    this.progressStage = 'analyzing';
+    this.progressMessage = '';
     this.messageService.clear('confirm');
     this.isFileInputDisabled = false;
     this.cdr.markForCheck();

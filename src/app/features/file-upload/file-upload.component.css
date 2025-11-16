@@ -28,6 +28,30 @@ button,
   transition: all 0.3s ease !important;
 }
 
+/* Убираем обводку у всех кнопок */
+button:focus,
+button:active,
+button:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+  border: none !important;
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+}
+
+button:focus {
+  outline: 0 !important;
+  -webkit-box-shadow: none !important;
+  box-shadow: none !important;
+}
+
+button::-moz-focus-inner {
+  border: 0 !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
 /* Ховер эффекты для активных кнопок */
 .file-upload__choose-btn:not(:disabled):hover {
   background-color: #ff8533 !important; /* более светлый оранжевый при ховере */
@@ -123,6 +147,34 @@ button.bg-\[\#FF6600\] {
 }
 
 /* Для состояний фокуса */
+button.bg-\[\#232323\]:focus,
+button.bg-\[\#232323\]:active,
+button.bg-\[\#232323\]:focus-visible {
+  outline: 0 !important;
+  box-shadow: none !important;
+  border: none !important;
+  -webkit-outline: 0 !important;
+  -moz-outline: 0 !important;
+}
+
+/* Полное удаление обводки для серой кнопки во всех состояниях */
+button.bg-\[\#232323\] {
+  outline: none !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+button.bg-\[\#232323\]:focus,
+button.bg-\[\#232323\]:active,
+button.bg-\[\#232323\]:focus-visible,
+button.bg-\[\#232323\]:focus-within {
+  outline: 0 !important;
+  box-shadow: none !important;
+  border: none !important;
+  --tw-ring-shadow: none !important;
+  --tw-ring-color: transparent !important;
+}
+
 button.bg-\[\#232323\]:focus,
 button.bg-\[\#232323\]:focus-visible,
 button.bg-\[\#FF6600\]:focus,

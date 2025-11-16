@@ -59,7 +59,7 @@
                 [class]="
                   'px-2 py-1 rounded-full inter-medium ' +
                   (progressStage === 'retrieving'
-                    ? 'bg-purple-500/20 text-purple-400'
+                    ? 'bg-green-500/20 text-green-400'
                     : 'bg-gray-700/30 text-gray-400')
                 "
               >
@@ -78,7 +78,9 @@
               ? '[&>div]:bg-linear-to-r [&>div]:from-blue-500 [&>div]:to-blue-400'
               : progressStage === 'waiting'
               ? '[&>div]:bg-linear-to-r [&>div]:from-[#FF6600] [&>div]:to-[#FF8533]'
-              : '[&>div]:bg-linear-to-r [&>div]:from-green-500 [&>div]:to-green-400'
+              : progressStage === 'retrieving'
+              ? '[&>div]:bg-linear-to-r [&>div]:from-green-500 [&>div]:to-green-400'
+              : '[&>div]:bg-linear-to-r [&>div]:from-purple-500 [&>div]:to-purple-400'
           "
         >
         </p-progressbar>
@@ -303,10 +305,18 @@
       <!-- Кнопка действия -->
       <div class="flex flex-col sm:flex-row gap-2 sm:gap-3 mt-4 sm:mt-6">
         <button
-          class="flex-1 px-4 py-2 sm:px-6 sm:py-3 bg-[#232323] text-gray-300 rounded-[40px] font-semibold transition-all duration-200 text-xs sm:text-sm border-none outline-none focus:ring-0 focus:border-0 focus:outline-none active:ring-0 active:border-0 active:outline-none inter-medium"
+          class="flex-1 px-4 py-2 sm:px-6 sm:py-3 bg-[#232323] text-gray-300 rounded-[40px] font-semibold transition-all duration-200 text-xs sm:text-sm inter-medium"
+          style="
+            outline: none !important;
+            box-shadow: none !important;
+            border: none !important;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+          "
           [ngClass]="{
             'cursor-not-allowed opacity-70': isProcessing,
-            'hover:bg-[#2E2E2E] hover:text-white hover:scale-105 hover:shadow-md transform':
+            'hover:bg-[#2E2E2E] hover:text-white hover:scale-105 hover:shadow-lg transform':
               !isProcessing
           }"
           (click)="!isProcessing && (uploadedFile = null)"
