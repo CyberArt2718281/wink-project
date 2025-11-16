@@ -60,23 +60,61 @@
     </div>
   </div>
 
-  <!-- Панель поиска -->
+  <!-- Панель поиска и контролов -->
   <div class="mb-6">
-    <label class="text-xs font-semibold text-gray-400 inter-medium uppercase tracking-wide block mb-2">{{ 'COMMON.SEARCH' | translate }}</label>
-    <div class="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">
-      <p-iconfield iconPosition="left" class="flex-1">
-        <p-inputicon>
-          <i class="pi pi-search text-[#FF6600]"></i>
-        </p-inputicon>
-        <input
-          pInputText
-          type="text"
-          [(ngModel)]="currentSearchText"
-          (ngModelChange)="onSearch($event)"
-          [placeholder]="'SCENE_TABLE.SEARCH_PLACEHOLDER' | translate"
-          class="w-full bg-[#232323] text-white border-2 border-[#333333] hover:border-[#444444] focus:border-[#FF6600] rounded-xl px-4 py-2.5 inter-regular text-sm transition-all duration-300 focus:outline-none focus:shadow-lg focus:shadow-[#FF6600]/30 placeholder:text-gray-500"
-        />
-      </p-iconfield>
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
+      <!-- Поиск -->
+      <div class="sm:col-span-2">
+        <label class="text-xs font-semibold text-gray-400 inter-medium uppercase tracking-wide block mb-2">{{ 'COMMON.SEARCH' | translate }}</label>
+        <p-iconfield iconPosition="left" class="w-full">
+          <p-inputicon>
+            <i class="pi pi-search text-[#FF6600]"></i>
+          </p-inputicon>
+          <input
+            pInputText
+            type="text"
+            [(ngModel)]="currentSearchText"
+            (ngModelChange)="onSearch($event)"
+            [placeholder]="'SCENE_TABLE.SEARCH_PLACEHOLDER' | translate"
+            class="w-full bg-[#232323] text-white border-2 border-[#333333] hover:border-[#444444] focus:border-[#FF6600] rounded-xl px-4 py-2.5 inter-regular text-sm transition-all duration-300 focus:outline-none focus:shadow-lg focus:shadow-[#FF6600]/30 placeholder:text-gray-500"
+          />
+        </p-iconfield>
+      </div>
+
+      <!-- Размер страницы -->
+      <div>
+        <label class="text-xs font-semibold text-gray-400 inter-medium uppercase tracking-wide block mb-2">{{ 'SCENE_TABLE.ROWS_PER_PAGE' | translate }}</label>
+        <p-select 
+          [(ngModel)]="pageSize"
+          (ngModelChange)="onPageSizeChange($event)"
+          [options]="[
+            { label: '5', value: 5 },
+            { label: '10', value: 10 },
+            { label: '25', value: 25 },
+            { label: '50', value: 50 },
+            { label: '100', value: 100 }
+          ]"
+          optionLabel="label"
+          optionValue="value"
+          class="w-full"
+          [showClear]="false"
+        ></p-select>
+      </div>
+    </div>
+
+    <!-- Видимость столбцов -->
+    <div class="flex flex-col  gap-3">
+      <label class="text-xs font-semibold text-gray-400 inter-medium uppercase tracking-wide">{{ 'SCENE_TABLE.VISIBLE_COLUMNS' | translate }}</label>
+      <p-multiSelect
+        #columnMultiSelect
+        [(ngModel)]="visibleColumns"
+        [options]="(columns$ | async) || []"
+        (ngModelChange)="onVisibleColumnsChange($event)"
+        [maxSelectedLabels]="0"
+        [showToggleAll]="false"
+        class="w-full sm:w-64"
+        [placeholder]="'SCENE_TABLE.SELECT_COLUMNS' | translate"
+      ></p-multiSelect>
     </div>
   </div>
 
@@ -86,10 +124,10 @@
       <table class="w-full">
         <!-- Заголовок таблицы -->
         <thead>
-          <tr class="bg-[#232323] border-b border-[#333333]">
+          <tr class="bg-[#232323] border-b border-[#333333] inter-medium">
             <!-- Столбцы данных -->
             <th 
-              *ngFor="let col of columns$ | async; trackBy: trackByString"
+              *ngFor="let col of getVisibleColumns(); trackBy: trackByString"
               (click)="sortByColumn(col)"
               class="px-4 sm:px-6 py-4 text-left text-white font-semibold inter-medium text-sm cursor-pointer hover:bg-[#2a2a2a] transition-colors duration-300"
               [class.bg-linear-to-r]="isSortActive(col)"
@@ -108,16 +146,16 @@
         <!-- Тело таблицы -->
         <tbody>
           <tr 
-            *ngFor="let row of filteredRows$ | async; let i = index; trackBy: trackByIndex"
-            class="border-b border-[#232323] hover:bg-[#232323]/50 transition-colors duration-150"
+            *ngFor="let row of getPaginatedRows(); let i = index; trackBy: trackByIndex"
+            class="border-b border-[#232323] hover:bg-[#232323]/50 transition-colors duration-150 inter-medium"
             [class.bg-[#0a0a0a]]="i % 2 === 0"
-            [class.bg-[#FF6600]/10]="isRowSelected(i)"
+            [class.bg-[#FF6600]/10]="isRowSelectedByObject(row)"
           >
             <!-- Ячейки данных -->
             <td 
-              *ngFor="let col of columns$ | async; trackBy: trackByString" 
+              *ngFor="let col of getVisibleColumns(); trackBy: trackByString" 
               class="px-4 sm:px-6 py-4 text-gray-300 text-sm inter-regular"
-              (dblclick)="enableEditing(i, col)"
+              (dblclick)="enableEditingForRow(row, col)"
             >
               <!-- Режим редактирования -->
               <ng-container *ngIf="isCellEditing(i, col)">
@@ -193,12 +231,68 @@
       </table>
     </div>
 
-    <!-- Информация о количестве записей -->
+    <!-- Информация о странице и контролы пагинации -->
     <div class="bg-[#232323]/50 border-t border-[#333333] px-4 sm:px-6 py-4">
-      <div class="flex items-center justify-center">
-        <span class="text-gray-400 text-xs inter-regular bg-[#2a2a2a] px-3 py-1.5 rounded-lg">
+      <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+        <!-- Информация о записях -->
+        <div class="text-gray-400 text-sm inter-regular">
+          <span *ngIf="(filteredRows$ | async)!.length > 0" class="text-gray-300 font-medium">
+            {{ getPageInfo().start }} - {{ getPageInfo().end }} 
+          </span>
+            <span *ngIf="(filteredRows$ | async)!.length === 0" class="text-gray-300 font-medium ">
+              0
+          </span>
+          <span class="text-gray-500 mx-1">{{ 'SCENE_TABLE.OF' | translate }}</span>
+          <span class="text-gray-300 font-medium">{{ getPageInfo().total }}</span>
+        </div>
+
+        <!-- Контролы пагинации -->
+        <div class="flex items-center gap-2">
+          <button
+            (click)="firstPage()"
+            [disabled]="(currentPage$ | async) === 0"
+            class="p-2.5 bg-linear-to-r from-[#FF6600] to-[#FF8533] hover:from-[#FF7622] hover:to-[#FF9548] text-white rounded-full transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed shadow-lg shadow-[#FF6600]/20 hover:shadow-xl hover:shadow-[#FF6600]/40 flex"
+            title="{{ 'SCENE_TABLE.FIRST_PAGE' | translate }}"
+          >
+            <i class="pi pi-chevron-left text-sm"></i>
+          </button>
+
+          <button
+            (click)="prevPage()"
+            [disabled]="(currentPage$ | async) === 0"
+            class="p-2.5 bg-linear-to-r from-[#FF6600] to-[#FF8533] hover:from-[#FF7622] hover:to-[#FF9548] text-white rounded-lg transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed shadow-lg shadow-[#FF6600]/20 hover:shadow-xl hover:shadow-[#FF6600]/40 flex"
+            title="{{ 'SCENE_TABLE.PREVIOUS_PAGE' | translate }}"
+          >
+            <i class="pi pi-chevron-up text-sm"></i>
+          </button>
+
+          <div class="px-4 py-2.5 bg-linear-to-r from-[#232323] to-[#1A1A1A] border border-[#333333] rounded-lg text-[#FF6600] text-xs inter-medium font-semibold shadow-lg shadow-black/50">
+            {{ ((currentPage$ | async) || 0) + 1 }} / {{ getTotalPages() }}
+          </div>
+
+          <button
+            (click)="nextPage()"
+            [disabled]="((currentPage$ | async) || 0) >= getTotalPages() - 1"
+            class="p-2.5 bg-linear-to-r from-[#FF6600] to-[#FF8533] hover:from-[#FF7622] hover:to-[#FF9548] text-white rounded-lg transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed shadow-lg shadow-[#FF6600]/20 hover:shadow-xl hover:shadow-[#FF6600]/40 flex"
+            title="{{ 'SCENE_TABLE.NEXT_PAGE' | translate }}"
+          >
+            <i class="pi pi-chevron-down text-sm"></i>
+          </button>
+
+          <button
+            (click)="lastPage()"
+            [disabled]="((currentPage$ | async) || 0) >= getTotalPages() - 1"
+            class="p-2.5 bg-linear-to-r from-[#FF6600] to-[#FF8533] hover:from-[#FF7622] hover:to-[#FF9548] text-white rounded-lg transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed shadow-lg shadow-[#FF6600]/20 hover:shadow-xl hover:shadow-[#FF6600]/40 flex"
+            title="{{ 'SCENE_TABLE.LAST_PAGE' | translate }}"
+          >
+            <i class="pi pi-chevron-right text-sm"></i>
+          </button>
+        </div>
+
+        <!-- Всего записей -->
+        <div class="text-gray-400 text-xs inter-regular bg-[#2a2a2a] px-3 py-1.5 rounded-lg">
           Всего записей: {{ (totalRecords$ | async) }}
-        </span>
+        </div>
       </div>
     </div>
   </div>

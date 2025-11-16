@@ -1,5 +1,13 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject, OnDestroy, OnInit } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  inject,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { ConfirmationService, MessageService } from 'primeng/api';
@@ -54,13 +62,21 @@ export class SceneTableComponent implements OnInit, OnDestroy {
   private readonly messageService = inject(MessageService);
   private readonly ceilService = inject(CeilService);
   private readonly exportService = inject(ExportService);
+  private readonly cdr = inject(ChangeDetectorRef);
   private readonly destroy$ = new Subject<void>();
   private readonly search$ = new Subject<string>();
   private readonly collator = new Intl.Collator('ru');
   private jobId: string | null = null;
 
+  // ViewChild для селекта столбцов
+  @ViewChild('columnMultiSelect') columnMultiSelect: any;
+
   // Публичное свойство для двусторонней привязки с инпутом
   currentSearchText = '';
+
+  // Пагинация и видимость столбцов
+  pageSize = 10;
+  visibleColumns: string[] = [];
 
   // State management с BehaviorSubject
   private readonly initialState: TableState = {
@@ -170,6 +186,14 @@ export class SceneTableComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.loadDataFromServer();
     this.initSearchDebounce();
+
+    // Инициализируем пагинацию - сортируем по первому столбцу
+    setTimeout(() => {
+      const firstColumn = this.state$.value.columns[0];
+      if (firstColumn) {
+        this.sortByColumn(firstColumn);
+      }
+    }, 100);
   }
 
   ngOnDestroy(): void {
@@ -203,11 +227,19 @@ export class SceneTableComponent implements OnInit, OnDestroy {
         const columns = serverResponse.table.columns;
         const rows = JSON.parse(JSON.stringify(serverResponse.table.rows));
 
+        // Инициализируем видимые столбцы
+        this.visibleColumns = [...columns];
+
+        // Устанавливаем первый столбец как активный для сортировки
+        const firstColumn = columns.length > 0 ? columns[0] : null;
+
         this.setState({
           columns,
           rows,
           filteredRows: [...rows],
           loading: false,
+          sortColumn: firstColumn,
+          sortOrder: 'asc',
         });
       } else {
         this.setState({
@@ -215,6 +247,7 @@ export class SceneTableComponent implements OnInit, OnDestroy {
           rows: [],
           filteredRows: [],
         });
+        this.visibleColumns = [];
       }
     } catch (error) {
       this.messageService.add({
@@ -348,10 +381,16 @@ export class SceneTableComponent implements OnInit, OnDestroy {
     const state = this.state$.value;
     // Очищаем текст поиска синхронно
     this.currentSearchText = '';
-    
+
+    // Сбрасываем видимые столбцы на все
+    this.visibleColumns = [...state.columns];
+
+    // Принудительно обновляем селект столбцов
+    this.cdr.markForCheck();
+
     // Сразу обновляем поиск с пустой строкой (без задержки debounce)
     this.updateSearch('');
-    
+
     this.setState({
       searchText: '',
       sortColumn: null,
@@ -426,6 +465,15 @@ export class SceneTableComponent implements OnInit, OnDestroy {
    */
   isRowSelected(rowIndex: number): boolean {
     return this.state$.value.selectedRows.has(rowIndex);
+  }
+
+  /**
+   * Проверить, выбрана ли строка по объекту
+   */
+  isRowSelectedByObject(row: any): boolean {
+    const state = this.state$.value;
+    const rowIndex = state.filteredRows.findIndex((r) => r === row);
+    return rowIndex !== -1 && state.selectedRows.has(rowIndex);
   }
 
   /**
@@ -613,6 +661,33 @@ export class SceneTableComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Включить режим редактирования для ячейки (используя сам row объект)
+   */
+  enableEditingForRow(row: any, columnName: string): void {
+    const state = this.state$.value;
+    if (state.editingCell) {
+      this.cancelEditing();
+    }
+
+    // Найти индекс строки в filteredRows
+    const rowIndex = state.filteredRows.findIndex((r) => r === row);
+    if (rowIndex === -1) return;
+
+    const value = row[columnName];
+
+    const editingCell: EditingCell = {
+      rowIndex,
+      columnName,
+      value,
+      originalValue: value,
+      isLoading: false,
+      error: null,
+    };
+
+    this.setState({ editingCell });
+  }
+
+  /**
    * Сохранить изменения редактирования и отправить на сервер
    */
   saveEditing(): void {
@@ -732,5 +807,105 @@ export class SceneTableComponent implements OnInit, OnDestroy {
 
   trackByIndex(index: number, value: any): number {
     return index;
+  }
+
+  /**
+   * Изменение размера страницы
+   */
+  onPageSizeChange(newSize: number): void {
+    this.pageSize = newSize;
+    this.setState({
+      pageSize: newSize,
+      currentPage: 0,
+    });
+  }
+
+  /**
+   * Обновление видимых столбцов
+   */
+  onVisibleColumnsChange(visibleCols: string[]): void {
+    // Если попытка снять последний столбец - игнорируем
+    if (visibleCols.length === 0) {
+      // Ничего не происходит, visibleColumns остаётся без изменений
+      return;
+    }
+    this.visibleColumns = visibleCols;
+  }
+
+  /**
+   * Фильтрация отображаемых столбцов
+   */
+  getVisibleColumns(): string[] {
+    const allColumns = this.state$.value.columns;
+    if (this.visibleColumns.length === 0) {
+      this.visibleColumns = [...allColumns];
+      return allColumns;
+    }
+    return allColumns.filter((col) => this.visibleColumns.includes(col));
+  }
+
+  /**
+   * Получение пагинированных строк
+   */
+  getPaginatedRows(): any[] {
+    const state = this.state$.value;
+    const startIndex = state.currentPage * state.pageSize;
+    const endIndex = startIndex + state.pageSize;
+    return state.filteredRows.slice(startIndex, endIndex);
+  }
+
+  /**
+   * Получение информации о странице
+   */
+  getPageInfo(): { start: number; end: number; total: number } {
+    const state = this.state$.value;
+    const total = state.filteredRows.length;
+    const start = total === 0 ? 0 : state.currentPage * state.pageSize + 1;
+    const end = Math.min((state.currentPage + 1) * state.pageSize, total);
+    return { start, end, total };
+  }
+
+  /**
+   * Получение количества страниц
+   */
+  getTotalPages(): number {
+    const state = this.state$.value;
+    return Math.ceil(state.filteredRows.length / state.pageSize);
+  }
+
+  /**
+   * Переход на следующую страницу
+   */
+  nextPage(): void {
+    const totalPages = this.getTotalPages();
+    const state = this.state$.value;
+    if (state.currentPage < totalPages - 1) {
+      this.setState({ currentPage: state.currentPage + 1 });
+    }
+  }
+
+  /**
+   * Переход на предыдущую страницу
+   */
+  prevPage(): void {
+    const state = this.state$.value;
+    if (state.currentPage > 0) {
+      this.setState({ currentPage: state.currentPage - 1 });
+    }
+  }
+
+  /**
+   * Переход на первую страницу
+   */
+  firstPage(): void {
+    this.setState({ currentPage: 0 });
+  }
+
+  /**
+   * Переход на последнюю страницу
+   */
+  lastPage(): void {
+    const totalPages = this.getTotalPages();
+    this.setState({ currentPage: totalPages - 1 });
   }
 }
