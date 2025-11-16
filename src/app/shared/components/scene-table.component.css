@@ -1,6 +1,8 @@
 :host ::ng-deep {
   .p-datatable .p-datatable-tbody > tr {
     transition: background-color 0.2s;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
 
     &:hover {
       background-color: #f8f9fa !important;
@@ -40,6 +42,7 @@
 .bg-blue-50 {
   background-color: #eff6ff;
 }
+
 /* Глобальные стили для кнопок с inter-medium */
 .p-button-inter-medium .p-button-label {
   font-family: 'Inter Medium', sans-serif;
@@ -101,6 +104,7 @@
     padding: 1.5rem;
   }
 }
+
 button {
   border-radius: 40px;
 }
@@ -132,10 +136,12 @@ button {
     background: #232323;
     border: 1px solid #333333;
     border-radius: 0.5rem;
-    transition: all 0.2s;
+    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
     padding: 0.5rem 0.75rem;
     font-size: 0.875rem;
     cursor: pointer;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
   }
 
   .p-paginator .p-paginator-page:hover,
@@ -179,11 +185,42 @@ button {
 /* Исправление для webkit браузеров */
 @supports (-webkit-appearance: none) {
   .gradient-button,
+  .export-excel-button,
+  .export-csv-button,
+  .filter-button,
   .gradient-vertical,
-  .gradient-card {
+  .gradient-card,
+  button {
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
-    -webkit-perspective: 1000;
+    -webkit-perspective: 1000px;
     perspective: 1000px;
+    transform: translate3d(0, 0, 0);
+  }
+
+  .gradient-button:hover,
+  .export-excel-button:hover,
+  .export-csv-button:hover,
+  .filter-button:hover {
+    transform: translateY(-1px) translate3d(0, 0, 0);
+  }
+}
+
+/* Дополнительные фиксы для иконок */
+:host ::ng-deep {
+  .p-button-icon,
+  i {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    display: inline-block;
+    vertical-align: middle;
+  }
+
+  .p-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
   }
 }

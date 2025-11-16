@@ -37,7 +37,6 @@ export class CeilService {
   updateCell(payload: CeilRequest): Observable<UpdatedCell> {
     const url = this.baseUrl ? `${this.baseUrl.replace(/\/+$/, '')}/cell` : `/cell`;
 
-
     return this.http.patch<CeilSuccessResponse | CeilErrorResponse>(url, payload).pipe(
       map((res: any) => {
         // Если сервер вернул объект с полем updated_cell и статус success — возвращаем updated_cell

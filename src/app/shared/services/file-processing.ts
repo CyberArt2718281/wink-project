@@ -183,7 +183,6 @@ export class FileProcessing {
           message: errorMessage,
         };
 
-        console.error('Ошибка при опрашивании результата:', processingError);
         return throwError(() => processingError);
       }),
       take(1)

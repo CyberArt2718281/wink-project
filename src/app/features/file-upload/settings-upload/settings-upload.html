@@ -1,314 +1,456 @@
 <div class="settings-upload-container relative">
-  <button pButton
-          [label]="'SETTINGS_UPLOAD.BUTTON' | translate"
-          class="settings-button !bg-[#1A1A1A] !border-[#232323] !text-gray-300 !text-xs sm:!text-sm hover:!bg-[#232323]  hover:!text-white transition-all duration-200 inter-regular !rounded-[40px]"
-          (click)="openModal()">
-    <i class="pi pi-cog mr-1 sm:mr-2"></i>
+  <button
+    pButton
+    [label]="'SETTINGS_UPLOAD.BUTTON' | translate"
+    class="settings-button !bg-[#1A1A1A] !border-[#232323] !text-gray-300 !text-xs sm:!text-sm hover:!bg-[#232323] hover:!text-white transition-all duration-200 inter-regular !rounded-[40px]"
+    (click)="openModal()"
+  >
+    <i class="pi pi-cog mr-1 sm:mr-2 shrink-0"></i>
   </button>
 
   @if (modalOpen) {
-    <!-- Backdrop -->
-    <div class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 transition-opacity duration-300"
-         (click)="closeModal()"></div>
+  <!-- Backdrop -->
+  <div
+    class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 transition-opacity duration-300"
+    (click)="closeModal()"
+  ></div>
 
-    <!-- Modal -->
+  <!-- Modal -->
+  <div
+    class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-[#1A1A1A] border border-[#232323] rounded-xl shadow-2xl z-50 w-[95vw] max-w-4xl max-h-[90vh] overflow-hidden animate-scale-in mobile-modal"
+  >
+    <!-- Header -->
     <div
-      class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-[#1A1A1A] border border-[#232323] rounded-xl shadow-2xl z-50 w-[95vw] max-w-4xl max-h-[90vh] overflow-hidden animate-scale-in mobile-modal">
-      <!-- Header -->
-      <div class="flex items-center justify-between p-4 sm:p-6 border-b border-[#232323] bg-[#1A1A1A] sticky top-0">
-        <div>
-          <h3
-            class="text-lg sm:text-xl font-bold text-white inter-extra-bold">{{ 'SETTINGS_UPLOAD.TITLE' | translate }}</h3>
-          <p
-            class="text-gray-400 text-xs sm:text-sm mt-1 inter-regular">{{ 'SETTINGS_UPLOAD.SUBTITLE' | translate }}</p>
-        </div>
-        <button (click)="closeModal()"
-                class="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center text-gray-400 hover:text-white hover:bg-[#232323] rounded-lg transition-colors inter-regular">
-          <i class="pi pi-times text-sm sm:text-base"></i>
-        </button>
+      class="flex items-center justify-between p-4 sm:p-6 border-b border-[#232323] bg-[#1A1A1A] sticky top-0"
+    >
+      <div>
+        <h3 class="text-lg sm:text-xl font-bold text-white inter-extra-bold">
+          {{ 'SETTINGS_UPLOAD.TITLE' | translate }}
+        </h3>
+        <p class="text-gray-400 text-xs sm:text-sm mt-1 inter-regular">
+          {{ 'SETTINGS_UPLOAD.SUBTITLE' | translate }}
+        </p>
       </div>
+      <button
+        (click)="closeModal()"
+        class="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center text-gray-400 hover:text-white hover:bg-[#232323] rounded-lg transition-colors inter-regular"
+      >
+        <i class="pi pi-times text-sm sm:text-base shrink-0"></i>
+      </button>
+    </div>
 
-      <!-- Content -->
-      <div class="flex flex-col h-[calc(90vh-120px)]">
-        <div class="flex-1 overflow-auto custom-scroll">
-          <div class="p-4 sm:p-6">
-            <!-- Preset Selection -->
-            <div class="mb-6 sm:mb-8">
-              <h4
-                class="text-white font-semibold mb-3 sm:mb-4 flex items-center gap-2 text-sm sm:text-base inter-medium">
-                <i class="pi pi-sliders-h text-[#FF6600]"></i>
-                {{ 'SETTINGS_UPLOAD.PRESET_SELECTION' | translate }}
-              </h4>
-              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3">
-                <label
-                  class="preset-option flex flex-col p-3 sm:p-4 rounded-lg border-2 border-[#232323] hover:border-[#FF6600] cursor-pointer transition-all duration-200 group has-[:checked]:border-[#FF6600] has-[:checked]:bg-[#FF6600]/5 inter-regular">
-                  <input type="radio" name="preset" value="basic" [(ngModel)]="selectedPreset"
-                         class="hidden" (change)="applyPreset('basic')">
-                  <div class="flex items-center gap-2 sm:gap-3 mb-2">
+    <!-- Content -->
+    <div class="flex flex-col h-[calc(90vh-120px)]">
+      <div class="flex-1 overflow-auto custom-scroll">
+        <div class="p-4 sm:p-6">
+          <!-- Preset Selection -->
+          <div class="mb-6 sm:mb-8">
+            <h4
+              class="text-white font-semibold mb-3 sm:mb-4 flex items-center gap-2 text-sm sm:text-base inter-medium"
+            >
+              <i class="pi pi-sliders-h text-[#FF6600] shrink-0"></i>
+              {{ 'SETTINGS_UPLOAD.PRESET_SELECTION' | translate }}
+            </h4>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3">
+              <label
+                class="preset-option flex flex-col p-3 sm:p-4 rounded-lg border-2 border-[#232323] hover:border-[#FF6600] cursor-pointer transition-all duration-200 group has-[:checked]:border-[#FF6600] has-[:checked]:bg-[#FF6600]/5 inter-regular"
+              >
+                <input
+                  type="radio"
+                  name="preset"
+                  value="basic"
+                  [(ngModel)]="selectedPreset"
+                  class="hidden"
+                  (change)="applyPreset('basic')"
+                />
+                <div class="flex items-center gap-2 sm:gap-3 mb-2">
+                  <div
+                    class="w-3 h-3 sm:w-4 sm:h-4 rounded-full border-2 border-[#232323] group-has-[:checked]:border-[#FF6600] group-has-[:checked]:bg-[#FF6600] flex items-center justify-center"
+                  >
                     <div
-                      class="w-3 h-3 sm:w-4 sm:h-4 rounded-full border-2 border-[#232323] group-has-[:checked]:border-[#FF6600] group-has-[:checked]:bg-[#FF6600] flex items-center justify-center">
-                      <div
-                        class="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-white opacity-0 group-has-[:checked]:opacity-100 transition-opacity"></div>
-                    </div>
-                    <span
-                      class="font-medium text-white group-has-[:checked]:text-[#FF6600] text-xs sm:text-sm inter-medium">{{ 'SETTINGS_UPLOAD.BASIC' | translate }}</span>
-                  </div>
-                  <p
-                    class="text-gray-400 text-xs ml-5 sm:ml-7 inter-regular">{{ 'SETTINGS_UPLOAD.BASIC_DESC' | translate }}</p>
-                </label>
-
-                <label
-                  class="preset-option flex flex-col p-3 sm:p-4 rounded-lg border-2 border-[#232323] hover:border-[#FF6600] cursor-pointer transition-all duration-200 group has-[:checked]:border-[#FF6600] has-[:checked]:bg-[#FF6600]/5 inter-regular">
-                  <input type="radio" name="preset" value="extended" [(ngModel)]="selectedPreset"
-                         class="hidden" (change)="applyPreset('extended')">
-                  <div class="flex items-center gap-2 sm:gap-3 mb-2">
-                    <div
-                      class="w-3 h-3 sm:w-4 sm:h-4 rounded-full border-2 border-[#232323] group-has-[:checked]:border-[#FF6600] group-has-[:checked]:bg-[#FF6600] flex items-center justify-center">
-                      <div
-                        class="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-white opacity-0 group-has-[:checked]:opacity-100 transition-opacity"></div>
-                    </div>
-                    <span
-                      class="font-medium text-white group-has-[:checked]:text-[#FF6600] text-xs sm:text-sm inter-medium">{{ 'SETTINGS_UPLOAD.ADVANCED' | translate }}</span>
-                  </div>
-                  <p
-                    class="text-gray-400 text-xs ml-5 sm:ml-7 inter-regular">{{ 'SETTINGS_UPLOAD.ADVANCED_DESC' | translate }}</p>
-                </label>
-                <label
-                  class="preset-option flex flex-col p-3 sm:p-4 rounded-lg border-2 border-[#232323] hover:border-[#FF6600] cursor-pointer transition-all duration-200 group has-[:checked]:border-[#FF6600] has-[:checked]:bg-[#FF6600]/5 inter-regular">
-                  <input type="radio" name="preset" value="full" [(ngModel)]="selectedPreset"
-                         class="hidden" (change)="applyPreset('full')">
-                  <div class="flex items-center gap-2 sm:gap-3 mb-2">
-                    <div
-                      class="w-3 h-3 sm:w-4 sm:h-4 rounded-full border-2 border-[#232323] group-has-[:checked]:border-[#FF6600] group-has-[:checked]:bg-[#FF6600] flex items-center justify-center">
-                      <div
-                        class="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-white opacity-0 group-has-[:checked]:opacity-100 transition-opacity"></div>
-                    </div>
-                    <span
-                      class="font-medium text-white group-has-[:checked]:text-[#FF6600] text-xs sm:text-sm inter-medium">{{ 'SETTINGS_UPLOAD.FULL' | translate }}</span>
-                  </div>
-                  <p
-                    class="text-gray-400 text-xs ml-5 sm:ml-7 inter-regular">{{ 'SETTINGS_UPLOAD.FULL_DESC' | translate }}</p>
-                </label>
-                <label
-                  class="preset-option flex flex-col p-3 sm:p-4 rounded-lg border-2 border-[#232323] hover:border-[#FF6600] cursor-pointer transition-all duration-200 group has-[:checked]:border-[#FF6600] has-[:checked]:bg-[#FF6600]/5 inter-regular">
-                  <input type="radio" name="preset" value="custom" [(ngModel)]="selectedPreset"
-                         class="hidden" (change)="applyPreset('custom')">
-                  <div class="flex items-center gap-2 sm:gap-3 mb-2">
-                    <div
-                      class="w-3 h-3 sm:w-4 sm:h-4 rounded-full border-2 border-[#232323] group-has-[:checked]:border-[#FF6600] group-has-[:checked]:bg-[#FF6600] flex items-center justify-center">
-                      <div
-                        class="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-white opacity-0 group-has-[:checked]:opacity-100 transition-opacity"></div>
-                    </div>
-                    <span
-                      class="font-medium text-white group-has-[:checked]:text-[#FF6600] text-xs sm:text-sm inter-medium">{{ 'SETTINGS_UPLOAD.CUSTOM' | translate }}</span>
-                  </div>
-                  <p
-                    class="text-gray-400 text-xs ml-5 sm:ml-7 inter-regular">{{ 'SETTINGS_UPLOAD.CUSTOM_DESC' | translate }}</p>
-                </label>
-              </div>
-            </div>
-
-            <!-- Custom Columns Selection -->
-            @if (selectedPreset === 'custom') {
-              <div class="mb-6 sm:mb-8 animate-fade-in">
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
-                  <h4 class="text-white font-semibold flex items-center gap-2 text-sm sm:text-base inter-medium"><i
-                    class="pi pi-list text-[#FF6600]"></i> {{ 'SETTINGS_UPLOAD.CUSTOM_COLUMNS' | translate }} </h4>
-                  <div class="flex gap-2">
-                    <button type="button"
-                            class="px-2 py-1 sm:px-3 sm:py-1 text-xs bg-gradient-to-r from-[#ff9532] via-[#ff5b21] to-[#ff5a24] text-white rounded-lg transition-all duration-300 inter-regular select-all shadow-md hover:shadow-lg transform  inter-medium "
-                            (click)="selectAllColumns()">
-                      {{ 'SETTINGS_UPLOAD.SELECT_ALL' | translate }}
-                    </button>
-                    <button type="button"
-                            class="px-2 py-1 sm:px-3 sm:py-1 text-xs bg-gradient-to-r from-[#ff9532] via-[#ff5b21] to-[#ff5a24] text-white rounded-lg transition-all duration-300 inter-regular select-all shadow-md hover:shadow-lg transform  inter-medium"
-                            (click)="deselectAllColumns()">
-                      {{ 'SETTINGS_UPLOAD.DESELECT_ALL' | translate }}
-                    </button>
-                  </div>
-                </div>
-
-                <!-- Column Categories -->
-                <div class="space-y-3 sm:space-y-4">
-                  <!-- Basic Info Columns -->
-                  <div class="border border-[#232323] rounded-lg overflow-hidden">
-                    <div class="bg-[#232323] px-3 sm:px-4 py-2 sm:py-3">
-                      <h5 class="text-white font-medium flex items-center gap-2 text-sm sm:text-base inter-medium"><i
-                        class="pi pi-info-circle text-[#FF6600]"></i> {{ 'SETTINGS_UPLOAD.BASIC_INFO' | translate }}
-                      </h5>
-                    </div>
-                    <div class="p-3 sm:p-4 grid grid-cols-1 gap-2 sm:gap-3">
-                      <div *ngFor="let column of basicColumns"
-                           class="column-option flex items-center justify-between gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg border border-[#232323] hover:border-[#FF6600] transition-all duration-200 group inter-regular cursor-pointer"
-                           (click)="toggleColumn(column, $event)">
-                        <div class="flex items-start gap-2 sm:gap-3 flex-1 min-w-0">
-                          <div class="flex-1 min-w-0">
-                            <span
-                              class="font-medium text-white text-sm sm:text-base block inter-medium">{{ column.name }}</span>
-                            <p class="text-gray-400 text-xs sm:text-sm mt-1 inter-regular">{{ column.description }}</p>
-                          </div>
-                        </div>
-                        <p-toggleswitch [(ngModel)]="column.selected" [dt]="amberSwitch" (click)="$event.stopPropagation()"></p-toggleswitch>
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- Financial Columns -->
-                  <div class="border border-[#232323] rounded-lg overflow-hidden">
-                    <div class="bg-[#232323] px-3 sm:px-4 py-2 sm:py-3">
-                      <h5 class="text-white font-medium flex items-center gap-2 text-sm sm:text-base inter-medium"><i
-                        class="pi pi-dollar text-[#FF6600]"></i> {{ 'SETTINGS_UPLOAD.FINANCIAL' | translate }} </h5>
-                    </div>
-                    <div class="p-3 sm:p-4 grid grid-cols-1 gap-2 sm:gap-3">
-                      <div *ngFor="let column of financialColumns"
-                           class="column-option flex items-center justify-between gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg border border-[#232323] hover:border-[#FF6600] transition-all duration-200 group inter-regular cursor-pointer"
-                           (click)="toggleColumn(column, $event)">
-                        <div class="flex items-start gap-2 sm:gap-3 flex-1 min-w-0">
-                          <div class="flex-1 min-w-0">
-                            <span
-                              class="font-medium text-white text-sm sm:text-base block inter-medium">{{ column.name }}</span>
-                            <p class="text-gray-400 text-xs sm:text-sm mt-1 inter-regular">{{ column.description }}</p>
-                          </div>
-                        </div>
-                        <p-toggleswitch [(ngModel)]="column.selected" [dt]="amberSwitch" (click)="$event.stopPropagation()"></p-toggleswitch>
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- Production Columns -->
-                  <div class="border border-[#232323] rounded-lg overflow-hidden">
-                    <div class="bg-[#232323] px-3 sm:px-4 py-2 sm:py-3">
-                      <h5 class="text-white font-medium flex items-center gap-2 text-sm sm:text-base inter-medium"><i
-                        class="pi pi-video text-[#FF6600]"></i> {{ 'SETTINGS_UPLOAD.PRODUCTION' | translate }} </h5>
-                    </div>
-                    <div class="p-3 sm:p-4 grid grid-cols-1 gap-2 sm:gap-3">
-                      <div *ngFor="let column of productionColumns"
-                           class="column-option flex items-center justify-between gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg border border-[#232323] hover:border-[#FF6600] transition-all duration-200 group inter-regular cursor-pointer"
-                           (click)="toggleColumn(column, $event)">
-                        <div class="flex items-start gap-2 sm:gap-3 flex-1 min-w-0">
-                          <div class="flex-1 min-w-0">
-                            <span
-                              class="font-medium text-white text-sm sm:text-base block inter-medium">{{ column.name }}</span>
-                            <p class="text-gray-400 text-xs sm:text-sm mt-1 inter-regular">{{ column.description }}</p>
-                          </div>
-                        </div>
-                        <p-toggleswitch [(ngModel)]="column.selected" [dt]="amberSwitch" (click)="$event.stopPropagation()"></p-toggleswitch>
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- Custom Columns -->
-                  @if (customColumns.length > 0) {
-                    <div class="border border-[#232323] rounded-lg overflow-hidden">
-                      <div class="bg-[#232323] px-3 sm:px-4 py-2 sm:py-3">
-                        <h5 class="text-white font-medium flex items-center gap-2 text-sm sm:text-base inter-medium"><i
-                          class="pi pi-star text-[#FF6600]"></i> {{ 'SETTINGS_UPLOAD.CUSTOM_COLUMNS_CATEGORY' | translate }}
-                        </h5>
-                      </div>
-                      <div class="p-3 sm:p-4 grid grid-cols-1 gap-2 sm:gap-3">
-                        <div *ngFor="let column of customColumns"
-                             class="column-option flex items-center justify-between gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg border border-[#232323] hover:border-[#FF6600] transition-all duration-200 group inter-regular cursor-pointer"
-                             (click)="toggleColumn(column, $event)">
-                          <div class="flex items-start gap-2 sm:gap-3 flex-1 min-w-0">
-                            <div class="flex-1 min-w-0">
-                              <div class="flex items-center gap-2">
-                                <span
-                                  class="font-medium text-white text-sm sm:text-base block inter-medium">{{ column.name }}</span>
-                                <span
-                                  class="px-1.5 py-0.5  text-white text-xs  inter-regular gradient-badge">Custom</span>
-                              </div>
-                              <p
-                                class="text-gray-400 text-xs sm:text-sm mt-1 inter-regular">{{ column.description }}</p>
-                            </div>
-                          </div>
-                          <div class="flex items-center gap-2">
-                            <p-toggleswitch [(ngModel)]="column.selected" [dt]="amberSwitch" (click)="$event.stopPropagation()"></p-toggleswitch>
-                            <button type="button"
-                                    class="text-gray-400 hover:text-red-500 transition-colors duration-200 ml-2"
-                                    (click)="removeCustomColumn(column.id)"
-                                    title="{{ 'SETTINGS_UPLOAD.REMOVE_COLUMN' | translate }}">
-                              <i class="pi pi-times text-sm"></i>
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  }
-
-                  <!-- Custom Column Input -->
-                  <div class="border border-[#232323] rounded-lg overflow-hidden">
-                    <div class="bg-[#232323] px-3 sm:px-4 py-2 sm:py-3">
-                      <h5 class="text-white font-medium flex items-center gap-2 text-sm sm:text-base inter-medium"><i
-                        class="pi pi-plus text-[#FF6600]"></i> {{ 'SETTINGS_UPLOAD.ADD_CUSTOM_COLUMN' | translate }}
-                      </h5>
-                    </div>
-                    <div class="p-3 sm:p-4">
-                      <div class="flex flex-col sm:flex-row gap-2 sm:gap-3">
-                        <input type="text"
-                               [(ngModel)]="newColumnName"
-                               [ngModelOptions]="{standalone: true}"
-                               placeholder="{{ 'SETTINGS_UPLOAD.COLUMN_NAME_PLACEHOLDER' | translate }}"
-                               class="flex-1 px-3 py-2 bg-[#1A1A1A] border border-[#232323] rounded-lg text-white placeholder-gray-500 focus:border-[#FF6600] focus:ring-1 focus:ring-[#FF6600] outline-none text-sm sm:text-base inter-regular"
-                               (keydown.enter)="addCustomColumn()">
-                        <button type="button"
-                                class="px-3 sm:px-4 py-2 bg-[#FF6600] text-white  hover:bg-[#FF8533] transition-colors duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base whitespace-nowrap inter-medium gradient-button rounded-[40px]"
-                                (click)="addCustomColumn()"
-                                [disabled]="!newColumnName">
-                          {{ 'SETTINGS_UPLOAD.ADD' | translate }}
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            }
-
-            <!-- Selected Columns Summary -->
-            @if (selectedColumnsCount > 0) {
-              <div class="bg-[#232323] border border-[#232323] rounded-lg p-3 sm:p-4 mb-6 animate-fade-in">
-                <div class="flex items-center justify-between">
-                  <div>
-                    <h5 class="text-white font-medium flex items-center gap-2 text-sm sm:text-base inter-medium">
-                      <i class="pi pi-check-circle text-green-500"></i>
-                      {{ 'SETTINGS_UPLOAD.SELECTED_COLUMNS' | translate }}
-                    </h5>
-                    <p class="text-gray-400 text-xs sm:text-sm mt-1 inter-regular">
-                      {{ selectedColumnsCount }} {{ 'SETTINGS_UPLOAD.COLUMNS_SELECTED' | translate }}
-                    </p>
+                      class="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-white opacity-0 group-has-[:checked]:opacity-100 transition-opacity"
+                    ></div>
                   </div>
                   <span
-                    class="px-2 sm:px-3 py-1 bg-[#FF6600] text-white rounded-full text-xs sm:text-sm font-medium inter-medium gradient-badge ">
-                    {{ selectedColumnsCount }}
-                  </span>
+                    class="font-medium text-white group-has-[:checked]:text-[#FF6600] text-xs sm:text-sm inter-medium"
+                    >{{ 'SETTINGS_UPLOAD.BASIC' | translate }}</span
+                  >
+                </div>
+                <p class="text-gray-400 text-xs ml-5 sm:ml-7 inter-regular">
+                  {{ 'SETTINGS_UPLOAD.BASIC_DESC' | translate }}
+                </p>
+              </label>
+
+              <label
+                class="preset-option flex flex-col p-3 sm:p-4 rounded-lg border-2 border-[#232323] hover:border-[#FF6600] cursor-pointer transition-all duration-200 group has-[:checked]:border-[#FF6600] has-[:checked]:bg-[#FF6600]/5 inter-regular"
+              >
+                <input
+                  type="radio"
+                  name="preset"
+                  value="extended"
+                  [(ngModel)]="selectedPreset"
+                  class="hidden"
+                  (change)="applyPreset('extended')"
+                />
+                <div class="flex items-center gap-2 sm:gap-3 mb-2">
+                  <div
+                    class="w-3 h-3 sm:w-4 sm:h-4 rounded-full border-2 border-[#232323] group-has-[:checked]:border-[#FF6600] group-has-[:checked]:bg-[#FF6600] flex items-center justify-center"
+                  >
+                    <div
+                      class="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-white opacity-0 group-has-[:checked]:opacity-100 transition-opacity"
+                    ></div>
+                  </div>
+                  <span
+                    class="font-medium text-white group-has-[:checked]:text-[#FF6600] text-xs sm:text-sm inter-medium"
+                    >{{ 'SETTINGS_UPLOAD.ADVANCED' | translate }}</span
+                  >
+                </div>
+                <p class="text-gray-400 text-xs ml-5 sm:ml-7 inter-regular">
+                  {{ 'SETTINGS_UPLOAD.ADVANCED_DESC' | translate }}
+                </p>
+              </label>
+              <label
+                class="preset-option flex flex-col p-3 sm:p-4 rounded-lg border-2 border-[#232323] hover:border-[#FF6600] cursor-pointer transition-all duration-200 group has-[:checked]:border-[#FF6600] has-[:checked]:bg-[#FF6600]/5 inter-regular"
+              >
+                <input
+                  type="radio"
+                  name="preset"
+                  value="full"
+                  [(ngModel)]="selectedPreset"
+                  class="hidden"
+                  (change)="applyPreset('full')"
+                />
+                <div class="flex items-center gap-2 sm:gap-3 mb-2">
+                  <div
+                    class="w-3 h-3 sm:w-4 sm:h-4 rounded-full border-2 border-[#232323] group-has-[:checked]:border-[#FF6600] group-has-[:checked]:bg-[#FF6600] flex items-center justify-center"
+                  >
+                    <div
+                      class="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-white opacity-0 group-has-[:checked]:opacity-100 transition-opacity"
+                    ></div>
+                  </div>
+                  <span
+                    class="font-medium text-white group-has-[:checked]:text-[#FF6600] text-xs sm:text-sm inter-medium"
+                    >{{ 'SETTINGS_UPLOAD.FULL' | translate }}</span
+                  >
+                </div>
+                <p class="text-gray-400 text-xs ml-5 sm:ml-7 inter-regular">
+                  {{ 'SETTINGS_UPLOAD.FULL_DESC' | translate }}
+                </p>
+              </label>
+              <label
+                class="preset-option flex flex-col p-3 sm:p-4 rounded-lg border-2 border-[#232323] hover:border-[#FF6600] cursor-pointer transition-all duration-200 group has-[:checked]:border-[#FF6600] has-[:checked]:bg-[#FF6600]/5 inter-regular"
+              >
+                <input
+                  type="radio"
+                  name="preset"
+                  value="custom"
+                  [(ngModel)]="selectedPreset"
+                  class="hidden"
+                  (change)="applyPreset('custom')"
+                />
+                <div class="flex items-center gap-2 sm:gap-3 mb-2">
+                  <div
+                    class="w-3 h-3 sm:w-4 sm:h-4 rounded-full border-2 border-[#232323] group-has-[:checked]:border-[#FF6600] group-has-[:checked]:bg-[#FF6600] flex items-center justify-center"
+                  >
+                    <div
+                      class="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-white opacity-0 group-has-[:checked]:opacity-100 transition-opacity"
+                    ></div>
+                  </div>
+                  <span
+                    class="font-medium text-white group-has-[:checked]:text-[#FF6600] text-xs sm:text-sm inter-medium"
+                    >{{ 'SETTINGS_UPLOAD.CUSTOM' | translate }}</span
+                  >
+                </div>
+                <p class="text-gray-400 text-xs ml-5 sm:ml-7 inter-regular">
+                  {{ 'SETTINGS_UPLOAD.CUSTOM_DESC' | translate }}
+                </p>
+              </label>
+            </div>
+          </div>
+
+          <!-- Custom Columns Selection -->
+          @if (selectedPreset === 'custom') {
+          <div class="mb-6 sm:mb-8 animate-fade-in">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+              <h4
+                class="text-white font-semibold flex items-center gap-2 text-sm sm:text-base inter-medium"
+              >
+                <i class="pi pi-list text-[#FF6600] shrink-0"></i>
+                {{ 'SETTINGS_UPLOAD.CUSTOM_COLUMNS' | translate }}
+              </h4>
+              <div class="flex gap-2">
+                <button
+                  type="button"
+                  class="px-2 py-1 sm:px-3 sm:py-1 text-xs bg-gradient-to-r from-[#ff9532] via-[#ff5b21] to-[#ff5a24] text-white rounded-lg transition-all duration-300 inter-regular select-all shadow-md hover:shadow-lg transform inter-medium"
+                  (click)="selectAllColumns()"
+                >
+                  {{ 'SETTINGS_UPLOAD.SELECT_ALL' | translate }}
+                </button>
+                <button
+                  type="button"
+                  class="px-2 py-1 sm:px-3 sm:py-1 text-xs bg-gradient-to-r from-[#ff9532] via-[#ff5b21] to-[#ff5a24] text-white rounded-lg transition-all duration-300 inter-regular select-all shadow-md hover:shadow-lg transform inter-medium"
+                  (click)="deselectAllColumns()"
+                >
+                  {{ 'SETTINGS_UPLOAD.DESELECT_ALL' | translate }}
+                </button>
+              </div>
+            </div>
+
+            <!-- Column Categories -->
+            <div class="space-y-3 sm:space-y-4">
+              <!-- Basic Info Columns -->
+              <div class="border border-[#232323] rounded-lg overflow-hidden">
+                <div class="bg-[#232323] px-3 sm:px-4 py-2 sm:py-3">
+                  <h5
+                    class="text-white font-medium flex items-center gap-2 text-sm sm:text-base inter-medium"
+                  >
+                    <i class="pi pi-info-circle text-[#FF6600] shrink-0"></i>
+                    {{ 'SETTINGS_UPLOAD.BASIC_INFO' | translate }}
+                  </h5>
+                </div>
+                <div class="p-3 sm:p-4 grid grid-cols-1 gap-2 sm:gap-3">
+                  <div
+                    *ngFor="let column of basicColumns"
+                    class="column-option flex items-center justify-between gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg border border-[#232323] hover:border-[#FF6600] transition-all duration-200 group inter-regular cursor-pointer"
+                    (click)="toggleColumn(column, $event)"
+                  >
+                    <div class="flex items-start gap-2 sm:gap-3 flex-1 min-w-0">
+                      <div class="flex-1 min-w-0">
+                        <span
+                          class="font-medium text-white text-sm sm:text-base block inter-medium"
+                          >{{ column.name }}</span
+                        >
+                        <p class="text-gray-400 text-xs sm:text-sm mt-1 inter-regular">
+                          {{ column.description }}
+                        </p>
+                      </div>
+                    </div>
+                    <p-toggleswitch
+                      [(ngModel)]="column.selected"
+                      [dt]="amberSwitch"
+                      (click)="$event.stopPropagation()"
+                    ></p-toggleswitch>
+                  </div>
                 </div>
               </div>
-            }
-          </div>
-        </div>
 
-        <!-- Actions -->
-        <div class="border-t border-[#232323] bg-[#1A1A1A] p-4 sm:p-6 sticky bottom-0">
-          <div class="flex flex-col sm:flex-row gap-3 justify-between items-center">
-            <div class="text-xs sm:text-sm text-gray-400 order-2 sm:order-1 inter-regular">
-              {{ 'SETTINGS_UPLOAD.SELECTED' | translate }}: <span
-              class="text-white font-medium inter-medium">{{ selectedColumnsCount }}</span> {{ 'SETTINGS_UPLOAD.COLUMNS' | translate }}
+              <!-- Financial Columns -->
+              <div class="border border-[#232323] rounded-lg overflow-hidden">
+                <div class="bg-[#232323] px-3 sm:px-4 py-2 sm:py-3">
+                  <h5
+                    class="text-white font-medium flex items-center gap-2 text-sm sm:text-base inter-medium"
+                  >
+                    <i class="pi pi-dollar text-[#FF6600] shrink-0"></i>
+                    {{ 'SETTINGS_UPLOAD.FINANCIAL' | translate }}
+                  </h5>
+                </div>
+                <div class="p-3 sm:p-4 grid grid-cols-1 gap-2 sm:gap-3">
+                  <div
+                    *ngFor="let column of financialColumns"
+                    class="column-option flex items-center justify-between gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg border border-[#232323] hover:border-[#FF6600] transition-all duration-200 group inter-regular cursor-pointer"
+                    (click)="toggleColumn(column, $event)"
+                  >
+                    <div class="flex items-start gap-2 sm:gap-3 flex-1 min-w-0">
+                      <div class="flex-1 min-w-0">
+                        <span
+                          class="font-medium text-white text-sm sm:text-base block inter-medium"
+                          >{{ column.name }}</span
+                        >
+                        <p class="text-gray-400 text-xs sm:text-sm mt-1 inter-regular">
+                          {{ column.description }}
+                        </p>
+                      </div>
+                    </div>
+                    <p-toggleswitch
+                      [(ngModel)]="column.selected"
+                      [dt]="amberSwitch"
+                      (click)="$event.stopPropagation()"
+                    ></p-toggleswitch>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Production Columns -->
+              <div class="border border-[#232323] rounded-lg overflow-hidden">
+                <div class="bg-[#232323] px-3 sm:px-4 py-2 sm:py-3">
+                  <h5
+                    class="text-white font-medium flex items-center gap-2 text-sm sm:text-base inter-medium"
+                  >
+                    <i class="pi pi-video text-[#FF6600] shrink-0"></i>
+                    {{ 'SETTINGS_UPLOAD.PRODUCTION' | translate }}
+                  </h5>
+                </div>
+                <div class="p-3 sm:p-4 grid grid-cols-1 gap-2 sm:gap-3">
+                  <div
+                    *ngFor="let column of productionColumns"
+                    class="column-option flex items-center justify-between gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg border border-[#232323] hover:border-[#FF6600] transition-all duration-200 group inter-regular cursor-pointer"
+                    (click)="toggleColumn(column, $event)"
+                  >
+                    <div class="flex items-start gap-2 sm:gap-3 flex-1 min-w-0">
+                      <div class="flex-1 min-w-0">
+                        <span
+                          class="font-medium text-white text-sm sm:text-base block inter-medium"
+                          >{{ column.name }}</span
+                        >
+                        <p class="text-gray-400 text-xs sm:text-sm mt-1 inter-regular">
+                          {{ column.description }}
+                        </p>
+                      </div>
+                    </div>
+                    <p-toggleswitch
+                      [(ngModel)]="column.selected"
+                      [dt]="amberSwitch"
+                      (click)="$event.stopPropagation()"
+                    ></p-toggleswitch>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Custom Columns -->
+              @if (customColumns.length > 0) {
+              <div class="border border-[#232323] rounded-lg overflow-hidden">
+                <div class="bg-[#232323] px-3 sm:px-4 py-2 sm:py-3">
+                  <h5
+                    class="text-white font-medium flex items-center gap-2 text-sm sm:text-base inter-medium"
+                  >
+                    <i class="pi pi-star text-[#FF6600] shrink-0"></i>
+                    {{ 'SETTINGS_UPLOAD.CUSTOM_COLUMNS_CATEGORY' | translate }}
+                  </h5>
+                </div>
+                <div class="p-3 sm:p-4 grid grid-cols-1 gap-2 sm:gap-3">
+                  <div
+                    *ngFor="let column of customColumns"
+                    class="column-option flex items-center justify-between gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg border border-[#232323] hover:border-[#FF6600] transition-all duration-200 group inter-regular cursor-pointer"
+                    (click)="toggleColumn(column, $event)"
+                  >
+                    <div class="flex items-start gap-2 sm:gap-3 flex-1 min-w-0">
+                      <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2">
+                          <span
+                            class="font-medium text-white text-sm sm:text-base block inter-medium"
+                            >{{ column.name }}</span
+                          >
+                          <span
+                            class="px-1.5 py-0.5 text-white text-xs inter-regular gradient-badge"
+                            >Custom</span
+                          >
+                        </div>
+                        <p class="text-gray-400 text-xs sm:text-sm mt-1 inter-regular">
+                          {{ column.description }}
+                        </p>
+                      </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                      <p-toggleswitch
+                        [(ngModel)]="column.selected"
+                        [dt]="amberSwitch"
+                        (click)="$event.stopPropagation()"
+                      ></p-toggleswitch>
+                      <button
+                        type="button"
+                        class="text-gray-400 hover:text-red-500 transition-colors duration-200 ml-2 shrink-0"
+                        (click)="removeCustomColumn(column.id)"
+                        title="{{ 'SETTINGS_UPLOAD.REMOVE_COLUMN' | translate }}"
+                      >
+                        <i class="pi pi-times text-sm shrink-0"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              }
+
+              <!-- Custom Column Input -->
+              <div class="border border-[#232323] rounded-lg overflow-hidden">
+                <div class="bg-[#232323] px-3 sm:px-4 py-2 sm:py-3">
+                  <h5
+                    class="text-white font-medium flex items-center gap-2 text-sm sm:text-base inter-medium"
+                  >
+                    <i class="pi pi-plus text-[#FF6600]"></i>
+                    {{ 'SETTINGS_UPLOAD.ADD_CUSTOM_COLUMN' | translate }}
+                  </h5>
+                </div>
+                <div class="p-3 sm:p-4">
+                  <div class="flex flex-col sm:flex-row gap-2 sm:gap-3">
+                    <input
+                      type="text"
+                      [(ngModel)]="newColumnName"
+                      [ngModelOptions]="{ standalone: true }"
+                      placeholder="{{ 'SETTINGS_UPLOAD.COLUMN_NAME_PLACEHOLDER' | translate }}"
+                      class="flex-1 px-3 py-2 bg-[#1A1A1A] border border-[#232323] rounded-lg text-white placeholder-gray-500 focus:border-[#FF6600] focus:ring-1 focus:ring-[#FF6600] outline-none text-sm sm:text-base inter-regular"
+                      (keydown.enter)="addCustomColumn()"
+                    />
+                    <button
+                      type="button"
+                      class="px-3 sm:px-4 py-2 bg-[#FF6600] text-white hover:bg-[#FF8533] transition-colors duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base whitespace-nowrap inter-medium gradient-button rounded-[40px]"
+                      (click)="addCustomColumn()"
+                      [disabled]="!newColumnName"
+                    >
+                      {{ 'SETTINGS_UPLOAD.ADD' | translate }}
+                    </button>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div class="flex gap-2 sm:gap-3 order-1 sm:order-2 w-full sm:w-auto">
-              <button type="button"
-                      class="flex-1 sm:flex-none px-4 sm:px-6 py-2 bg-[#232323] text-gray-300 rounded-lg hover:bg-[#2A2A2A] hover:text-white transition-colors duration-200 font-medium text-sm sm:text-base inter-medium"
-                      (click)="closeModal()">
-                {{ 'SETTINGS_UPLOAD.CANCEL' | translate }}
-              </button>
-              <button type="button"
-                      class="flex-1 sm:flex-none px-4 sm:px-6 py-2 bg-[#FF6600] text-white rounded-lg hover:bg-[#FF8533] transition-colors duration-200 font-medium shadow-lg hover:shadow-[#FF6600]/25 flex items-center justify-center gap-2 text-sm sm:text-base inter-medium gradient-button"
-                      (click)="saveSettings()">
-                <i class="pi pi-check"></i>
-                {{ 'SETTINGS_UPLOAD.SAVE' | translate }}
-              </button>
+          </div>
+          }
+
+          <!-- Selected Columns Summary -->
+          @if (selectedColumnsCount > 0) {
+          <div
+            class="bg-[#232323] border border-[#232323] rounded-lg p-3 sm:p-4 mb-6 animate-fade-in"
+          >
+            <div class="flex items-center justify-between">
+              <div>
+                <h5
+                  class="text-white font-medium flex items-center gap-2 text-sm sm:text-base inter-medium"
+                >
+                  <i class="pi pi-check-circle text-green-500"></i>
+                  {{ 'SETTINGS_UPLOAD.SELECTED_COLUMNS' | translate }}
+                </h5>
+                <p class="text-gray-400 text-xs sm:text-sm mt-1 inter-regular">
+                  {{ selectedColumnsCount }} {{ 'SETTINGS_UPLOAD.COLUMNS_SELECTED' | translate }}
+                </p>
+              </div>
+              <span
+                class="px-2 sm:px-3 py-1 bg-[#FF6600] text-white rounded-full text-xs sm:text-sm font-medium inter-medium gradient-badge"
+              >
+                {{ selectedColumnsCount }}
+              </span>
             </div>
+          </div>
+          }
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="border-t border-[#232323] bg-[#1A1A1A] p-4 sm:p-6 sticky bottom-0">
+        <div class="flex flex-col sm:flex-row gap-3 justify-between items-center">
+          <div class="text-xs sm:text-sm text-gray-400 order-2 sm:order-1 inter-regular">
+            {{ 'SETTINGS_UPLOAD.SELECTED' | translate }}:
+            <span class="text-white font-medium inter-medium">{{ selectedColumnsCount }}</span>
+            {{ 'SETTINGS_UPLOAD.COLUMNS' | translate }}
+          </div>
+          <div class="flex gap-2 sm:gap-3 order-1 sm:order-2 w-full sm:w-auto">
+            <button
+              type="button"
+              class="flex-1 sm:flex-none px-4 sm:px-6 py-2 bg-[#232323] text-gray-300 rounded-lg hover:bg-[#2A2A2A] hover:text-white transition-colors duration-200 font-medium text-sm sm:text-base inter-medium"
+              (click)="closeModal()"
+            >
+              {{ 'SETTINGS_UPLOAD.CANCEL' | translate }}
+            </button>
+            <button
+              type="button"
+              class="flex-1 sm:flex-none px-4 sm:px-6 py-2 bg-[#FF6600] text-white rounded-lg hover:bg-[#FF8533] transition-colors duration-200 font-medium shadow-lg hover:shadow-[#FF6600]/25 flex items-center justify-center gap-2 text-sm sm:text-base inter-medium gradient-button"
+              (click)="saveSettings()"
+            >
+              <i class="pi pi-check shrink-0"></i>
+              {{ 'SETTINGS_UPLOAD.SAVE' | translate }}
+            </button>
           </div>
         </div>
       </div>
     </div>
+  </div>
   }
 </div>

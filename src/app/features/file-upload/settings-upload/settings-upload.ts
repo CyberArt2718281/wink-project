@@ -209,12 +209,10 @@ export class SettingsUpload implements OnInit {
 
   openModal(): void {
     this.modalOpen = true;
-    this.cdr.markForCheck();
   }
 
   closeModal(): void {
     this.modalOpen = false;
-    this.cdr.markForCheck();
   }
 
   saveSettings(): void {
@@ -295,8 +293,6 @@ export class SettingsUpload implements OnInit {
         }
         break;
     }
-
-    this.cdr.markForCheck();
   }
 
   selectAllColumns() {

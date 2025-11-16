@@ -81,6 +81,7 @@ export class FilmingTableComponent implements OnInit, OnDestroy {
   private readonly exportService = inject(ExportService);
   private readonly destroy$ = new Subject<void>();
   private readonly search$ = new Subject<string>();
+  private readonly collator = new Intl.Collator('ru');
   private jobId: string | null = null;
 
   // State management с BehaviorSubject
@@ -117,20 +118,41 @@ export class FilmingTableComponent implements OnInit, OnDestroy {
 
   selectedRows$ = this.state$.pipe(map((state) => state.selectedRows));
   editingCell$ = this.state$.pipe(map((state) => state.editingCell));
-  loading$ = this.state$.pipe(map((state) => state.loading), distinctUntilChanged());
-  searchText$ = this.state$.pipe(map((state) => state.searchText), distinctUntilChanged());
-  showExportDialog$ = this.state$.pipe(map((state) => state.showExportDialog), distinctUntilChanged());
+  loading$ = this.state$.pipe(
+    map((state) => state.loading),
+    distinctUntilChanged()
+  );
+  searchText$ = this.state$.pipe(
+    map((state) => state.searchText),
+    distinctUntilChanged()
+  );
+  showExportDialog$ = this.state$.pipe(
+    map((state) => state.showExportDialog),
+    distinctUntilChanged()
+  );
   exportType$ = this.state$.pipe(map((state) => state.exportType));
   sortColumn$ = this.state$.pipe(map((state) => state.sortColumn));
   sortOrder$ = this.state$.pipe(map((state) => state.sortOrder));
 
   selectedCount$ = this.selectedRows$.pipe(map((selectedRows) => selectedRows.size));
-  allRecords$ = this.state$.pipe(map((state) => state.rows.length), distinctUntilChanged());
-  totalRecords$ = this.filteredRows$.pipe(map((rows) => rows.length), distinctUntilChanged());
+  allRecords$ = this.state$.pipe(
+    map((state) => state.rows.length),
+    distinctUntilChanged()
+  );
+  totalRecords$ = this.filteredRows$.pipe(
+    map((rows) => rows.length),
+    distinctUntilChanged()
+  );
 
   // Pagination selectors
-  currentPage$ = this.state$.pipe(map((state) => state.currentPage), distinctUntilChanged());
-  pageSize$ = this.state$.pipe(map((state) => state.pageSize), distinctUntilChanged());
+  currentPage$ = this.state$.pipe(
+    map((state) => state.currentPage),
+    distinctUntilChanged()
+  );
+  pageSize$ = this.state$.pipe(
+    map((state) => state.pageSize),
+    distinctUntilChanged()
+  );
 
   paginatedRows$ = this.state$.pipe(
     map((state) => {
@@ -154,7 +176,8 @@ export class FilmingTableComponent implements OnInit, OnDestroy {
       if (state.filteredRows.length === 0) return 0;
       return state.currentPage * state.pageSize + 1;
     }),
-    distinctUntilChanged()
+    distinctUntilChanged(),
+    takeUntil(this.destroy$)
   );
 
   paginationEnd$ = this.state$.pipe(
@@ -162,7 +185,8 @@ export class FilmingTableComponent implements OnInit, OnDestroy {
       const end = (state.currentPage + 1) * state.pageSize;
       return Math.min(end, state.filteredRows.length);
     }),
-    distinctUntilChanged()
+    distinctUntilChanged(),
+    takeUntil(this.destroy$)
   );
 
   ngOnInit(): void {
@@ -215,7 +239,6 @@ export class FilmingTableComponent implements OnInit, OnDestroy {
         });
       }
     } catch (error) {
-      console.error('❌ Ошибка при загрузке данных:', error);
       this.messageService.add({
         severity: 'error',
         summary: this.translate.instant('COMMON.ERROR') || 'Ошибка',
@@ -245,30 +268,30 @@ export class FilmingTableComponent implements OnInit, OnDestroy {
    * Обновляет результаты поиска
    */
   private updateSearch(searchText: string): void {
-  const state = this.state$.value;
-  let filtered = [...state.rows];
+    const state = this.state$.value;
+    let filtered = [...state.rows];
 
-  if (searchText.trim()) {
-    const searchLower = searchText.toLowerCase();
-    filtered = filtered.filter((row) =>
-      Object.values(row).some((value) => String(value).toLowerCase().includes(searchLower))
-    );
+    if (searchText.trim()) {
+      const searchLower = searchText.toLowerCase();
+      filtered = filtered.filter((row) =>
+        Object.values(row).some((value) => String(value).toLowerCase().includes(searchLower))
+      );
+    }
+
+    if (state.sortColumn) {
+      filtered = this.sortRows(filtered, state.sortColumn, state.sortOrder);
+    }
+
+    // Всегда сбрасываем на первую страницу при поиске
+    this.setState({
+      filteredRows: filtered,
+      searchText,
+      currentPage: 0,
+    });
   }
-
-  if (state.sortColumn) {
-    filtered = this.sortRows(filtered, state.sortColumn, state.sortOrder);
-  }
-
-  // Всегда сбрасываем на первую страницу при поиске
-  this.setState({ 
-    filteredRows: filtered, 
-    searchText, 
-    currentPage: 0 
-  });
-}
 
   /**
-   * Сортировка строк
+   * Сортировка строк (оптимизирована с Intl.Collator)
    */
   private sortRows(rows: any[], columnName: string, sortOrder: 'asc' | 'desc'): any[] {
     return [...rows].sort((a, b) => {
@@ -280,12 +303,15 @@ export class FilmingTableComponent implements OnInit, OnDestroy {
 
       let comparison = 0;
 
-      if (!isNaN(Number(valueA)) && !isNaN(Number(valueB))) {
-        comparison = Number(valueA) - Number(valueB);
+      const numA = Number(valueA);
+      const numB = Number(valueB);
+
+      if (!isNaN(numA) && !isNaN(numB)) {
+        comparison = numA - numB;
       } else {
         const strA = String(valueA).toLowerCase();
         const strB = String(valueB).toLowerCase();
-        comparison = strA.localeCompare(strB, 'ru');
+        comparison = this.collator.compare(strA, strB);
       }
 
       return sortOrder === 'asc' ? comparison : -comparison;
@@ -295,27 +321,27 @@ export class FilmingTableComponent implements OnInit, OnDestroy {
   /**
    * Сортировка по столбцу
    */
- sortByColumn(columnName: string): void {
-  const state = this.state$.value;
-  let newOrder: 'asc' | 'desc' = 'asc';
+  sortByColumn(columnName: string): void {
+    const state = this.state$.value;
+    let newOrder: 'asc' | 'desc' = 'asc';
 
-  if (state.sortColumn === columnName) {
-    newOrder = state.sortOrder === 'asc' ? 'desc' : 'asc';
+    if (state.sortColumn === columnName) {
+      newOrder = state.sortOrder === 'asc' ? 'desc' : 'asc';
+    }
+
+    const sortedRows = this.sortRows(state.filteredRows, columnName, newOrder);
+
+    // Пересчитываем текущую страницу после сортировки
+    const totalPages = Math.ceil(sortedRows.length / state.pageSize);
+    const newCurrentPage = state.currentPage >= totalPages ? 0 : state.currentPage;
+
+    this.setState({
+      sortColumn: columnName,
+      sortOrder: newOrder,
+      filteredRows: sortedRows,
+      currentPage: newCurrentPage, // Сбрасываем страницу если нужно
+    });
   }
-
-  const sortedRows = this.sortRows(state.filteredRows, columnName, newOrder);
-
-  // Пересчитываем текущую страницу после сортировки
-  const totalPages = Math.ceil(sortedRows.length / state.pageSize);
-  const newCurrentPage = state.currentPage >= totalPages ? 0 : state.currentPage;
-
-  this.setState({
-    sortColumn: columnName,
-    sortOrder: newOrder,
-    filteredRows: sortedRows,
-    currentPage: newCurrentPage, // Сбрасываем страницу если нужно
-  });
-}
   /**
    * Получить иконку сортировки для столбца
    */
@@ -342,23 +368,23 @@ export class FilmingTableComponent implements OnInit, OnDestroy {
    */
   clearFilters(): void {
     const state = this.state$.value;
-  this.setState({
-    searchText: '',
-    filteredRows: [...state.rows],
-    sortColumn: null,
-    sortOrder: 'asc',
-    selectedRows: new Set(),
-    currentPage: 0, // Уже сбрасывается на 0
-  });
+    this.setState({
+      searchText: '',
+      filteredRows: [...state.rows],
+      sortColumn: null,
+      sortOrder: 'asc',
+      selectedRows: new Set(),
+      currentPage: 0, // Уже сбрасывается на 0
+    });
 
-  this.messageService.add({
-    severity: 'info',
-    summary: this.translate.instant('SCENE_TABLE.FILTERS_CLEARED') || 'Фильтры очищены',
-    detail:
-      this.translate.instant('SCENE_TABLE.FILTERS_DETAILS') ||
-      'Все фильтры были сброшены до значений по умолчанию.',
-    life: 2000,
-  });
+    this.messageService.add({
+      severity: 'info',
+      summary: this.translate.instant('SCENE_TABLE.FILTERS_CLEARED') || 'Фильтры очищены',
+      detail:
+        this.translate.instant('SCENE_TABLE.FILTERS_DETAILS') ||
+        'Все фильтры были сброшены до значений по умолчанию.',
+      life: 2000,
+    });
   }
 
   /**
@@ -397,20 +423,20 @@ export class FilmingTableComponent implements OnInit, OnDestroy {
   /**
    * Обработка изменения страницы пагинатора
    */
- onPageChange(event: any): void {
-  const pageSize = event.rows || 10;
-  const first = event.first || 0;
-  const currentPage = Math.floor(first / pageSize);
+  onPageChange(event: any): void {
+    const pageSize = event.rows || 10;
+    const first = event.first || 0;
+    const currentPage = Math.floor(first / pageSize);
 
-  // Проверяем, что текущая страница не выходит за пределы
-  const totalPages = Math.ceil(this.state$.value.filteredRows.length / pageSize);
-  const safeCurrentPage = Math.min(currentPage, totalPages - 1);
+    // Проверяем, что текущая страница не выходит за пределы
+    const totalPages = Math.ceil(this.state$.value.filteredRows.length / pageSize);
+    const safeCurrentPage = Math.min(currentPage, totalPages - 1);
 
-  this.setState({
-    currentPage: safeCurrentPage,
-    pageSize,
-  });
-}
+    this.setState({
+      currentPage: safeCurrentPage,
+      pageSize,
+    });
+  }
 
   /**
    * Проверить, выбрана ли строка
@@ -452,12 +478,6 @@ export class FilmingTableComponent implements OnInit, OnDestroy {
     // Показываем индикатор загрузки
     this.setState({ loading: true });
 
-    console.log('🔄 [SceneTable] Начало экспорта:', {
-      jobId: this.jobId,
-      format: state.exportType,
-      recordCount: state.filteredRows.length,
-    });
-
     let format: 'csv' | 'xlsx' = 'csv';
     if (state.exportType === 'excel') {
       format = 'xlsx';
@@ -466,8 +486,6 @@ export class FilmingTableComponent implements OnInit, OnDestroy {
     // Подписываемся на Observable с правильной обработкой ошибок
     this.exportService.downloadExport(this.jobId, format).subscribe({
       next: () => {
-        console.log('✅ [SceneTable] Экспорт успешен');
-
         this.messageService.add({
           severity: 'success',
           summary: this.translate.instant('SCENE_TABLE.EXPORT_SUCCESS') || 'Экспорт успешен',
@@ -478,8 +496,6 @@ export class FilmingTableComponent implements OnInit, OnDestroy {
         this.setState({ showExportDialog: false, exportType: null, loading: false });
       },
       error: (err: any) => {
-        console.error('❌ [SceneTable] Ошибка при экспорте:', err);
-
         const errorMessage =
           err?.message || err?.detail || `Ошибка при экспорте ${state.exportType?.toUpperCase()}`;
 
@@ -493,7 +509,7 @@ export class FilmingTableComponent implements OnInit, OnDestroy {
         this.setState({ loading: false });
       },
       complete: () => {
-        console.log('📤 [SceneTable] Запрос экспорта завершен');
+        // Запрос экспорта завершен
       },
     });
   }
@@ -653,15 +669,11 @@ export class FilmingTableComponent implements OnInit, OnDestroy {
       value: String(editingCell.value),
     };
 
-    console.log('📤 Отправка запроса на обновление ячейки:', payload);
-
     this.ceilService
       .updateCell(payload)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (updatedCell) => {
-          console.log('✅ Ячейка обновлена на сервере:', updatedCell);
-
           this.messageService.add({
             severity: 'success',
             summary: this.translate.instant('SCENE_TABLE.CHANGES_SAVED') || 'Изменения сохранены',
@@ -673,8 +685,6 @@ export class FilmingTableComponent implements OnInit, OnDestroy {
           this.setState({ editingCell: null, savingCells });
         },
         error: (err) => {
-          console.error('❌ Ошибка при сохранении:', err);
-
           // Откатываем значение в случае ошибки
           const filteredRows = [...state.filteredRows];
           filteredRows[editingCell.rowIndex][editingCell.columnName] = editingCell.originalValue;

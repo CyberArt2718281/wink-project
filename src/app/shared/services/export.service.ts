@@ -2,7 +2,7 @@ import { HttpClient, HttpErrorResponse, HttpResponse } from '@angular/common/htt
 import { Injectable } from '@angular/core';
 import { saveAs } from 'file-saver-es';
 import { Observable, throwError } from 'rxjs';
-import { catchError, finalize, map } from 'rxjs/operators';
+import { catchError, map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 
 export interface ExportErrorResponse {
@@ -54,7 +54,6 @@ export class ExportService {
     });
   }
 
-
   exportData(jobId: string, format: 'csv' | 'xlsx'): Observable<Blob> {
     const url = this.baseUrl ? `${this.baseUrl.replace(/\/+$/, '')}/export` : `/export`;
 
@@ -62,7 +61,6 @@ export class ExportService {
       job_id: jobId,
       format: format,
     };
-
 
     // Запрашиваем ответ как arraybuffer и наблюдаем за response целиком
     return (
@@ -73,20 +71,17 @@ export class ExportService {
       } as any) as unknown as Observable<HttpResponse<ArrayBuffer>>
     ).pipe(
       map((response: HttpResponse<ArrayBuffer>) => {
-
         const contentType = response.headers.get('content-type') || '';
         const arrayBuffer = response.body;
 
         // Проверяем Content-Type
         if (contentType.includes('text/html') || contentType.includes('application/json')) {
-          console.error('❌ [ExportService] ОШИБКА: Неожиданный Content-Type:', contentType);
 
           // Пытаемся прочитать ошибку из тела ответа
           try {
             if (arrayBuffer) {
               const decoder = new TextDecoder();
               const text = decoder.decode(arrayBuffer);
-              console.error('📋 [ExportService] Содержимое ответа:', text);
 
               if (text.includes('<!DOCTYPE') || text.includes('<html')) {
                 throw new Error(
@@ -107,7 +102,6 @@ export class ExportService {
 
         // Проверяем размер данных
         if (!arrayBuffer || arrayBuffer.byteLength === 0) {
-          console.error('❌ [ExportService] ОШИБКА: Получены пустые данные');
           throw new Error('Сервер вернул пустой файл');
         }
 
@@ -129,8 +123,6 @@ export class ExportService {
         return blob;
       }),
       catchError((err: any) => {
-
-
         let msg = 'Неизвестная ошибка при экспорте';
 
         if (err instanceof HttpErrorResponse) {
@@ -151,9 +143,7 @@ export class ExportService {
     );
   }
 
-
   downloadExport(jobId: string, format: 'csv' | 'xlsx'): Observable<void> {
-
     return this.exportData(jobId, format).pipe(
       // Проверяем на HTML ошибки перед сохранением
       map((blob) => {
@@ -162,7 +152,6 @@ export class ExportService {
       map((blob: Blob) => {
         const timestamp = new Date().toISOString().replace(/[:.]/g, '');
         const filename = `export_${jobId.substring(0, 8)}_${timestamp}.${format}`;
-
 
         try {
           saveAs(blob, filename);
@@ -174,7 +163,7 @@ export class ExportService {
       }),
       catchError((err: any) => {
         return throwError(() => err);
-      }),
+      })
     );
   }
 }
