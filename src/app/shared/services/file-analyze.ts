@@ -24,9 +24,9 @@ export class FileAnalyze {
     // config должен быть отправлен как JSON строка
     formData.append('config', JSON.stringify(config));
 
-    console.log('=== ОТПРАВКА НА СЕРВЕР ===');
-    console.log('File:', file.name, 'Size:', file.size, 'Type:', file.type);
-    console.log('Config:', config);
+    
+    
+    
 
     return this.http.post<AnalyzeReponseType>(
       `${environment.apiUrl}/analyze`,
@@ -47,21 +47,21 @@ export class FileAnalyze {
       catchError((error) => {
         let errorMessage = 'Неизвестная ошибка при анализе файла';
 
-        console.error('=== ДЕТАЛИ ОШИБКИ ===');
-        console.error('HTTP Status:', error.status);
-        console.error('Error body:', error.error);
+        
+        
+        
 
         // Проверяем различные типы ошибок
         if (error instanceof Error) {
           errorMessage = error.message;
         } else if (error.error && Array.isArray(error.error)) {
           // Если ошибка это массив (validation errors)
-          console.error('Validation errors:', error.error);
+          
           errorMessage = error.error.map((e: any) => {
             return e.msg || e.message || e.detail || JSON.stringify(e);
           }).join('; ');
         } else if (error.error && typeof error.error === 'object') {
-          console.error('Error object details:', error.error);
+          
           if (error.error.detail) {
             errorMessage = error.error.detail;
           } else if (error.error.message) {
@@ -75,7 +75,7 @@ export class FileAnalyze {
           errorMessage = error.message;
         }
 
-        console.error('❌ Извлеченное сообщение об ошибке:', errorMessage);
+        
 
         const analyzeError: AnalyzeError = {
           status: 'error',

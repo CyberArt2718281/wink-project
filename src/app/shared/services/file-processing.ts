@@ -44,8 +44,7 @@ export class FileProcessing {
     cancel$?: Subject<void>
   ): Observable<SuccessResultResponse> {
     return this.fileAnalyze.analyzeFile(file, config).pipe(
-      tap((analyzeResponse) => {
-        console.log('✓ Файл успешно отправлен на анализ:', analyzeResponse.job_id);
+      tap(() => {
         onProgress?.({
           stage: 'analyzing',
           progress: 30,
@@ -63,12 +62,6 @@ export class FileProcessing {
         return this.pollResult(job_id, onProgress, cancel$);
       }),
       tap((successResponse) => {
-        console.log('✓ Обработка файла завершена:', {
-          job_id: successResponse.job_id,
-          rows: successResponse.table.rows.length,
-          processing_time: successResponse.metadata.processing_time_seconds,
-        });
-
         onProgress?.({
           stage: 'completed',
           progress: 100,
@@ -76,7 +69,6 @@ export class FileProcessing {
         });
       }),
       catchError((error) => {
-        console.error('✗ Ошибка при обработке файла:', error);
 
         // Если это отмена пользователем, пробросим её как есть
         if (error && error.isCancelled) {
@@ -109,7 +101,6 @@ export class FileProcessing {
       switchMap((response) => {
         // Если это SuccessResultResponse (status === 'completed')
         if ('status' in response && response.status === 'completed') {
-          console.log('✓ Результат готов:', response.job_id);
           return from(Promise.resolve(response as SuccessResultResponse));
         }
 
@@ -121,7 +112,6 @@ export class FileProcessing {
             40 + (Math.log(retryCount + 1) / Math.log(this.MAX_RETRIES + 1)) * 50
           );
 
-          console.log(`⏳ Обработка... попытка ${retryCount}/${this.MAX_RETRIES}`);
 
           // Расчет примерного оставшегося времени
           const estimatedRemainingTime = Math.max(

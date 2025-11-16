@@ -114,7 +114,6 @@ button:disabled:focus {
   border-color: transparent !important;
   --tw-ring-color: transparent !important;
   --tw-ring-shadow: none !important;
-  ring: none !important;
 }
 
 /* Убрать фокус конкретно для этих кнопок */

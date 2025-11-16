@@ -175,3 +175,15 @@ button {
     background: #232323;
   }
 }
+
+/* Исправление для webkit браузеров */
+@supports (-webkit-appearance: none) {
+  .gradient-button,
+  .gradient-vertical,
+  .gradient-card {
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    -webkit-perspective: 1000;
+    perspective: 1000px;
+  }
+}

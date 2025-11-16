@@ -29,8 +29,7 @@ export interface CeilErrorResponse {
 
 @Injectable({ providedIn: 'root' })
 export class CeilService {
-  // Берём базовый url безопасно из environment (если нет — пустая строка, будет относительный путь)
-  private baseUrl: string = (environment as any)?.apiUrl || (environment as any)?.apiBase || '';
+  private readonly baseUrl: string = environment.apiUrl || '';
 
   constructor(private http: HttpClient) {}
 

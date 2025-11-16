@@ -13,7 +13,7 @@ export interface ExportErrorResponse {
   providedIn: 'root',
 })
 export class ExportService {
-  private baseUrl: string = (environment as any)?.apiUrl || (environment as any)?.apiBase || '';
+  private readonly baseUrl: string = environment.apiUrl || '';
 
   constructor(private http: HttpClient) {}
 
@@ -54,11 +54,7 @@ export class ExportService {
     });
   }
 
-  /**
-   * Экспортирует данные в формате CSV или XLSX
-   * @param jobId - ID задачи
-   * @param format - Формат экспорта ('csv' или 'xlsx')
-   */
+
   exportData(jobId: string, format: 'csv' | 'xlsx'): Observable<Blob> {
     const url = this.baseUrl ? `${this.baseUrl.replace(/\/+$/, '')}/export` : `/export`;
 
@@ -67,9 +63,6 @@ export class ExportService {
       format: format,
     };
 
-    console.log('📤 [ExportService] Отправка GET запроса на экспорт');
-    console.log('🔗 [ExportService] URL:', url);
-    console.log('⚙️ [ExportService] Параметры:', params);
 
     // Запрашиваем ответ как arraybuffer и наблюдаем за response целиком
     return (
@@ -80,12 +73,6 @@ export class ExportService {
       } as any) as unknown as Observable<HttpResponse<ArrayBuffer>>
     ).pipe(
       map((response: HttpResponse<ArrayBuffer>) => {
-        console.log('📋 [ExportService] Статус ответа:', response.status);
-        console.log('📝 [ExportService] Content-Type:', response.headers.get('content-type'));
-        console.log(
-          '📎 [ExportService] Content-Disposition:',
-          response.headers.get('content-disposition')
-        );
 
         const contentType = response.headers.get('content-type') || '';
         const arrayBuffer = response.body;
@@ -139,17 +126,10 @@ export class ExportService {
 
         const blob = new Blob([arrayBuffer], { type: mimeType });
 
-        console.log('✅ [ExportService] Файл получен успешно');
-        console.log('📦 [ExportService] Размер:', blob.size, 'байт');
-        console.log('📝 [ExportService] Type:', blob.type);
-
         return blob;
       }),
       catchError((err: any) => {
-        console.error('❌ [ExportService] HTTP ошибка при экспорте');
-        console.error('📋 [ExportService] Статус:', err?.status);
-        console.error('📝 [ExportService] StatusText:', err?.statusText);
-        console.error('📋 [ExportService] Message:', err?.message);
+
 
         let msg = 'Неизвестная ошибка при экспорте';
 
@@ -166,64 +146,35 @@ export class ExportService {
         } else if (err && err.message) {
           msg = err.message;
         }
-
-        console.error('❌ [ExportService] Финальная ошибка:', msg);
         return throwError(() => ({ status: 'error', message: msg }));
       })
     );
   }
 
-  /**
-   * Загружает файл экспорта
-   * @param jobId - ID задачи
-   * @param format - Формат экспорта ('csv' или 'xlsx')
-   * @returns Observable для отслеживания статуса
-   */
+
   downloadExport(jobId: string, format: 'csv' | 'xlsx'): Observable<void> {
-    console.log('🚀 [ExportService] Инициирование загрузки файла:', { jobId, format });
 
     return this.exportData(jobId, format).pipe(
       // Проверяем на HTML ошибки перед сохранением
       map((blob) => {
-        console.log('🔍 [ExportService] Проверка содержимого blob...');
         return blob;
       }),
       map((blob: Blob) => {
-        console.log('✅ [ExportService] Blob готов к скачиванию');
-        console.log('📦 [ExportService] Размер Blob:', blob.size, 'байт');
-        console.log('📝 [ExportService] Type Blob:', blob.type);
-
-        // Дополнительная проверка: если размер слишком мал для XLSX, это может быть ошибка
-        if (format === 'xlsx' && blob.size < 100) {
-          console.warn(
-            '⚠️ [ExportService] ВНИМАНИЕ: XLSX файл слишком маленький, может быть ошибка'
-          );
-        }
-
-        // Генерируем имя файла с временной меткой
         const timestamp = new Date().toISOString().replace(/[:.]/g, '');
         const filename = `export_${jobId.substring(0, 8)}_${timestamp}.${format}`;
 
-        console.log('📥 [ExportService] Инициирование скачивания файла:', filename);
 
-        // ВАЖНО: saveAs должен быть вызван синхронно в обработчике map
         try {
           saveAs(blob, filename);
-          console.log('✅ [ExportService] Файл успешно инициирован для скачивания:', filename);
         } catch (err) {
-          console.error('❌ [ExportService] Ошибка при вызове saveAs:', err);
           throw new Error(`Ошибка при сохранении файла: ${err}`);
         }
 
         return void 0;
       }),
       catchError((err: any) => {
-        console.error('❌ [ExportService] Ошибка при получении файла:', err);
         return throwError(() => err);
       }),
-      finalize(() => {
-        console.log('📤 [ExportService] Запрос завершен');
-      })
     );
   }
 }

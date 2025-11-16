@@ -3,7 +3,7 @@
   key="confirm"
   (onClose)="onClose()"
   [baseZIndex]="5000"
-  class="w-full max-w-[95vw] sm:max-w-md mx-auto px-2 inter-medium !rounded-[28px]"
+  class="w-full max-w-[95vw] sm:max-w-md mx-auto px-2 inter-medium rounded-[28px]!"
 >
   <ng-template let-message pTemplate="headless" let-closeFn="closeFn">
     <section
@@ -101,7 +101,7 @@
   position="top-center"
   key="error"
   [baseZIndex]="6000"
-  class="w-full max-w-[95vw] sm:max-w-md mx-auto px-2 inter-medium !rounded-[40px]"
+  class="w-full max-w-[95vw] sm:max-w-md mx-auto px-2 inter-medium rounded-[40px]!"
 ></p-toast>
 
 <!-- Модалка подтверждения отмены -->
@@ -112,7 +112,7 @@
   [blockScroll]="false"
   [style]="{ width: '90vw', maxWidth: '400px' }"
   [baseZIndex]="7000"
-  styleClass="confirm-cancel-dialog !rounded-[28px] "
+  styleClass="confirm-cancel-dialog rounded-[28px]! "
 >
   <div class="flex flex-col gap-4">
     <div class="flex items-center gap-3">
@@ -126,14 +126,14 @@
       <button
         pButton
         (click)="hideCancelConfirmation()"
-        class="p-button-text p-button-secondary !bg-[#232323] !text-gray-300 !border-[#232323] hover:!bg-[#2A2A2A] inter-medium !rounded-[40px]"
+        class="p-button-text p-button-secondary bg-[#232323]! text-gray-300! border-[#232323]! hover:bg-[#2A2A2A]! inter-medium rounded-[40px]!"
       >
         {{ 'UPLOAD.NO' | translate }}
       </button>
       <button
         pButton
         (click)="confirmCancel()"
-        class="!text-white !bg-red-500 !border-red-500 hover:!bg-red-600 hover:!border-red-600 inter-medium !rounded-[40px]"
+        class="text-white! bg-red-500! border-red-500! hover:bg-red-600! hover:border-red-600! inter-medium rounded-[40px]!"
       >
         {{ 'UPLOAD.YES_CANCEL' | translate }}
       </button>
@@ -143,12 +143,12 @@
 
 <!-- Основной контейнер -->
 <div
-  class="flex flex-col items-center justify-center min-h-[70vh] bg-gradient-to-br from-black to-[#0A0A0A] rounded-none p-4 sm:p-4 md:p-6 lg:p-8 inter-medium"
+  class="flex flex-col items-center justify-center min-h-[70vh] bg-linear-to-br from-black to-[#0A0A0A] rounded-none p-4 sm:p-4 md:p-6 lg:p-8 inter-medium"
 >
   <!-- Заголовок и описание -->
   <div class="text-center mb-6 sm:mb-8 w-full max-w-2xl">
     <h1
-      class="text-2xl sm:text-3xl md:text-4xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent mb-3 sm:mb-4 px-2 py-8 inter-extra-bold"
+      class="text-2xl sm:text-3xl md:text-4xl font-bold bg-linear-to-r from-white to-gray-300 bg-clip-text text-transparent mb-3 sm:mb-4 px-2 py-8 inter-extra-bold"
     >
       {{ 'UPLOAD.TITLE' | translate }}
     </h1>
