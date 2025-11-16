@@ -6,7 +6,12 @@ import {
 } from '@angular/core';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
-import { provideRouter, withPreloading, PreloadAllModules, withInMemoryScrolling } from '@angular/router';
+import {
+  PreloadAllModules,
+  provideRouter,
+  withInMemoryScrolling,
+  withPreloading,
+} from '@angular/router';
 import { provideTranslateService } from '@ngx-translate/core';
 import { provideTranslateHttpLoader } from '@ngx-translate/http-loader';
 import Aura from '@primeuix/themes/aura';

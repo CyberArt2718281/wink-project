@@ -52,48 +52,6 @@
   animation-delay: -10s;
 }
 
-.bg-pulse {
-  position: absolute;
-  background: radial-gradient(circle, rgba(255, 102, 0, 0.1) 0%, transparent 70%);
-  border-radius: 50%;
-  animation: pulse 4s ease-in-out infinite;
-}
-
-.bg-pulse-1 {
-  width: 100px;
-  height: 100px;
-  top: 20%;
-  right: 20%;
-  animation-delay: 0s;
-}
-
-.bg-pulse-2 {
-  width: 150px;
-  height: 150px;
-  bottom: 30%;
-  left: 15%;
-  animation-delay: -2s;
-}
-
-/* Стили для 505 ошибки */
-.server-error .bg-pulse-error-1 {
-  width: 120px;
-  height: 120px;
-  top: 15%;
-  left: 10%;
-  background: radial-gradient(circle, rgba(239, 68, 68, 0.15) 0%, transparent 70%);
-  animation: pulseError 3s ease-in-out infinite;
-}
-
-.server-error .bg-pulse-error-2 {
-  width: 80px;
-  height: 80px;
-  top: 70%;
-  right: 15%;
-  background: radial-gradient(circle, rgba(245, 158, 11, 0.1) 0%, transparent 70%);
-  animation: pulseError 4s ease-in-out infinite;
-  animation-delay: -1s;
-}
 
 .bg-glitch {
   position: absolute;

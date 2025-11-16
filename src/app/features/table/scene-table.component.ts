@@ -811,8 +811,6 @@ export class SceneTableComponent implements OnInit, OnDestroy {
     });
   }
 
-
-
   /**
    * Получение всех столбцов для отображения
    */

@@ -1,8 +1,8 @@
-import {Component, OnInit} from '@angular/core';
-import {Header} from '../header/header';
-import {Footer} from '../footer/footer';
-import {RouterModule} from '@angular/router';
-import {CommonModule} from '@angular/common';
+import { CommonModule } from '@angular/common';
+import { Component, OnInit } from '@angular/core';
+import { RouterModule } from '@angular/router';
+import { Footer } from '../footer/footer';
+import { Header } from '../header/header';
 
 @Component({
   selector: 'app-layout',

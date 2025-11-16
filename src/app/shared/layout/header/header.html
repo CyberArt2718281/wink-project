@@ -38,8 +38,8 @@
             <i
               [class]="
                 selectedLanguage.code === 'ru'
-                  ? 'pi pi-home text-[#FF6600]!'
-                  : 'pi pi-language text-[#FF6600]!'
+                  ? 'pi pi-home text-[#FF6600]! w-5 h-5 inline-flex items-center justify-center'
+                  : 'pi pi-language text-[#FF6600]! w-5 h-5 inline-flex items-center justify-center'
               "
             ></i>
             <span class="text-white text-sm inter-medium">{{ selectedLanguage.label }}</span>
@@ -47,7 +47,13 @@
         </ng-template>
         <ng-template let-language pTemplate="item">
           <div class="flex items-center gap-2">
-            <i [class]="language.code === 'ru' ? 'pi pi-home   ' : 'pi pi-language '"></i>
+            <i
+              [class]="
+                language.code === 'ru'
+                  ? 'pi pi-home w-5 h-5 inline-flex items-center justify-center'
+                  : 'pi pi-language w-5 h-5 inline-flex items-center justify-center'
+              "
+            ></i>
             <span class="text-white inter-medium">{{ language.label }}</span>
           </div>
         </ng-template>
@@ -103,14 +109,24 @@
             <ng-template pTemplate="selectedItem">
               <div class="flex items-center gap-2">
                 <i
-                  [class]="selectedLanguage.code === 'ru' ? 'pi pi-home  ' : 'pi pi pi-language '"
+                  [class]="
+                    selectedLanguage.code === 'ru'
+                      ? 'pi pi-home w-5 h-5 inline-flex items-center justify-center'
+                      : 'pi pi-language w-5 h-5 inline-flex items-center justify-center'
+                  "
                 ></i>
                 <span class="text-white text-sm inter-medium">{{ selectedLanguage.label }}</span>
               </div>
             </ng-template>
             <ng-template let-language pTemplate="item">
               <div class="flex items-center gap-2">
-                <i [class]="language.code === 'ru' ? 'pi pi-home   ' : 'pi pi-language'"></i>
+                <i
+                  [class]="
+                    language.code === 'ru'
+                      ? 'pi pi-home w-5 h-5 inline-flex items-center justify-center'
+                      : 'pi pi-language w-5 h-5 inline-flex items-center justify-center'
+                  "
+                ></i>
                 <span class="text-white inter-medium">{{ language.label }}</span>
               </div>
             </ng-template>
