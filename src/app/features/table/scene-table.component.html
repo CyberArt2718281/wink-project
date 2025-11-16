@@ -7,7 +7,7 @@
     <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6">
       <div>
         <div class="flex items-center gap-3 mb-2">
-          <div class="w-1.5 h-10 bg-linear-to-b from-[#FF6600] to-[#FF8533] rounded-full shadow-lg shadow-[#FF6600]/30"></div>
+          <div class="w-1.5 h-10 bg-linear-to-b  rounded-full shadow-lg shadow-[#FF6600]/30 gradient-badge"></div>
           <h1 class="text-3xl sm:text-4xl font-bold text-white inter-extra-bold leading-tight">
             {{ 'SCENE_TABLE.ANALYSIS_RESULTS' | translate }}
           </h1>
@@ -66,15 +66,15 @@
     <div class="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">
       <p-iconfield iconPosition="left" class="flex-1">
         <p-inputicon>
-          <i class="pi pi-search text-gray-500"></i>
+          <i class="pi pi-search text-[#FF6600]"></i>
         </p-inputicon>
         <input
           pInputText
           type="text"
-          [value]="searchText$ | async"
-          (input)="onSearch($any($event.target).value)"
+          [(ngModel)]="currentSearchText"
+          (ngModelChange)="onSearch($event)"
           [placeholder]="'SCENE_TABLE.SEARCH_PLACEHOLDER' | translate"
-          class="w-full bg-[#232323] text-white border border-[#333333] hover:border-[#444444] focus:border-[#FF6600] rounded-xl px-4 py-2.5 inter-regular text-sm transition-colors duration-200 focus:outline-none focus:shadow-lg focus:shadow-[#FF6600]/10"
+          class="w-full bg-[#232323] text-white border-2 border-[#333333] hover:border-[#444444] focus:border-[#FF6600] rounded-xl px-4 py-2.5 inter-regular text-sm transition-all duration-300 focus:outline-none focus:shadow-lg focus:shadow-[#FF6600]/30 placeholder:text-gray-500"
         />
       </p-iconfield>
     </div>
@@ -91,8 +91,12 @@
             <th 
               *ngFor="let col of columns$ | async; trackBy: trackByString"
               (click)="sortByColumn(col)"
-              class="px-4 sm:px-6 py-4 text-left text-white font-semibold inter-medium text-sm cursor-pointer hover:bg-[#2a2a2a] transition-colors duration-200"
-              [class.bg-[#2a2a2a]]="isSortActive(col)"
+              class="px-4 sm:px-6 py-4 text-left text-white font-semibold inter-medium text-sm cursor-pointer hover:bg-[#2a2a2a] transition-colors duration-300"
+              [class.bg-linear-to-r]="isSortActive(col)"
+              [class.from-[#FF6600]/20]="isSortActive(col)"
+              [class.to-[#FF8533]/10]="isSortActive(col)"
+              [class.border-b-2]="isSortActive(col)"
+              [class.border-[#FF6600]]="isSortActive(col)"
             >
               <div class="flex items-center justify-between gap-2">
                 <span>{{ col }}</span>
@@ -133,7 +137,7 @@
                       <button
                         (click)="saveEditing()"
                         [disabled]="editingCell.isLoading"
-                        class="p-2 bg-green-600/90 hover:bg-green-600 text-white rounded-lg transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                        class="p-2 bg-linear-to-r from-[#FF6600] to-[#FF8533] hover:from-[#FF7622] hover:to-[#FF9548] text-white rounded-lg transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center shadow-lg shadow-[#FF6600]/20 hover:shadow-xl hover:shadow-[#FF6600]/40"
                         [title]="'COMMON.SAVE' | translate"
                       >
                         <i class="pi pi-check text-sm"></i>
@@ -141,7 +145,7 @@
                       <button
                         (click)="cancelEditing()"
                         [disabled]="editingCell.isLoading"
-                        class="p-2 bg-red-600/90 hover:bg-red-600 text-white rounded-lg transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                        class="p-2 bg-[#232323] border border-[#333333] text-gray-300 hover:bg-[#2a2a2a] hover:border-[#444444] rounded-lg transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
                         [title]="'COMMON.CANCEL' | translate"
                       >
                         <i class="pi pi-times text-sm"></i>

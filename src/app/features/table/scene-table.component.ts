@@ -19,34 +19,9 @@ import { ToastModule } from 'primeng/toast';
 import { BehaviorSubject, Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, map, shareReplay, takeUntil } from 'rxjs/operators';
 import { SuccessResultResponse } from '../../../types/resultResponse.type';
-import { CeilRequest, CeilService } from '../services/ceil.service';
-import { ExportService } from '../services/export.service';
-
-interface EditingCell {
-  rowIndex: number;
-  columnName: string;
-  value: any;
-  originalValue: any;
-  isLoading: boolean;
-  error: string | null;
-}
-
-interface TableState {
-  columns: string[];
-  rows: any[];
-  filteredRows: any[];
-  searchText: string;
-  sortColumn: string | null;
-  sortOrder: 'asc' | 'desc';
-  selectedRows: Set<number>;
-  editingCell: EditingCell | null;
-  loading: boolean;
-  savingCells: Set<string>;
-  showExportDialog: boolean;
-  exportType: 'excel' | 'csv' | null;
-  currentPage: number;
-  pageSize: number;
-}
+import { EditingCell, TableState } from '../../../types/tableState.type';
+import { CeilRequest, CeilService } from '../../shared/services/ceil.service';
+import { ExportService } from '../../shared/services/export.service';
 
 @Component({
   selector: 'app-filming-table',
@@ -73,7 +48,7 @@ interface TableState {
   styleUrls: ['./scene-table.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class FilmingTableComponent implements OnInit, OnDestroy {
+export class SceneTableComponent implements OnInit, OnDestroy {
   private readonly translate = inject(TranslateService);
   private readonly primeng = inject(PrimeNG);
   private readonly messageService = inject(MessageService);
@@ -83,6 +58,9 @@ export class FilmingTableComponent implements OnInit, OnDestroy {
   private readonly search$ = new Subject<string>();
   private readonly collator = new Intl.Collator('ru');
   private jobId: string | null = null;
+
+  // Публичное свойство для двусторонней привязки с инпутом
+  currentSearchText = '';
 
   // State management с BehaviorSubject
   private readonly initialState: TableState = {
@@ -368,13 +346,18 @@ export class FilmingTableComponent implements OnInit, OnDestroy {
    */
   clearFilters(): void {
     const state = this.state$.value;
+    // Очищаем текст поиска синхронно
+    this.currentSearchText = '';
+    
+    // Сразу обновляем поиск с пустой строкой (без задержки debounce)
+    this.updateSearch('');
+    
     this.setState({
       searchText: '',
-      filteredRows: [...state.rows],
       sortColumn: null,
       sortOrder: 'asc',
       selectedRows: new Set(),
-      currentPage: 0, // Уже сбрасывается на 0
+      currentPage: 0,
     });
 
     this.messageService.add({

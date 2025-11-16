@@ -115,7 +115,7 @@ export class FileUploadComponent implements OnInit, OnDestroy {
     this.processingSubscription?.unsubscribe();
     this.processingSubscription = null;
     // Очищаем все ожидающие таймауты
-    this.timeouts.forEach(timeout => clearTimeout(timeout));
+    this.timeouts.forEach((timeout) => clearTimeout(timeout));
     this.timeouts.clear();
   }
 

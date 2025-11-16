@@ -18,7 +18,7 @@ export const routes: Routes = [
         path: 'table',
         canActivate: [TableDataGuard],
         loadComponent: () =>
-          import('./features/table/table.component').then((m) => m.TableComponent),
+          import('./features/table/scene-table.component').then((m) => m.SceneTableComponent),
       },
     ],
   },

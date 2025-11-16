@@ -1,0 +1,21 @@
+version: "3.8"
+
+services:
+  wink-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: wink-project
+    ports:
+      - "8001:8001"
+    environment:
+      - NODE_ENV=production
+    restart: unless-stopped
+    networks:
+      - wink-network
+    labels:
+      - "com.example.description=Wink Project Angular Application"
+
+networks:
+  wink-network:
+    driver: bridge

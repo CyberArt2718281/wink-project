@@ -50,3 +50,13 @@
   font-family: "Inter Medium", sans-serif !important;
   font-weight: 600 !important;
 }
+.p-inputtext{
+  font-family: "Inter Medium", sans-serif !important;
+  font-weight: 600 !important;
+  border-radius: 40px !important;
+  &:focus{
+    border-color: #FF6600 !important;
+  }
+}
+
+
