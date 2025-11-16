@@ -31,7 +31,6 @@ interface Column {
 export class SettingsUpload implements OnInit {
   modalOpen = false;
   selectedPreset: string = 'basic';
-  newColumnName: string = '';
 
   @Output() presetChange = new EventEmitter<string>();
   @Output() columnsChange = new EventEmitter<{ preset: string; columns: string[] }>();
@@ -150,8 +149,6 @@ export class SettingsUpload implements OnInit {
     },
   ];
 
-  customColumns: Column[] = [];
-
   private allColumnsCache: Column[] | null = null;
   private selectedColumnCountCache: number = -1;
   private selectedColumnNamesCache: string[] | null = null;
@@ -194,13 +191,8 @@ export class SettingsUpload implements OnInit {
       ...this.basicColumns,
       ...this.financialColumns,
       ...this.productionColumns,
-      ...this.customColumns,
     ];
     return this.allColumnsCache;
-  }
-
-  get selectedColumnsCount(): number {
-    return this.allColumns.filter((col) => col.selected).length;
   }
 
   get selectedColumnNames(): string[] {
@@ -219,7 +211,6 @@ export class SettingsUpload implements OnInit {
     const columnNames = this.selectedColumnNames;
     localStorage.setItem('settings-upload-preset', this.selectedPreset);
     localStorage.setItem('settings-upload-columns', JSON.stringify(columnNames));
-    localStorage.setItem('settings-upload-custom-columns', JSON.stringify(this.customColumns));
 
     this.presetChange.emit(this.selectedPreset);
     this.columnsChange.emit({
@@ -233,17 +224,12 @@ export class SettingsUpload implements OnInit {
   loadSavedSettings(): void {
     const savedPreset = localStorage.getItem('settings-upload-preset');
     const savedColumns = localStorage.getItem('settings-upload-columns');
-    const savedCustomColumns = localStorage.getItem('settings-upload-custom-columns');
 
     if (savedPreset) {
       this.selectedPreset = savedPreset;
     }
 
-    if (savedCustomColumns) {
-      this.customColumns = JSON.parse(savedCustomColumns);
-    }
-
-    if (savedColumns && this.selectedPreset === 'custom') {
+    if (savedColumns) {
       const selectedColumnIds = JSON.parse(savedColumns);
       this.allColumns.forEach((column) => {
         column.selected = selectedColumnIds.includes(column.id);
@@ -271,7 +257,7 @@ export class SettingsUpload implements OnInit {
 
       case 'extended':
         this.allColumns.forEach((col) => {
-          if (!col.id.includes('cost_breakdown') && !col.category.includes('custom')) {
+          if (!col.id.includes('cost_breakdown')) {
             col.selected = true;
           }
         });
@@ -282,44 +268,7 @@ export class SettingsUpload implements OnInit {
           col.selected = true;
         });
         break;
-
-      case 'custom':
-        const savedColumns = localStorage.getItem('settings-upload-columns');
-        if (savedColumns) {
-          const selectedColumnIds = JSON.parse(savedColumns);
-          this.allColumns.forEach((column) => {
-            column.selected = selectedColumnIds.includes(column.id);
-          });
-        }
-        break;
     }
-  }
-
-  selectAllColumns() {
-    this.allColumns.forEach((column) => (column.selected = true));
-  }
-
-  deselectAllColumns() {
-    this.allColumns.forEach((column) => (column.selected = false));
-  }
-
-  addCustomColumn() {
-    if (this.newColumnName.trim()) {
-      const newColumn: Column = {
-        id: `custom_${Date.now()}`,
-        name: this.newColumnName.trim(),
-        description: 'Пользовательская колонка',
-        selected: true,
-        category: 'custom',
-      };
-
-      this.customColumns.push(newColumn);
-      this.newColumnName = '';
-    }
-  }
-
-  removeCustomColumn(columnId: string) {
-    this.customColumns = this.customColumns.filter((col) => col.id !== columnId);
   }
 
   toggleColumn(column: any, event: MouseEvent) {
