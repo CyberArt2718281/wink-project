@@ -22,15 +22,10 @@
   color: var(--toast-text);
 }
 
-.p-toast-message-error{
+.p-toast-message-error , .p-toast-message-success, .p-toast-message-info , .p-toast-message-warn {
   border-radius: 18px !important;
 }
-.p-toast-message-info{
-  border-radius: 18px !important;
-}
-.p-toast-message-success{
-  border-radius: 18px !important;
-}
+
 button {
   cursor: pointer;
 }

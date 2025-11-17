@@ -85,6 +85,8 @@ export class SceneTableComponent implements OnInit, OnDestroy {
     exportType: null,
     currentPage: 0,
     pageSize: 10,
+    visibleColumns: new Set(),
+    showColumnFilter: false,
   };
 
   private readonly state$ = new BehaviorSubject<TableState>(this.initialState);
@@ -118,6 +120,8 @@ export class SceneTableComponent implements OnInit, OnDestroy {
   exportType$ = this.state$.pipe(map((state) => state.exportType));
   sortColumn$ = this.state$.pipe(map((state) => state.sortColumn));
   sortOrder$ = this.state$.pipe(map((state) => state.sortOrder));
+  visibleColumns$ = this.state$.pipe(map((state) => state.visibleColumns));
+  showColumnFilter$ = this.state$.pipe(map((state) => state.showColumnFilter));
 
   selectedCount$ = this.selectedRows$.pipe(map((selectedRows) => selectedRows.size));
   allRecords$ = this.state$.pipe(
@@ -191,6 +195,8 @@ export class SceneTableComponent implements OnInit, OnDestroy {
       if (firstColumn) {
         this.sortByColumn(firstColumn);
       }
+      // Инициализируем видимые столбцы
+      this.loadColumnVisibility();
     }, 100);
   }
 
@@ -388,7 +394,10 @@ export class SceneTableComponent implements OnInit, OnDestroy {
       sortOrder: 'asc',
       selectedRows: new Set(),
       currentPage: 0,
+      visibleColumns: new Set(state.columns),
+      showColumnFilter: false,
     });
+    this.saveColumnVisibility();
 
     this.messageService.add({
       severity: 'info',
@@ -398,6 +407,114 @@ export class SceneTableComponent implements OnInit, OnDestroy {
         'Все фильтры были сброшены до значений по умолчанию.',
       life: 2000,
     });
+  }
+
+  /**
+   * Загрузить видимость столбцов из localStorage
+   */
+  private loadColumnVisibility(): void {
+    const state = this.state$.value;
+    const visibleColumns = new Set(state.columns);
+    
+    try {
+      const savedColumns = localStorage.getItem('tableVisibleColumns');
+      if (savedColumns) {
+        const parsed = JSON.parse(savedColumns);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          const savedSet = new Set(parsed.filter((col: string) => state.columns.includes(col)));
+          if (savedSet.size > 0) {
+            this.setState({ visibleColumns: savedSet });
+            return;
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Error loading column visibility:', error);
+    }
+    
+    this.setState({ visibleColumns });
+  }
+
+  /**
+   * Сохранить видимость столбцов в localStorage
+   */
+  private saveColumnVisibility(): void {
+    const state = this.state$.value;
+    try {
+      localStorage.setItem('tableVisibleColumns', JSON.stringify(Array.from(state.visibleColumns)));
+    } catch (error) {
+      console.error('Error saving column visibility:', error);
+    }
+  }
+
+  /**
+   * Переключить видимость столбца
+   */
+  toggleColumnVisibility(column: string): void {
+    const state = this.state$.value;
+    const visibleColumns = new Set(state.visibleColumns);
+    
+    if (visibleColumns.has(column)) {
+      if (visibleColumns.size > 1) {
+        visibleColumns.delete(column);
+      } else {
+        this.messageService.add({
+          severity: 'warn',
+          summary: 'Ошибка',
+          detail: 'Должен быть виден хотя бы один столбец',
+          life: 2000,
+        });
+        return;
+      }
+    } else {
+      visibleColumns.add(column);
+    }
+    
+    this.setState({ visibleColumns });
+    this.saveColumnVisibility();
+  }
+
+  /**
+   * Показать все столбцы
+   */
+  showAllColumns(): void {
+    const state = this.state$.value;
+    this.setState({ visibleColumns: new Set(state.columns) });
+    this.saveColumnVisibility();
+  }
+
+  /**
+   * Скрыть все столбцы кроме первого
+   */
+  hideAllColumnsExceptFirst(): void {
+    const state = this.state$.value;
+    if (state.columns.length > 0) {
+      this.setState({ visibleColumns: new Set([state.columns[0]]) });
+      this.saveColumnVisibility();
+    }
+  }
+
+  /**
+   * Получить скрытые столбцы
+   */
+  getHiddenColumns(): string[] {
+    const state = this.state$.value;
+    return state.columns.filter((col) => !state.visibleColumns.has(col));
+  }
+
+  /**
+   * Проверить, виден ли столбец
+   */
+  isColumnVisible(column: string): boolean {
+    return this.state$.value.visibleColumns.has(column);
+  }
+
+  /**
+   * Показать/скрыть панель фильтра столбцов
+   */
+  toggleColumnFilterPanel(): void {
+    const state = this.state$.value;
+    this.setState({ showColumnFilter: !state.showColumnFilter });
   }
 
   /**
@@ -815,7 +932,8 @@ export class SceneTableComponent implements OnInit, OnDestroy {
    * Получение всех столбцов для отображения
    */
   getVisibleColumns(): string[] {
-    return this.state$.value.columns;
+    const state = this.state$.value;
+    return state.columns.filter((col) => state.visibleColumns.has(col));
   }
 
   /**

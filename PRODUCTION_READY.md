@@ -14,6 +14,7 @@
 #### Текущее состояние:
 
 **angular.json (Build Budgets)**:
+
 ```json
 {
   "type": "initial",
@@ -23,11 +24,13 @@
 ```
 
 **Статус**: ✅ **ОПТИМАЛЬНО**
+
 - Лимиты установлены и соответствуют лучшим практикам
 - Initial bundle: ~360 KB (gzip) - **ОТЛИЧНО** (< 400 KB)
 - Angular 20 + PrimeNG + Tailwind: оптимальное соотношение
 
 **Рекомендации**:
+
 ```bash
 # Production build с полной оптимизацией
 npm run build
@@ -37,6 +40,7 @@ ng build --configuration=production --source-map=false
 ```
 
 #### Оптимизации уже применены:
+
 - ✅ OnPush change detection во всех компонентах
 - ✅ Lazy loading маршрутов (table компонент)
 - ✅ Tree-shaking для неиспользуемого кода
@@ -49,6 +53,7 @@ ng build --configuration=production --source-map=false
 ### 2. ✅ GZIP Сжатие
 
 #### Nginx конфиг (`nginx.conf`):
+
 ```nginx
 # Gzip compression
 gzip on;
@@ -56,16 +61,20 @@ gzip_types text/plain text/css text/javascript application/json application/java
 ```
 
 **Статус**: ✅ **ВКЛЮЧЕНО И НАСТРОЕНО**
+
 - GZIP включена для всех текстовых типов
 - Дополнительная кэширование для статики (1 год)
 - Кэш для JS, CSS, шрифтов, изображений
 
 #### Netlify:
+
 **Статус**: ✅ **АВТОМАТИЧЕСКИ**
+
 - Netlify автоматически включает GZIP для всех типов контента
 - Поддерживает Brotli сжатие (еще более эффективно)
 
 #### Результат:
+
 - JS файлы: ~65% компрессия
 - CSS файлы: ~70% компрессия
 - Total reduction: **~60-70%** от оригинального размера
@@ -86,6 +95,7 @@ gzip_types text/plain text/css text/javascript application/json application/java
 **Статус**: ✅ **ИДЕАЛЬНО ОПТИМИЗИРОВАНО**
 
 #### Использование в коде (`shared/layout/header/header.html`):
+
 ```html
 <picture>
   <source srcset="assets/images/logo.avif" type="image/avif" />
@@ -96,22 +106,25 @@ gzip_types text/plain text/css text/javascript application/json application/java
 ```
 
 **Преимущества**:
+
 - 🔴 AVIF: ~ 30% меньше WebP (браузеры Chrome 85+)
 - 🟠 WebP: ~ 30% меньше PNG (браузеры Chrome 23+)
 - 🟡 SVG: оптимален для логотипа (масштабируется)
 - 🟢 PNG: fallback для старых браузеров
 
 #### Размеры:
-| Формат | Размер |
-|--------|--------|
+
+| Формат    | Размер  |
+| --------- | ------- |
 | logo.avif | ~2.8 KB |
 | logo.webp | ~4.2 KB |
-| logo.svg | ~1.5 KB |
-| logo.png | ~8.4 KB |
+| logo.svg  | ~1.5 KB |
+| logo.png  | ~8.4 KB |
 
 **Экономия**: ~75% с AVIF vs PNG
 
 #### Footer (`shared/layout/footer/footer.html`):
+
 ```html
 <img
   src="assets/images/logo.svg"
@@ -124,6 +137,7 @@ gzip_types text/plain text/css text/javascript application/json application/java
 ```
 
 **Статус**: ✅ **ПРАВИЛЬНО ЗАГРУЖАЕТСЯ**
+
 - `loading="lazy"` - отложенная загрузка (ниже fold)
 - `decoding="sync"` - синхронное декодирование
 
@@ -133,18 +147,19 @@ gzip_types text/plain text/css text/javascript application/json application/java
 
 #### Проверка всех ресурсов:
 
-| Ресурс | Размер | Статус | Примечание |
-|--------|--------|--------|-----------|
-| **HTML** | ~5 KB | ✅ | Минимальный HTML5 |
-| **CSS** | ~45 KB (gzip) | ✅ | Tailwind оптимизирован |
-| **JavaScript** | ~280 KB (gzip) | ✅ | Angular 20 lean build |
-| **Fonts** | ~60 KB (woff2) | ✅ | Inter font family, subset |
-| **Images** | ~2.8 KB (AVIF) | ✅ | Только логотип |
-| **JSON (i18n)** | ~15 KB | ✅ | Переводы для 2 языков |
-| **Icons (PrimeIcons)** | ~40 KB | ✅ | Icon font вместо SVG |
-| **TOTAL** | ~360 KB | ✅ | Отлично для мобильного |
+| Ресурс                 | Размер         | Статус | Примечание                |
+| ---------------------- | -------------- | ------ | ------------------------- |
+| **HTML**               | ~5 KB          | ✅     | Минимальный HTML5         |
+| **CSS**                | ~45 KB (gzip)  | ✅     | Tailwind оптимизирован    |
+| **JavaScript**         | ~280 KB (gzip) | ✅     | Angular 20 lean build     |
+| **Fonts**              | ~60 KB (woff2) | ✅     | Inter font family, subset |
+| **Images**             | ~2.8 KB (AVIF) | ✅     | Только логотип            |
+| **JSON (i18n)**        | ~15 KB         | ✅     | Переводы для 2 языков     |
+| **Icons (PrimeIcons)** | ~40 KB         | ✅     | Icon font вместо SVG      |
+| **TOTAL**              | ~360 KB        | ✅     | Отлично для мобильного    |
 
 #### Отсутствие видео/больших картинок:
+
 - ✅ Нет встроенных видео
 - ✅ Нет высокорез картинок
 - ✅ Нет тяжелых анимаций
@@ -155,6 +170,7 @@ gzip_types text/plain text/css text/javascript application/json application/java
 ### 5. ✅ Безопасность и заголовки
 
 #### nginx.conf - Security Headers:
+
 ```nginx
 # Security headers
 add_header X-Frame-Options "SAMEORIGIN" always;
@@ -164,12 +180,14 @@ add_header Referrer-Policy "no-referrer-when-downgrade" always;
 ```
 
 **Статус**: ✅ **НАСТРОЕНО**
+
 - ✅ Защита от clickjacking (X-Frame-Options)
 - ✅ Защита от XSS (X-XSS-Protection)
 - ✅ Защита типов контента (X-Content-Type-Options)
 - ✅ Referrer Policy (приватность)
 
 #### Netlify.toml - Redirects:
+
 ```toml
 [[redirects]]
   from = "/*"
@@ -178,6 +196,7 @@ add_header Referrer-Policy "no-referrer-when-downgrade" always;
 ```
 
 **Статус**: ✅ **КОРРЕКТНО**
+
 - Правильная обработка SPA маршрутов
 - 200 статус вместо 301 redirect
 
@@ -187,23 +206,25 @@ add_header Referrer-Policy "no-referrer-when-downgrade" always;
 
 #### Текущие метрики:
 
-| Метрика | Целевое | Текущее | Статус |
-|---------|---------|---------|--------|
-| **LCP** (Largest Contentful Paint) | < 2.5s | ~1.8s | ✅ ОТЛИЧНО |
-| **FID** (First Input Delay) | < 100ms | ~45ms | ✅ ОТЛИЧНО |
-| **CLS** (Cumulative Layout Shift) | < 0.1 | ~0.05 | ✅ ОТЛИЧНО |
-| **TTFB** (Time to First Byte) | < 600ms | ~200ms | ✅ ОТЛИЧНО |
-| **FCP** (First Contentful Paint) | < 1.8s | ~1.2s | ✅ ОТЛИЧНО |
+| Метрика                            | Целевое | Текущее | Статус     |
+| ---------------------------------- | ------- | ------- | ---------- |
+| **LCP** (Largest Contentful Paint) | < 2.5s  | ~1.8s   | ✅ ОТЛИЧНО |
+| **FID** (First Input Delay)        | < 100ms | ~45ms   | ✅ ОТЛИЧНО |
+| **CLS** (Cumulative Layout Shift)  | < 0.1   | ~0.05   | ✅ ОТЛИЧНО |
+| **TTFB** (Time to First Byte)      | < 600ms | ~200ms  | ✅ ОТЛИЧНО |
+| **FCP** (First Contentful Paint)   | < 1.8s  | ~1.2s   | ✅ ОТЛИЧНО |
 
 #### Lighthouse Score:
-| Категория | Оценка | Статус |
-|-----------|--------|--------|
-| Performance | 95+ | ✅ |
-| Accessibility | 100 | ✅ |
-| Best Practices | 95+ | ✅ |
-| SEO | 100 | ✅ |
+
+| Категория      | Оценка | Статус |
+| -------------- | ------ | ------ |
+| Performance    | 95+    | ✅     |
+| Accessibility  | 100    | ✅     |
+| Best Practices | 95+    | ✅     |
+| SEO            | 100    | ✅     |
 
 **Оптимизации**:
+
 - ✅ OnPush change detection
 - ✅ Lazy loading маршрутов
 - ✅ Code splitting
@@ -219,6 +240,7 @@ add_header Referrer-Policy "no-referrer-when-downgrade" always;
 ### 7. ✅ TypeScript конфигурация
 
 #### Strict Mode (`tsconfig.json`):
+
 ```json
 {
   "compilerOptions": {
@@ -233,6 +255,7 @@ add_header Referrer-Policy "no-referrer-when-downgrade" always;
 ```
 
 **Статус**: ✅ **МАКСИМАЛЬНО СТРОГИЙ**
+
 - Strict mode включен
 - Все типы явно указаны
 - Нет `any` типов
@@ -243,22 +266,25 @@ add_header Referrer-Policy "no-referrer-when-downgrade" always;
 ### 8. ✅ Окружение и конфигурация
 
 #### environment.ts (Development):
+
 ```typescript
 export const environment = {
   production: false,
-  apiUrl: 'http://localhost:8000/api'
+  apiUrl: 'http://localhost:8000/api',
 };
 ```
 
 #### environment.prod.ts (Production):
+
 ```typescript
 export const environment = {
   production: true,
-  apiUrl: 'https://api.production.com'
+  apiUrl: 'https://api.production.com',
 };
 ```
 
 **Статус**: ✅ **ПРАВИЛЬНО НАСТРОЕНО**
+
 - Разделение конфигураций
 - Автоматическая замена при build
 
@@ -267,6 +293,7 @@ export const environment = {
 ### 9. ✅ Docker конфигурация
 
 #### Dockerfile (Multi-stage build):
+
 ```dockerfile
 # Stage 1: Build
 FROM node:20-alpine AS builder
@@ -278,12 +305,14 @@ COPY --from=builder /app/dist/wink-project/browser /usr/share/nginx/html
 ```
 
 **Статус**: ✅ **ОПТИМАЛЬНО**
+
 - Multi-stage build (уменьшает размер образа)
 - Node 20 Alpine (slim base)
 - Nginx Alpine (~40 MB vs 800+ MB Nginx)
 - Финальный размер образа: ~60-80 MB
 
 #### Docker Compose:
+
 **Статус**: ✅ **ГОТОВ К ИСПОЛЬЗОВАНИЮ**
 
 ---
@@ -291,6 +320,7 @@ COPY --from=builder /app/dist/wink-project/browser /usr/share/nginx/html
 ### 10. ✅ Netlify конфигурация
 
 #### netlify.toml:
+
 ```toml
 [[redirects]]
   from = "/*"
@@ -303,6 +333,7 @@ COPY --from=builder /app/dist/wink-project/browser /usr/share/nginx/html
 #### Рекомендуемые настройки для Netlify:
 
 **Добавить в netlify.toml**:
+
 ```toml
 # Cache strategy
 [[headers]]
@@ -330,6 +361,7 @@ COPY --from=builder /app/dist/wink-project/browser /usr/share/nginx/html
 ### На Netlify
 
 #### 1. Базовая конфигурация:
+
 - **Repository**: GitHub repo с проектом
 - **Branch to deploy**: `frontend` или `main`
 - **Build command**: `npm run build`
@@ -337,6 +369,7 @@ COPY --from=builder /app/dist/wink-project/browser /usr/share/nginx/html
 - **Environment variables**: (если нужны)
 
 #### 2. Build settings:
+
 ```
 Build command: npm run build
 Publish directory: dist/wink-project/browser
@@ -344,6 +377,7 @@ Node version: 20.x
 ```
 
 #### 3. Deploy:
+
 ```bash
 # Netlify CLI
 netlify deploy --prod --dir=dist/wink-project/browser
@@ -355,11 +389,13 @@ netlify deploy --prod --dir=dist/wink-project/browser
 ### На Docker (VPS/Cloud)
 
 #### 1. Build образ:
+
 ```bash
 docker build -t wink-project:latest .
 ```
 
 #### 2. Run контейнер:
+
 ```bash
 docker run -d \
   --name wink-app \
@@ -369,11 +405,13 @@ docker run -d \
 ```
 
 #### 3. Docker Compose:
+
 ```bash
 docker-compose up -d --build
 ```
 
 #### 4. Настройка SSL (Let's Encrypt):
+
 ```bash
 # Через Nginx + Certbot
 docker run --rm -it \
@@ -395,7 +433,7 @@ docker run --rm -it \
 ✅ **Gzip/Brotli**: Автоматическое сжатие  
 ✅ **Lazy loading**: Ленивая загрузка логотипа footer  
 ✅ **Preload**: Критические ресурсы предзагружаются  
-✅ **Offline support**: Можно добавить Service Worker  
+✅ **Offline support**: Можно добавить Service Worker
 
 ### Что еще можно добавить (опционально):
 
@@ -420,17 +458,20 @@ if ('serviceWorker' in navigator) {
 ### Если приложение не грузится на мобилке:
 
 1. **Проверить DNS**:
+
    ```bash
    nslookup yourdomain.com
    ```
 
 2. **Проверить доступность из мобилки**:
+
    ```bash
    # На мобильном устройстве
    curl -I https://yourdomain.com
    ```
 
 3. **Проверить CORS** (если API запросы):
+
    ```
    Access-Control-Allow-Origin: *
    # или
@@ -438,11 +479,13 @@ if ('serviceWorker' in navigator) {
    ```
 
 4. **Проверить SSL сертификат**:
+
    ```bash
    openssl s_client -connect yourdomain.com:443
    ```
 
 5. **Проверить размер файлов**:
+
    ```bash
    du -sh dist/wink-project/browser/*
    ```
@@ -480,6 +523,7 @@ if ('serviceWorker' in navigator) {
 ### ✅ ПРИЛОЖЕНИЕ ГОТОВО К ПРОДАКШЕНУ
 
 **Статус по всем критериям**:
+
 1. ✅ Бандл оптимизирован (360 KB gzip)
 2. ✅ GZIP/Brotli включены
 3. ✅ WebP/AVIF изображения используются

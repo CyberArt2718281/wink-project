@@ -73,11 +73,11 @@ webpack-bundle-analyzer dist/wink-project/browser/stats.json
 
 #### Шаг 2: Build Settings
 
-| Параметр | Значение |
-|----------|----------|
-| **Build command** | `npm run build` |
+| Параметр              | Значение                    |
+| --------------------- | --------------------------- |
+| **Build command**     | `npm run build`             |
 | **Publish directory** | `dist/wink-project/browser` |
-| **Node version** | `20.x` |
+| **Node version**      | `20.x`                      |
 
 #### Шаг 3: Environment Variables (если нужны)
 
@@ -229,6 +229,7 @@ sudo nano nginx.conf
 ```
 
 **nginx.conf с SSL**:
+
 ```nginx
 server {
     listen 80;
@@ -279,6 +280,7 @@ server {
 ### Шаг 6: Docker Compose deployment
 
 **docker-compose.prod.yml**:
+
 ```yaml
 version: '3.8'
 
@@ -290,7 +292,7 @@ services:
     container_name: wink-app
     restart: unless-stopped
     ports:
-      - "8001:8001"
+      - '8001:8001'
     networks:
       - wink-network
     environment:
@@ -408,12 +410,13 @@ https://pagespeed.web.dev/
 ### Автоматический деплой на деплой
 
 **`.github/workflows/deploy.yml`**:
+
 ```yaml
 name: Deploy to Production
 
 on:
   push:
-    branches: [ frontend ]
+    branches: [frontend]
 
 jobs:
   build-and-deploy:
@@ -455,6 +458,7 @@ location / {
 ```
 
 или в netlify.toml:
+
 ```toml
 [[redirects]]
   from = "/*"
@@ -465,6 +469,7 @@ location / {
 ### Проблема: "Медленная загрузка на мобилке"
 
 **Решение**: Проверить:
+
 1. Gzip включен
 2. Кэш статики настроен (1 год)
 3. Нет больших JS файлов
@@ -473,6 +478,7 @@ location / {
 ### Проблема: "SSL ошибка"
 
 **Решение**:
+
 ```bash
 # Проверить сертификат
 sudo openssl x509 -in /etc/letsencrypt/live/your-domain.com/fullchain.pem -text -noout
@@ -485,6 +491,7 @@ sudo certbot renew
 ### Проблема: "Out of memory"
 
 **Решение**: Увеличить лимиты Docker
+
 ```bash
 docker run -m 512m --cpus 1 wink-project
 ```

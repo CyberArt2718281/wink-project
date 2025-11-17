@@ -29,6 +29,8 @@
       <label class="text-xs font-semibold text-gray-400 inter-medium uppercase tracking-wide">{{ 'COMMON.ACTIONS' | translate }}</label>
     </div>
     <div class="flex flex-col sm:flex-row gap-3 flex-wrap">
+  
+
       <button
         (click)="showExcelExportDialog()"
         class="flex items-center justify-center gap-2 px-5 py-2.5 bg-linear-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white text-sm rounded-xl font-semibold inter-medium shadow-lg shadow-green-600/20 hover:shadow-xl hover:shadow-green-600/40 transition-all duration-300 transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer"
@@ -56,6 +58,76 @@
       >
         <i class="pi pi-filter-slash text-base shrink-0"></i>
         {{ 'SCENE_TABLE.CLEAR_FILTERS' | translate }}
+      </button>
+
+          <button
+        (click)="toggleColumnFilterPanel()"
+        class="flex items-center justify-center  px-5 py-2.5 bg-linear-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white text-sm rounded-xl font-semibold inter-medium shadow-lg shadow-purple-600/20 hover:shadow-xl hover:shadow-purple-600/40 transition-all duration-300 transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer"
+        title="Фильтр столбцов"
+      >
+        <i class="pi pi-columns text-base shrink-0"></i>
+        <span >Столбцы</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Панель фильтра столбцов (выезжающая) -->
+  <div 
+    *ngIf="showColumnFilter$ | async" 
+    class="mb-6 bg-linear-to-r from-[#232323] to-[#1A1A1A] border border-[#333333] rounded-2xl p-6 shadow-lg animate-in fade-in slide-in-from-top-2 duration-300"
+  >
+    <div class="mb-4">
+      <h3 class="text-lg font-semibold text-white inter-extra-bold mb-4 flex items-center gap-2">
+        <i class="pi pi-columns text-[#FF6600]"></i>
+        Управление столбцами
+      </h3>
+      <p class="text-gray-400 text-sm inter-regular">{{ getVisibleColumns().length }} из {{ (columns$ | async)!.length }} видимых</p>
+    </div>
+
+    <!-- Кнопки управления -->
+    <div class="flex gap-3 mb-4 flex-wrap">
+      <button
+        (click)="showAllColumns()"
+        class="px-4 py-2 bg-[#2a2a2a] hover:bg-[#333333] text-gray-300 border border-[#444444] rounded-lg inter-medium text-sm transition-all cursor-pointer"
+      >
+        <i class="pi pi-check-square text-xs mr-2"></i>Показать все
+      </button>
+      <button
+        (click)="hideAllColumnsExceptFirst()"
+        class="px-4 py-2 bg-[#2a2a2a] hover:bg-[#333333] text-gray-300 border border-[#444444] rounded-lg inter-medium text-sm transition-all cursor-pointer"
+      >
+        <i class="pi pi-times text-xs mr-2"></i>Скрыть все
+      </button>
+    </div>
+
+    <!-- Список столбцов -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+      <label 
+        *ngFor="let col of (columns$ | async); trackBy: trackByString"
+        class="flex items-center gap-3 p-3 bg-[#1A1A1A]/50 hover:bg-[#232323] border border-[#333333] hover:border-[#444444] rounded-lg cursor-pointer transition-all group"
+      >
+        <input
+          type="checkbox"
+          [checked]="isColumnVisible(col)"
+          (change)="toggleColumnVisibility(col)"
+          class="w-4 h-4 accent-[#FF6600] cursor-pointer"
+        />
+        <span class="flex-1 text-gray-300 text-sm inter-medium group-hover:text-white transition-colors">
+          {{ col }}
+        </span>
+        <span class="text-gray-600 text-xs bg-[#0a0a0a] px-2 py-1 rounded inter-medium">
+          {{ col.length > 0 ? col.substring(0, 2).toUpperCase() : '?' }}
+        </span>
+      </label>
+    </div>
+
+    <!-- Закрытие панели -->
+    <div class="mt-4 text-right">
+      <button
+        (click)="toggleColumnFilterPanel()"
+        class="px-4 py-2 bg-[#FF6600]/20 hover:bg-[#FF6600]/30 text-[#FF6600] rounded-lg inter-medium text-sm transition-all cursor-pointer"
+      >
+        <i class="pi pi-times text-xs mr-2"></i>Закрыть
       </button>
     </div>
   </div>

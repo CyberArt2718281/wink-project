@@ -1,6 +1,7 @@
 # 📚 Wink Project - Полная документация
 
 ## 📋 Содержание
+
 1. [Обзор проекта](#-обзор-проекта)
 2. [Технологический стек](#-технологический-стек)
 3. [Архитектура приложения](#-архитектура-приложения)
@@ -21,6 +22,7 @@
 **Wink Project** - современное Single Page Application (SPA) на Angular 20 для анализа и обработки данных из Excel файлов с информацией о съемочных сценах.
 
 ### Основные возможности:
+
 - ✅ **Загрузка файлов**: Drag & Drop загрузка Excel файлов (.xlsx)
 - ✅ **Валидация**: Проверка структуры и данных файла
 - ✅ **Интерактивная таблица**: Просмотр, редактирование, сортировка, поиск
@@ -37,22 +39,24 @@
 ## 🛠 Технологический стек
 
 ### Frontend
-| Технология | Версия | Назначение |
-|------------|--------|------------|
-| **Angular** | 20.3.0 | Core фреймворк |
-| **TypeScript** | 5.7+ | Язык программирования |
-| **PrimeNG** | 20.3.0 | UI компоненты |
-| **Tailwind CSS** | 4.1.17 | Утилитарные стили |
-| **RxJS** | 7.8.0 | Реактивное программирование |
-| **ngx-translate** | 17.0.0 | Интернационализация |
-| **XLSX** | 0.18.5 | Работа с Excel |
+
+| Технология        | Версия | Назначение                  |
+| ----------------- | ------ | --------------------------- |
+| **Angular**       | 20.3.0 | Core фреймворк              |
+| **TypeScript**    | 5.7+   | Язык программирования       |
+| **PrimeNG**       | 20.3.0 | UI компоненты               |
+| **Tailwind CSS**  | 4.1.17 | Утилитарные стили           |
+| **RxJS**          | 7.8.0  | Реактивное программирование |
+| **ngx-translate** | 17.0.0 | Интернационализация         |
+| **XLSX**          | 0.18.5 | Работа с Excel              |
 
 ### DevOps
-| Технология | Назначение |
-|------------|------------|
-| **Docker** | Контейнеризация |
-| **Nginx** | Web сервер (production) |
-| **Node.js 20** | Build environment |
+
+| Технология     | Назначение              |
+| -------------- | ----------------------- |
+| **Docker**     | Контейнеризация         |
+| **Nginx**      | Web сервер (production) |
+| **Node.js 20** | Build environment       |
 
 ---
 
@@ -77,6 +81,7 @@
 ```
 
 ### Ключевые принципы:
+
 1. **Standalone Components** - все компоненты автономные (без NgModule)
 2. **OnPush Change Detection** - оптимизация рендеринга
 3. **Reactive Programming** - RxJS observables + async pipe
@@ -189,9 +194,11 @@ wink-project/
 ## 🧩 Компоненты
 
 ### 1. Layout Component (`shared/layout/layout/layout.ts`)
+
 **Назначение**: Основной layout с header/footer
 
 **Особенности**:
+
 - Условный рендеринг для предотвращения FOUC
 - Минимальная высота для предотвращения CLS
 - Черный фон по умолчанию
@@ -209,38 +216,46 @@ export class Layout implements OnInit {
 ```
 
 ### 2. Header Component (`shared/layout/header/header.ts`)
+
 **Назначение**: Навигационная шапка
 
 **Функционал**:
+
 - Логотип с lazy loading
 - Языковой селектор (Desktop + Mobile)
 - Burger menu для мобильных
 - Sticky позиционирование
 
 **Оптимизации**:
+
 - `loading="eager"` для логотипа
 - Фиксированные размеры иконок (`w-5 h-5 inline-flex`)
 - `min-h-[72px]` для предотвращения CLS
 
 ### 3. FileUploadComponent (`features/file-upload/file-upload.component.ts`)
+
 **Назначение**: Загрузка и обработка Excel файлов
 
 **Функционал**:
+
 - Drag & Drop upload
 - Валидация файлов
 - Обработка с прогресс-баром
 - Диалог подтверждения отмены
 
 **Методы**:
+
 - `onFileDropped(files: FileList)` - обработка drop
 - `processData()` - запуск обработки
 - `cancel()` - отмена обработки
 - `showCancelConfirmation()` - показ диалога
 
 ### 4. SceneTableComponent (`features/table/scene-table.component.ts`)
+
 **Назначение**: Интерактивная таблица данных
 
 **Функционал**:
+
 - 🔍 Поиск с debounce 300ms
 - 🔀 Сортировка с Intl.Collator
 - 📄 Пагинация (5/10/25/50/100)
@@ -249,6 +264,7 @@ export class Layout implements OnInit {
 - 🗑️ Удаление с подтверждением
 
 **Состояние (BehaviorSubject)**:
+
 ```typescript
 private state$ = new BehaviorSubject<TableState>({
   data: [],
@@ -266,6 +282,7 @@ private state$ = new BehaviorSubject<TableState>({
 ## 🔧 Сервисы
 
 ### 1. CeilService (`shared/services/ceil.service.ts`)
+
 **Назначение**: API взаимодействие для операций с ячейками
 
 ```typescript
@@ -274,6 +291,7 @@ deleteCeil(id: string): Observable<SuccessResultResponse>
 ```
 
 ### 2. ExportService (`shared/services/export.service.ts`)
+
 **Назначение**: Экспорт данных
 
 ```typescript
@@ -282,6 +300,7 @@ exportToCSV(data: any[], fileName: string): void
 ```
 
 ### 3. FileProcessingService (`shared/services/file-processing.ts`)
+
 **Назначение**: Обработка файлов с backend
 
 ```typescript
@@ -290,6 +309,7 @@ cancelProcessing(): void
 ```
 
 ### 4. LanguageService (`core/language.service.ts`)
+
 **Назначение**: Управление языком интерфейса
 
 ```typescript
@@ -313,17 +333,21 @@ export const routes: Routes = [
       {
         path: 'table',
         canActivate: [TableDataGuard],
-        loadComponent: () => import('./features/table/scene-table.component')
-      }
-    ]
+        loadComponent: () => import('./features/table/scene-table.component'),
+      },
+    ],
   },
   { path: 'error/404', loadComponent: () => import('./features/404/not-found.component') },
-  { path: 'error/500', loadComponent: () => import('./features/505/internal-server-error.component') },
-  { path: '**', redirectTo: 'error/404' }
+  {
+    path: 'error/500',
+    loadComponent: () => import('./features/505/internal-server-error.component'),
+  },
+  { path: '**', redirectTo: 'error/404' },
 ];
 ```
 
 ### TableDataGuard
+
 **Назначение**: Защита маршрута `/table` от прямого доступа без данных
 
 ### Стратегии
@@ -334,9 +358,9 @@ provideRouter(
   withPreloading(PreloadAllModules),
   withInMemoryScrolling({
     scrollPositionRestoration: 'top',
-    anchorScrolling: 'enabled'
+    anchorScrolling: 'enabled',
   })
-)
+);
 ```
 
 ---
@@ -345,18 +369,19 @@ provideRouter(
 
 ### Цветовая палитра
 
-| Цвет | Hex | Применение |
-|------|-----|------------|
-| Primary Orange | `#FF6600` | Акценты, кнопки |
-| Orange Hover | `#FF8533` | Hover состояния |
-| Black | `#000000` | Фон основной |
+| Цвет            | Hex       | Применение        |
+| --------------- | --------- | ----------------- |
+| Primary Orange  | `#FF6600` | Акценты, кнопки   |
+| Orange Hover    | `#FF8533` | Hover состояния   |
+| Black           | `#000000` | Фон основной      |
 | Card Background | `#1A1A1A` | Карточки, модалки |
-| Border | `#232323` | Границы элементов |
-| Text Gray | `#9CA3AF` | Вторичный текст |
+| Border          | `#232323` | Границы элементов |
+| Text Gray       | `#9CA3AF` | Вторичный текст   |
 
 ### Шрифты
 
 **Inter** - основной шрифт:
+
 - Inter Regular (500) - обычный текст
 - Inter Medium (600) - заголовки
 - Inter ExtraBold (800) - крупные заголовки
@@ -370,21 +395,25 @@ provideRouter(
 **Стратегии**:
 
 1. **Фиксированные размеры изображений**:
+
 ```html
 <img src="logo.svg" width="120" height="32" loading="eager" />
 ```
 
 2. **Минимальные высоты**:
+
 ```html
 <div class="min-h-60">{{ asyncContent$ | async }}</div>
 ```
 
 3. **Зарезервированное пространство для иконок**:
+
 ```html
 <i class="pi pi-home w-5 h-5 inline-flex items-center justify-center"></i>
 ```
 
 4. **Фиксированные высоты header/footer**:
+
 ```html
 <header class="min-h-[72px]">...</header>
 <footer class="min-h-60">...</footer>
@@ -393,6 +422,7 @@ provideRouter(
 ### Change Detection
 
 **OnPush Strategy**:
+
 ```typescript
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -418,9 +448,9 @@ this.searchSubject.pipe(
 ### Sorting Optimization
 
 ```typescript
-private collator = new Intl.Collator('ru', { 
+private collator = new Intl.Collator('ru', {
   numeric: true,
-  sensitivity: 'base' 
+  sensitivity: 'base'
 });
 ```
 
@@ -434,23 +464,25 @@ private collator = new Intl.Collator('ru', {
 provideTranslateService({
   loader: provideTranslateHttpLoader({
     prefix: '/assets/i18n/',
-    suffix: '.json'
+    suffix: '.json',
   }),
   fallbackLang: 'ru',
-  lang: 'ru'
-})
+  lang: 'ru',
+});
 ```
 
 ### Использование
 
 **Template**:
+
 ```html
 <h1>{{ 'UPLOAD.TITLE' | translate }}</h1>
 ```
 
 **TypeScript**:
+
 ```typescript
-this.translate.instant('UPLOAD.TITLE')
+this.translate.instant('UPLOAD.TITLE');
 ```
 
 ---
@@ -512,10 +544,10 @@ docker-compose down
 ### Core Web Vitals
 
 | Метрика | Целевое | Текущее |
-|---------|---------|---------|
-| **LCP** | < 2.5s | ✅ 1.8s |
+| ------- | ------- | ------- |
+| **LCP** | < 2.5s  | ✅ 1.8s |
 | **FID** | < 100ms | ✅ 45ms |
-| **CLS** | < 0.1 | ✅ 0.05 |
+| **CLS** | < 0.1   | ✅ 0.05 |
 
 ### Lighthouse Score
 

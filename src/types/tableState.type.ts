@@ -13,6 +13,8 @@ export interface TableState {
   exportType: 'excel' | 'csv' | null;
   currentPage: number;
   pageSize: number;
+  visibleColumns: Set<string>;
+  showColumnFilter: boolean;
 }
 
 export interface EditingCell {
