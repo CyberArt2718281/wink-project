@@ -185,7 +185,8 @@
     "PREVIOUS_PAGE": "Previous page",
     "NEXT_PAGE": "Next page",
     "LAST_PAGE": "Last page",
-    "OF": "of"
+    "OF": "of",
+    "COLUMNS": "columns"
   },
   "ERROR_404": {
     "TITLE": "Page not found",

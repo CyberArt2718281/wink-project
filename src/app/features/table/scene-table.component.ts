@@ -415,7 +415,7 @@ export class SceneTableComponent implements OnInit, OnDestroy {
   private loadColumnVisibility(): void {
     const state = this.state$.value;
     const visibleColumns = new Set(state.columns);
-    
+
     try {
       const savedColumns = localStorage.getItem('tableVisibleColumns');
       if (savedColumns) {
@@ -431,7 +431,7 @@ export class SceneTableComponent implements OnInit, OnDestroy {
     } catch (error) {
       console.error('Error loading column visibility:', error);
     }
-    
+
     this.setState({ visibleColumns });
   }
 
@@ -453,7 +453,7 @@ export class SceneTableComponent implements OnInit, OnDestroy {
   toggleColumnVisibility(column: string): void {
     const state = this.state$.value;
     const visibleColumns = new Set(state.visibleColumns);
-    
+
     if (visibleColumns.has(column)) {
       if (visibleColumns.size > 1) {
         visibleColumns.delete(column);
@@ -469,7 +469,7 @@ export class SceneTableComponent implements OnInit, OnDestroy {
     } else {
       visibleColumns.add(column);
     }
-    
+
     this.setState({ visibleColumns });
     this.saveColumnVisibility();
   }

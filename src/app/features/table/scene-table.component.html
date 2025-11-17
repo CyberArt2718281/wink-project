@@ -62,11 +62,11 @@
 
           <button
         (click)="toggleColumnFilterPanel()"
-        class="flex items-center justify-center  px-5 py-2.5 bg-linear-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white text-sm rounded-xl font-semibold inter-medium shadow-lg shadow-purple-600/20 hover:shadow-xl hover:shadow-purple-600/40 transition-all duration-300 transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer"
+        class="flex items-center justify-center  px-5 py-2.5 bg-linear-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 gap-2  text-white text-sm rounded-xl font-semibold inter-medium shadow-lg shadow-purple-600/20 hover:shadow-xl hover:shadow-purple-600/40 transition-all duration-300 transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer"
         title="Фильтр столбцов"
       >
-        <i class="pi pi-columns text-base shrink-0"></i>
-        <span >Столбцы</span>
+        <i class="pi pi-bars text-base shrink-0 "></i>
+        <span >{{'SCENE_TABLE.COLUMNS' | translate}}</span>
       </button>
     </div>
   </div>
@@ -77,8 +77,7 @@
     class="mb-6 bg-linear-to-r from-[#232323] to-[#1A1A1A] border border-[#333333] rounded-2xl p-6 shadow-lg animate-in fade-in slide-in-from-top-2 duration-300"
   >
     <div class="mb-4">
-      <h3 class="text-lg font-semibold text-white inter-extra-bold mb-4 flex items-center gap-2">
-        <i class="pi pi-columns text-[#FF6600]"></i>
+      <h3 class="text-lg font-semibold text-white inter-extra-bold mb-4 flex items-center ">
         Управление столбцами
       </h3>
       <p class="text-gray-400 text-sm inter-regular">{{ getVisibleColumns().length }} из {{ (columns$ | async)!.length }} видимых</p>
@@ -115,9 +114,7 @@
         <span class="flex-1 text-gray-300 text-sm inter-medium group-hover:text-white transition-colors">
           {{ col }}
         </span>
-        <span class="text-gray-600 text-xs bg-[#0a0a0a] px-2 py-1 rounded inter-medium">
-          {{ col.length > 0 ? col.substring(0, 2).toUpperCase() : '?' }}
-        </span>
+        
       </label>
     </div>
 
