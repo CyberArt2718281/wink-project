@@ -180,7 +180,7 @@
     "EXPORT_CONFIRM_SUBTEXT": "The file will be saved to your downloads",
     "ITEMS_SELECTED": "selected items",
     "FILTERS_DETAILS": "Filters have been successfully reset.",
-        "ROWS_PER_PAGE": "Rows per page",
+    "ROWS_PER_PAGE": "Rows per page",
     "VISIBLE_COLUMNS": "Visible columns",
     "SELECT_COLUMNS": "Select columns to display",
     "FIRST_PAGE": "First page",

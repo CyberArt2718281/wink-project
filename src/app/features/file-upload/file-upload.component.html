@@ -245,10 +245,14 @@
           </svg>
         </div>
 
-        <h3 class="text-white font-semibold text-base sm:text-lg mb-1 sm:mb-2 px-2 inter-medium min-h-7 flex items-center justify-center">
+        <h3
+          class="text-white font-semibold text-base sm:text-lg mb-1 sm:mb-2 px-2 inter-medium min-h-7 flex items-center justify-center"
+        >
           {{ visible ? ('UPLOAD.LOADING' | translate) : ('UPLOAD.DRAG_FILE' | translate) }}
         </h3>
-        <p class="text-gray-400 text-xs sm:text-sm mb-3 sm:mb-4 px-2 inter-regular min-h-5 flex items-center justify-center">
+        <p
+          class="text-gray-400 text-xs sm:text-sm mb-3 sm:mb-4 px-2 inter-regular min-h-5 flex items-center justify-center"
+        >
           {{ visible ? ('UPLOAD.PLEASE_WAIT' | translate) : ('UPLOAD.OR_SELECT' | translate) }}
         </p>
         <button
@@ -343,29 +347,37 @@
     }
 
     <!-- Подсказки -->
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3 md:gap-4 mt-6 sm:mt-8 py-8 min-h-[140px]">
+    <div
+      class="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3 md:gap-4 mt-6 sm:mt-8 py-8 min-h-40 shrink-0 will-change-transform"
+    >
       <div
-        class="text-center p-3 sm:p-4 rounded-lg sm:rounded-xl bg-[#1A1A1A]/50 border border-[#232323] inter-medium"
+        class="text-center p-3 sm:p-4 rounded-lg sm:rounded-xl bg-[#1A1A1A]/50 border border-[#232323] inter-medium h-32 flex flex-col items-center justify-center transition-transform duration-200"
       >
-        <i class="pi pi-shield text-[#FF6600] text-lg sm:text-xl mb-1 sm:mb-2 shrink-0"></i>
+        <i
+          class="pi pi-shield text-[#FF6600] text-lg sm:text-xl mb-1 sm:mb-2 shrink-0 h-5 w-5 flex items-center justify-center"
+        ></i>
         <h4 class="text-white font-semibold text-xs sm:text-sm mb-1 inter-medium min-h-5">
           {{ 'UPLOAD.SAFE' | translate }}
         </h4>
         <p class="text-gray-400 text-xs inter-regular">{{ 'UPLOAD.SAFE_DESC' | translate }}</p>
       </div>
       <div
-        class="text-center p-3 sm:p-4 rounded-lg sm:rounded-xl bg-[#1A1A1A]/50 border border-[#232323] inter-medium"
+        class="text-center p-3 sm:p-4 rounded-lg sm:rounded-xl bg-[#1A1A1A]/50 border border-[#232323] inter-medium h-32 flex flex-col items-center justify-center transition-transform duration-200"
       >
-        <i class="pi pi-bolt text-[#FF6600] text-lg sm:text-xl mb-1 sm:mb-2 shrink-0"></i>
+        <i
+          class="pi pi-bolt text-[#FF6600] text-lg sm:text-xl mb-1 sm:mb-2 shrink-0 h-5 w-5 flex items-center justify-center"
+        ></i>
         <h4 class="text-white font-semibold text-xs sm:text-sm mb-1 inter-medium min-h-5">
           {{ 'UPLOAD.FAST' | translate }}
         </h4>
         <p class="text-gray-400 text-xs inter-regular">{{ 'UPLOAD.FAST_DESC' | translate }}</p>
       </div>
       <div
-        class="text-center p-3 sm:p-4 rounded-lg sm:rounded-xl bg-[#1A1A1A]/50 border border-[#232323] inter-medium"
+        class="text-center p-3 sm:p-4 rounded-lg sm:rounded-xl bg-[#1A1A1A]/50 border border-[#232323] inter-medium h-32 flex flex-col items-center justify-center transition-transform duration-200"
       >
-        <i class="pi pi-mobile text-[#FF6600] text-lg sm:text-xl mb-1 sm:mb-2 shrink-0"></i>
+        <i
+          class="pi pi-mobile text-[#FF6600] text-lg sm:text-xl mb-1 sm:mb-2 shrink-0 h-5 w-5 flex items-center justify-center"
+        ></i>
         <h4 class="text-white font-semibold text-xs sm:text-sm mb-1 inter-medium min-h-5">
           {{ 'UPLOAD.AVAILABLE' | translate }}
         </h4>

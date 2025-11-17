@@ -271,6 +271,7 @@ export class FileUploadComponent implements OnInit, OnDestroy {
             return;
           }
           this.showError(error?.message ?? this.translate.instant('UPLOAD.ERROR_UNKNOWN'));
+          this.router.navigate(['/error/505']);
         },
       });
   }

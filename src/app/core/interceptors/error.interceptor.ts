@@ -33,7 +33,7 @@ export class ErrorInterceptor implements HttpInterceptor {
       severity: 'error',
       summary: 'Ошибка сервера',
       detail: (error) => `Ошибка ${error.status}: ${error.statusText || 'Internal Server Error'}`,
-      navigateTo: '/error/500',
+      navigateTo: '/error/505',
     },
     {
       status: 0,

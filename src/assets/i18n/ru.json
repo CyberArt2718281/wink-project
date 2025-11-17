@@ -180,7 +180,7 @@
     "LOAD_ERROR": "Не удалось загрузить данные",
     "EXPORT_EXCEL": "Экспорт в Excel",
     "FILTERS_DETAILS": "Фильтры успешно сброшены",
-        "ROWS_PER_PAGE": "Строк на странице",
+    "ROWS_PER_PAGE": "Строк на странице",
     "VISIBLE_COLUMNS": "Видимые столбцы",
     "SELECT_COLUMNS": "Выберите столбцы для отображения",
     "FIRST_PAGE": "Первая страница",

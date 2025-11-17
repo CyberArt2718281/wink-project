@@ -23,11 +23,22 @@ export class InternalServerErrorComponent implements OnInit {
   }
 
   goHome(): void {
+    // Очищаем состояние ошибки перед переходом на главную
+    localStorage.removeItem('processedTableData');
+    localStorage.removeItem('jobId');
     this.router.navigate(['/']);
   }
 
   reloadPage(): void {
-    window.location.reload();
+    // Очищаем состояние ошибки перед перезагрузкой
+    localStorage.removeItem('processedTableData');
+    localStorage.removeItem('jobId');
+    // Устанавливаем флаг, чтобы перенаправить на главную после перезагрузки
+    localStorage.setItem('redirectAfterReload', 'true');
+    // Небольшая задержка для гарантии очистки, затем перезагружаем
+    setTimeout(() => {
+      window.location.reload();
+    }, 100);
   }
 
   contactSupport(): void {

@@ -28,7 +28,7 @@ export const routes: Routes = [
           import('./features/404/not-found.component').then((m) => m.NotFoundComponent),
   },
   {
-    path: 'error/500',
+    path: 'error/505',
         loadComponent: () =>
           import('./features/505/internal-server-error.component').then((m) => m.InternalServerErrorComponent),
   },
