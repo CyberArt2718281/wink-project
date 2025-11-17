@@ -224,3 +224,58 @@ button {
     backface-visibility: hidden;
   }
 }
+
+/* CLS оптимизация - предотвращение сдвигов */
+.overflow-x-auto {
+  will-change: transform;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+tbody tr {
+  transition: background-color 0.15s ease-in-out;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+/* Скелетон загрузки контейнера */
+.table-loading {
+  min-height: 24rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(90deg, #1a1a1a 0%, #232323 50%, #1a1a1a 100%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Стили для пустой таблицы */
+:host ::ng-deep tbody tr:last-child td {
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+  vertical-align: middle;
+}
+
+.no-results-icon {
+  animation: fadeInScale 0.3s ease-in-out;
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

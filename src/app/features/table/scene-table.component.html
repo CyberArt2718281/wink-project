@@ -1,9 +1,9 @@
 <p-toast position="top-center" class="w-full max-w-[95vw] sm:max-w-md mx-auto px-2 rounded-[40px]! inter-medium"></p-toast>
 <p-confirmDialog [style]="{ width: '90vw', maxWidth: '500px' }" styleClass="!bg-[#1A1A1A] !border !border-[#232323] !rounded-2xl inter-medium"></p-confirmDialog>
 
-<div class="bg-black min-h-screen py-6 px-4 sm:p-8 lg:p-10">
+<div class="bg-black min-h-screen py-6 px-4 sm:p-8 lg:p-10 flex flex-col">
   <!-- Заголовок с счётчиком -->
-  <div class="mb-8 min-h-24">
+  <div class="mb-8 min-h-24 shrink-0">
     <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6">
       <div>
         <div class="flex items-center gap-3 mb-2 min-h-12">
@@ -14,17 +14,17 @@
         </div>
         <p class="text-gray-400 text-sm ml-6 min-h-5">{{ 'SCENE_TABLE.ANALYSIS_RESULTS_DESC' | translate }}</p>
       </div>
-      <div class="bg-linear-to-br from-[#232323] to-[#1A1A1A] rounded-2xl px-6 py-4 border border-[#333333] shadow-lg shadow-black/50 backdrop-blur-sm min-w-[120px]">
+      <div class="bg-linear-to-br from-[#232323] to-[#1A1A1A] rounded-2xl px-6 py-4 border border-[#333333] shadow-lg shadow-black/50 backdrop-blur-sm min-w-32 h-24 flex flex-col items-center justify-center">
         <div class="text-center">
-          <div class="text-2xl font-bold text-[#FF6600] inter-extra-bold min-h-[32px] flex items-center justify-center">{{ totalRecords$ | async }}</div>
-          <div class="text-gray-500 text-xs mt-1 inter-medium">{{ 'SCENE_TABLE.RECORDS' | translate }}</div>
+          <div class="text-2xl font-bold text-[#FF6600] inter-extra-bold h-8 flex items-center justify-center">{{ totalRecords$ | async }}</div>
+          <div class="text-gray-500 text-xs mt-2 inter-medium h-5 flex items-center justify-center">{{ 'SCENE_TABLE.RECORDS' | translate }}</div>
         </div>
       </div>
     </div>
   </div>
 
   <!-- Панель действий (кнопки) -->
-  <div class="mb-6 min-h-[80px]" *ngIf="(columns$ | async)!.length > 0">
+  <div class="mb-6 min-h-20 shrink-0" *ngIf="(columns$ | async)!.length > 0">
     <div class="flex flex-col gap-2 mb-3">
       <label class="text-xs font-semibold text-gray-400 inter-medium uppercase tracking-wide">{{ 'COMMON.ACTIONS' | translate }}</label>
     </div>
@@ -37,8 +37,8 @@
         title="{{ 'SCENE_TABLE.EXPORT_EXCEL' | translate }}"
       >
         <i class="pi pi-file-excel text-base shrink-0"></i>
-        <span class="hidden sm:inline">{{ 'SCENE_TABLE.EXPORT_EXCEL' | translate }}</span>
-        <span class="sm:hidden">Excel</span>
+        <span class="inline" >{{ 'SCENE_TABLE.EXPORT_EXCEL' | translate }}</span>
+
       </button>
 
       <button
@@ -47,8 +47,7 @@
         title="{{ 'SCENE_TABLE.EXPORT_CSV' | translate }}"
       >
         <i class="pi pi-file text-base shrink-0"></i>
-        <span class="hidden sm:inline">{{ 'SCENE_TABLE.EXPORT_CSV' | translate }}</span>
-        <span class="sm:hidden">CSV</span>
+        <span class="inline">{{ 'SCENE_TABLE.EXPORT_CSV' | translate }}</span>
       </button>
 
       <button
@@ -74,7 +73,7 @@
   <!-- Панель фильтра столбцов (выезжающая) -->
   <div 
     *ngIf="showColumnFilter$ | async" 
-    class="mb-6 bg-linear-to-r from-[#232323] to-[#1A1A1A] border border-[#333333] rounded-2xl p-6 shadow-lg animate-in fade-in slide-in-from-top-2 duration-300"
+    class="mb-6 bg-linear-to-r from-[#232323] to-[#1A1A1A] border border-[#333333] rounded-2xl p-6 shadow-lg animate-in fade-in slide-in-from-top-2 duration-300 shrink-0 min-h-64"
   >
     <div class="mb-4">
       <h3 class="text-lg font-semibold text-white inter-extra-bold mb-4 flex items-center ">
@@ -130,7 +129,7 @@
   </div>
 
   <!-- Панель поиска и контролов -->
-  <div class="mb-6 min-h-[140px]">
+  <div class="mb-6 min-h-36 shrink-0">
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
       <!-- Поиск -->
       <div class="sm:col-span-2">
@@ -172,7 +171,7 @@
     </div>
 
   <!-- Таблица -->
-  <div class="bg-[#1A1A1A] border border-[#232323] rounded-2xl overflow-hidden shadow-lg min-h-[400px]" *ngIf="(columns$ | async)!.length > 0; else noData">
+  <div class="bg-[#1A1A1A] border border-[#232323] rounded-2xl overflow-hidden shadow-lg min-h-96 flex flex-col grow" *ngIf="(columns$ | async)!.length > 0; else noData">
     <div class="overflow-x-auto">
       <table class="w-full">
         <!-- Заголовок таблицы -->
@@ -197,7 +196,7 @@
           </tr>
         </thead>
         <!-- Тело таблицы -->
-        <tbody>
+        <tbody *ngIf="(paginatedRows$ | async)!.length > 0; else noResults">
           <tr 
             *ngFor="let row of getPaginatedRows(); let i = index; trackBy: trackByIndex"
             class="border-b border-[#232323] hover:bg-[#232323]/50 transition-colors duration-150 inter-medium"
@@ -281,14 +280,31 @@
             </td>
           </tr>
         </tbody>
+
+        <!-- Сообщение когда нет совпадений -->
+        <ng-template #noResults>
+          <tbody>
+            <tr>
+              <td [attr.colspan]="getVisibleColumns().length" class="px-4 sm:px-6 py-16 text-center">
+                <div class="flex flex-col items-center justify-center gap-4">
+                  <i class="pi pi-search text-5xl text-gray-600 no-results-icon"></i>
+                  <div>
+                    <p class="text-gray-300 text-lg font-semibold inter-medium">{{ 'SCENE_TABLE.NO_RESULTS' | translate }}</p>
+                    <p class="text-gray-500 text-sm inter-regular mt-2">{{ 'SCENE_TABLE.NO_RESULTS_DESC' | translate }}</p>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </ng-template>
       </table>
     </div>
 
     <!-- Информация о странице и контролы пагинации -->
-    <div class="bg-[#232323]/50 border-t border-[#333333] px-4 sm:px-6 py-4">
-      <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+    <div class="bg-[#232323]/50 border-t border-[#333333] px-4 sm:px-6 py-4 min-h-20 flex flex-col justify-center shrink-0">
+      <div class="flex flex-col sm:flex-row items-center justify-between gap-4 min-h-12">
         <!-- Информация о записях -->
-        <div class="text-gray-400 text-sm inter-regular">
+        <div class="text-gray-400 text-sm inter-regular h-6 flex items-center">
           <span *ngIf="(filteredRows$ | async)!.length > 0" class="text-gray-300 font-medium">
             {{ getPageInfo().start }} - {{ getPageInfo().end }} 
           </span>
@@ -300,7 +316,7 @@
         </div>
 
         <!-- Контролы пагинации -->
-        <div class="flex items-center gap-2">
+        <div class="flex items-center gap-2 h-10 shrink-0">
           <button
             (click)="firstPage()"
             [disabled]="(currentPage$ | async) === 0"
@@ -343,7 +359,7 @@
         </div>
 
         <!-- Всего записей -->
-        <div class="text-gray-400 text-xs inter-regular bg-[#2a2a2a] px-3 py-1.5 rounded-lg">
+        <div class="text-gray-400 text-xs inter-regular bg-[#2a2a2a] px-3 py-1.5 rounded-lg h-6 flex items-center shrink-0">
           Всего записей: {{ (totalRecords$ | async) }}
         </div>
       </div>

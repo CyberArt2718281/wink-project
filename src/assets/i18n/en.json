@@ -108,6 +108,8 @@
     "EXPORT": "Export",
     "NO_DATA": "No data to display",
     "NO_DATA_DESC": "Upload a file for analysis and results will be displayed here",
+    "NO_RESULTS": "No matches found",
+    "NO_RESULTS_DESC": "Change your search query or filters to find the data you need",
     "CHANGES_SAVED": "Changes saved",
     "SAVE_HINT": "Save (Enter)",
     "CANCEL_HINT": "Cancel (Esc)",
